@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: javascrit
+# key: +j
+# --
+
+
+#+BEGIN_SRC javascript
+$1
+#+END_SRC

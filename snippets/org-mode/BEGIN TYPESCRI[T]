@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: BEGIN TYPESCRI[T]
+# key: +t
+# --
+
+#+BEGIN_SRC typescript
+#+END_SRC

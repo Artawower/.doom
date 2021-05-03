@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: +h
+# key: +h
+# --
+
+#+BEGIN_SRC html
+$1
+#+END_SRC

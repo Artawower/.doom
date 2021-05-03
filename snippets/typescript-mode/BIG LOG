@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: BIG LOG
+# key: bl
+# --
+console.log('-----------------------------------');
+console.log($1);
+console.log('-----------------------------------');

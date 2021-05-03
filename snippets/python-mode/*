@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: *
+# key: *
+# --
+print('-'*80)
+print($1)
