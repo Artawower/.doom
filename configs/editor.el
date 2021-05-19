@@ -73,6 +73,8 @@
   (setq treemacs-width 45)
   )
 
+;; Another file manager
+(use-package ranger)
 ;; terminal
 (use-package vterm-toggle
   :defer t

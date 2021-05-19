@@ -40,19 +40,6 @@
 (use-package ranger)
 (setq-default evil-kill-on-visual-paste nil)
 
-;; (setq +lsp-company-backends '(company-tabnine company-capf))
-                                        ; (use-package exec-path-from-shell
-                                        ;   ;; :if (memq window-system '(mac ns x))
-                                        ;   :config
-                                        ;   (setenv "PERL5LIB" (concat "~/perl5/lib/perl5" ":"
-                                        ;                              (getenv "PERL5LIB")))
-                                        ;
-                                        ;   (setenv "LC_ALL" "en_US.UTF-8")
-                                        ;   (exec-path-from-shell-initialize)
-                                        ;   (exec-path-from-shell-copy-env "SSH_AGENT_PID")
-                                        ;   (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
-                                        ;   )
-
 (defun my-exec-path-from-shell-initialize ()
 
   (setenv "PERL5LIB" (concat "~/perl5/lib/perl5" ":"
