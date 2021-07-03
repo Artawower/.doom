@@ -17,7 +17,7 @@
 
     "a" 'counsel-org-agenda-headlines
     "c" 'dired-create-empty-file
-    "p" 'format-all-buffer
+    "p" '+format/buffer
     )
   :init
   (global-evil-leader-mode)
@@ -40,6 +40,11 @@
 (global-set-key (kbd "C-S-j") 'enlarge-window)
 (global-set-key (kbd "C-S-l") 'enlarge-window-horizontally)
 (global-set-key (kbd "C-S-h") 'shrink-window-horizontally)
+(global-set-key (kbd "C-c l") 'smerge-keep-lower)
+(global-set-key (kbd "C-c u") 'smerge-keep-upper)
+(global-set-key (kbd "C-c a") 'smerge-keep-all)
+(global-set-key (kbd "C-c j") 'smerge-next)
+(global-set-key (kbd "C-c k") 'smerge-prev)
 
 (global-set-key (kbd "s-e") 'emmet-expand-line)
 (global-set-key (kbd "C-s") 'save-buffer)

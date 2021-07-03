@@ -78,7 +78,7 @@
 (package! all-the-icons-ivy-rich)
 (package! heaven-and-hell)
 (package! nyan-mode)
-
+(package! treemacs-all-the-icons)
 ;; common
 (package! exec-path-from-shell)
 (package! bm)

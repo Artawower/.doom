@@ -11,12 +11,16 @@
   :config
   (setenv "GOPATH" (concat (getenv "HOME") "/go"))
   (setenv "PATH" (concat (getenv "HOME") "/go/bin"))
+
+  ;; (add-hook 'before-save-hook #'lsp-format-buffer t t)
   :init
   (defun lsp-go-install-save-hooks ()
     (add-hook 'before-save-hook #'lsp-format-buffer t t)
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
   (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
   (add-hook 'go-mode-hook '(lambda () (setq lsp-diagnostic-package :none)))
+
+
   (setq lsp-modeline-diagnostics-scope :workspace)
   (setq lsp-file-watch-threshold 4000)
   (setq lsp-ui-sideline-show-code-actions nil)
@@ -26,21 +30,46 @@
 
   )
 
-(use-package format-all
-  :init
-  (add-hook 'before-save-hook #'format-all-buffer)
-  )
+;; (with-eval-after-load 'lsp-mode (lambda ()
+;;   (add-hook 'before-save-hook #'+format/buffer nil t)))
+;; (use-package format-all
+;;   :init
+;;   (add-hook 'before-save-hook #'format-all-buffer)
+;;   )
 
 
 
 (use-package lsp-ui
   :after lsp
   :config
-  (setq lsp-ui-sideline-show-code-actions nil))
+  ;; (setq lsp-ui-doc-position 'top)
+  ;; (setq lsp-ui-doc-max-width 180)
+  ;; (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-sideline-diagnostic-max-line-length 200)
+  (setq lsp-ui-sideline-diagnostic-max-lines 5)
+  ;; (setq lsp-ui-sideline-show-symbol t)
+  ;; (setq lsp-ui-doc-alignment 'window)
+  (setq lsp-diagnostic-clean-after-change t)
+  ;; (setq lsp-ui-doc-delay 0.8)
+  ;; (setq lsp-ui-doc-use-webkit t)
+  ;; (setq lsp-ui-doc-use-childframe t)
+  ;; (setq lsp-ui-sideline-show-code-actions nil)
+  (add-hook 'before-save-hook #'+format/buffer nil t)
+  :init
+
+  (setq lsp-ui-sideline-diagnostic-max-lines 5)
+  )
 
 ;; AI completion
 (defun add-company-tabnine ()
   (add-to-list (make-local-variable 'company-backends) 'company-tabnine))
+
+(use-package company
+  :config
+  (setq company-idle-delay 500
+        company-minimum-prefix-length 2
+        )
+  )
 
 (use-package! company-tabnine
   :config
@@ -143,7 +172,6 @@
   :after lsp
   :init
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
-
   (setq read-process-output-max (* 1024 1024))
 
   (setq lsp-clients-angular-language-server-command
@@ -157,21 +185,31 @@
 
   )
 
+;; (setq-hook! 'typescript-mode-hook +format-with-lsp nil)
+;; (setq-hook! 'ng2-mode-hook +format-with-lsp nil)
+;; (setq-hook! 'typescript-mode-hook +format-with-lsp nil)
+
 (defun init-angular-env ()
   (add-hook 'typescript-mode-hook #'lsp)
+  ;; (add-hook 'typescript-mode-hook #'prettier-js-mode)
   (add-hook 'ng2-html-mode-hook #'lsp)
-  ;; (add-hook 'ng2-mode #'lsp)
+  (add-hook 'ng2-mode #'lsp)
+
+  (add-hook 'before-save-hook #'+format/buffer nil t)
   ;; (add-hook 'typescript-mode-hook #'my-flycheck-setup)
 
-  ;; (add-hook 'ng2-mode-hook #'lsp-deferred)
   )
+
+
+;; (add-hook 'before-save-hook #'+format/buffer nil t)
+
 (with-eval-after-load 'typescript-mode (init-angular-env))
 (with-eval-after-load 'ng2-html (init-angular-env))
 ;; (with-eval-after-load 'ng2-mode (init-angular-env))
 ;; (with-eval-after-load 'ng2-ts-mode (init-angular-env))
 
 ;; Vue js
-
+;; (add-hook 'before-save-hook #'+format/buffer nil t)
 (use-package web-mode
   :defer t
   :init

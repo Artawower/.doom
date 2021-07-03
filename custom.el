@@ -3,14 +3,18 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#21252B" "#E06C75" "#98C379" "#E5C07B" "#61AFEF" "#C678DD" "#56B6C2" "#ABB2BF"])
  '(custom-enabled-themes '(atom-one-dark))
  '(custom-safe-themes
-   '("0c860c4fe9df8cff6484c54d2ae263f19d935e4ff57019999edbda9c7eda50b8" default))
+   '("63bfcabeb44559c67d8827dc68cd6c4a6d3ce35ef4504343af12d42f24894e00" "0c860c4fe9df8cff6484c54d2ae263f19d935e4ff57019999edbda9c7eda50b8" default))
+ '(fci-rule-color "#3E4451")
  '(jdee-db-active-breakpoint-face-colors (cons "#1c1f2b" "#c792ea"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1c1f2b" "#c3e88d"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1c1f2b" "#676E95"))
+ '(lsp-ui-sideline-diagnostic-max-lines 7)
  '(objed-cursor-color "#ff5370")
- '(package-selected-packages '(atom-dark-theme python-mode ox-json nyan-mode))
+ '(package-selected-packages '(ox-pandoc atom-dark-theme python-mode ox-json nyan-mode))
  '(pdf-view-midnight-colors (cons "#EEFFFF" "#292D3E"))
  '(rustic-ansi-faces
    ["#292D3E" "#ff5370" "#c3e88d" "#ffcb6b" "#82aaff" "#c792ea" "#89DDFF" "#EEFFFF"])

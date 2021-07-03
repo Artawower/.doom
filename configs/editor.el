@@ -189,3 +189,7 @@
 
   (global-set-key (kbd "C-c C-s") 'yas-new-snippet)
   )
+
+(use-package treemacs-all-the-icons
+  :config
+  (treemacs-load-theme "all-the-icons"))
