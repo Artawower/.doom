@@ -53,7 +53,7 @@
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
         '((light . doom-nord-light)
-          (dark . atom-one-dark))) ;; Themes can be the list: (dark . (tsdh-dark wombat))
+          (dark . doom-one))) ;; Themes can be the list: (dark . (tsdh-dark wombat))
   ;; Optionall, load themes without asking for confirmation.
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
@@ -103,6 +103,13 @@
   (ivy-posframe-mode +1)
   )
 
+;; Google translate, why not?
+(use-package google-translate
+  :ensure t
+  :custom
+  (google-translate-backend-method 'curl)
+  :config
+   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 ;; (use-package all-the-icons-ivy-rich
 ;;   :after ivy

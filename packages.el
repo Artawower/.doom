@@ -62,7 +62,9 @@
 (package! org-superstar)
 (package! ob-restclient)
 (package! org-gcal)
-
+(package! company-org-roam)
+;; (package! org-roam)
+(package! org-roam-server)
 ;; (package! org-pretty-tags) ;; ??
 
 
@@ -82,6 +84,7 @@
 ;; common
 (package! exec-path-from-shell)
 (package! bm)
+(package! google-translate)
 
 
 ;; dired
@@ -139,8 +142,10 @@
 (package! pyimport)
 
 (package! lua-mode)
-;; (package! vue-mode)
+(package! vue-mode)
 
+;; (package! rust-mode)
+(package! rustic)
 
 ;; Markup
 (package! pug-mode)

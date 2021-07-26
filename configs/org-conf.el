@@ -26,7 +26,6 @@
    '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
    )
   (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
-
   :config
   (appendq! +ligatures-extra-symbols
             `(:checkbox      "☐"
@@ -101,3 +100,58 @@
 
 (require 'ox-json)
 ;; (provide 'org-conf)
+
+;; (use-package org-roam
+;;       :ensure t
+;;       :custom
+;;       (org-roam-directory (file-truename "~/Yandex.Disk.localized/org-roam"))
+;;       :bind (("C-c n l" . org-roam-buffer-toggle)
+;;              ("C-c n f" . org-roam-node-find)
+;;              ("C-c n g" . org-roam-graph)
+;;              ("C-c n i" . org-roam-node-insert)
+;;              ("C-c n c" . org-roam-capture)
+;;              ;; Dailies
+;;              ("C-c n j" . org-roam-dailies-capture-today))
+;;       :config
+;;       (setq org-roam-v2-ack t)
+;;       (org-roam-setup)
+;;       ;; If using org-roam-protocol
+;;       (require 'org-roam-protocol))
+
+(require 'org-roam-protocol)
+(setq org-roam-directory "~/Yandex.Disk.localized/org-roam")
+
+(use-package company-org-roam
+  :when (featurep! :completion company)
+  :after org-roam
+  :config
+  (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8080
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))
+
+(defun org-roam-server-open ()
+  "Ensure the server is active, then open the roam graph."
+  (interactive)
+  (smartparens-global-mode -1)
+  (org-roam-server-mode 1)
+  (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))
+  (smartparens-global-mode 1))
+
+;; automatically enable server-mode
+(after! org-roam
+  (smartparens-global-mode -1)
+  (org-roam-server-mode)
+  (smartparens-global-mode 1))

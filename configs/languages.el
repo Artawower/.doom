@@ -11,7 +11,12 @@
   :config
   (setenv "GOPATH" (concat (getenv "HOME") "/go"))
   (setenv "PATH" (concat (getenv "HOME") "/go/bin"))
-
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  :custom
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
   ;; (add-hook 'before-save-hook #'lsp-format-buffer t t)
   :init
   (defun lsp-go-install-save-hooks ()
@@ -27,16 +32,16 @@
   ;; (setq lsp-print-performance t)
   (setq lsp-idle-delay 0.500)
   (setq lsp-enable-file-watchers nil) ;; boost performance ?
-
   )
 
 ;; (with-eval-after-load 'lsp-mode (lambda ()
-;;   (add-hook 'before-save-hook #'+format/buffer nil t)))
+;;                                   (add-hook 'before-save-hook #'+format/buffer nil t)))
 ;; (use-package format-all
+;;   :after lsp
 ;;   :init
-;;   (add-hook 'before-save-hook #'format-all-buffer)
+;;   (add-hook 'before-save-hook #'format-all-buffer nil t)
 ;;   )
-
+;; (add-hook 'before-save-hook #'+format/buffer nil t)
 
 
 (use-package lsp-ui
@@ -67,7 +72,7 @@
 (use-package company
   :config
   (setq company-idle-delay 500
-        company-minimum-prefix-length 2
+        company-minimum-prefix-length 1
         )
   )
 
@@ -82,6 +87,24 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+                                        ; (use-package dap-mode
+                                        ;   :ensure
+                                        ;   :config
+                                        ;   (dap-ui-mode)
+                                        ;   (dap-ui-controls-mode 1)
+
+                                        ;   (require 'dap-lldb)
+                                        ;   (require 'dap-gdb-lldb)
+                                        ;   ;; installs .extension/vscode
+                                        ;   (dap-gdb-lldb-setup)
+                                        ;   (dap-register-debug-template
+                                        ;    "Rust::LLDB Run Configuration"
+                                        ;    (list :type "lldb"
+                                        ;          :request "launch"
+                                        ;          :name "LLDB::Run"
+                                        ; 	 :gdbpath "rust-lldb"
+                                        ;          :target nil
+                                        ;          :cwd nil)))
 
 (use-package dap-go
   :after go-mode
@@ -157,6 +180,45 @@
                          (require 'lsp-python-ms)
                          (lsp))))
 
+;; Rust
+;;
+;; (use-package rust-mode
+;;   :init
+;;   (setq rust-format-on-save t)
+;;   (add-hook 'rust-mode-hook
+;;             (lambda () (setq indent-tabs-more nil)))
+;;   )
+;;   https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/
+(use-package rustic
+  :ensure
+  :bind (:map rustic-mode-map
+         ("M-j" . lsp-ui-imenu)
+         ("M-?" . lsp-find-references)
+         ("C-c C-c l" . flycheck-list-errors)
+         ("C-c C-c a" . lsp-execute-code-action)
+         ("C-c C-c r" . lsp-rename)
+         ("C-c C-c q" . lsp-workspace-restart)
+         ("C-c C-c Q" . lsp-workspace-shutdown)
+         ("C-c C-c s" . lsp-rust-analyzer-status))
+  :config
+  ;; uncomment for less flashiness
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+
+  ;; comment to disable rustfmt on save
+  (setq rustic-format-on-save t
+        rustic-format-display-method 'ignore)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+(defun rk/rustic-mode-hook ()
+  ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+  ;; save rust buffers that are not file visiting. Once
+  ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+  ;; no longer be necessary.
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;                                  frontend
@@ -191,11 +253,13 @@
 
 (defun init-angular-env ()
   (add-hook 'typescript-mode-hook #'lsp)
-  ;; (add-hook 'typescript-mode-hook #'prettier-js-mode)
+  (add-hook 'typescript-mode-hook #'prettier-js-mode)
+  ;; (add-hook 'typescript-mode-hook #'before-save-mode)
   (add-hook 'ng2-html-mode-hook #'lsp)
+  ;; (add-hook 'ng2-html-mode-hook #'before-save-mode)
   (add-hook 'ng2-mode #'lsp)
 
-  (add-hook 'before-save-hook #'+format/buffer nil t)
+  ;; (add-hook 'before-save-hook #'+format/buffer nil t)
   ;; (add-hook 'typescript-mode-hook #'my-flycheck-setup)
 
   )
@@ -209,7 +273,7 @@
 ;; (with-eval-after-load 'ng2-ts-mode (init-angular-env))
 
 ;; Vue js
-;; (add-hook 'before-save-hook #'+format/buffer nil t)
+(add-hook 'before-save-hook #'+format/buffer nil t)
 (use-package web-mode
   :defer t
   :init
@@ -222,6 +286,7 @@
   (add-hook 'web-mode-hook '(lambda () (setq lsp-diagnostic-package :none)))
   (add-hook 'web-mode-hook #'company-mode)
   (add-hook 'web-mode-hook #'flycheck-mode)
+  (add-hook 'web-mode-hook #'prettier-js-mode)
   (add-hook 'web-mode-hook #'lsp)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   ;; (flycheck-add-next-checker 'typescript-tide '(warning . typescript-tslint) 'append)
@@ -243,6 +308,32 @@
                                        (message "Run when entering vue-html mode")
                                        (emmet-mode 1)))
   )
+(use-package vue-mode
+  :ensure t
+  :mode ("\\.vue\\'")
+  :init
+  ;; 0, 1, or 2, representing (respectively) none, low, and high coloring
+  (setq mmm-submode-decoration-level 1)
+  (add-hook 'web-mode-hook #'company-mode)
+  (add-hook 'web-mode-hook #'flycheck-mode)
+  (add-hook 'web-mode-hook #'prettier-js-mode)
+  (add-hook 'web-mode-hook #'lsp)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  )
+;; (add-hook 'vue-mode-hook (flycheck-select-checker 'javascript-eslint))
+(setq mmm-vue-html-mode-exit-hook (lambda ()
+                                    (message "Run when leaving vue-html mode")
+                                    (emmet-mode -1)))
+(setq mmm-vue-html-mode-enter-hook (lambda ()
+                                     (message "Run when entering vue-html mode")
+                                     (emmet-mode 1)))
+;; (setq mmm-js-mode-enter-hook (lambda () (setq syntax-ppss-table nil)))
+;; (setq mmm-typescript-mode-enter-hook (lambda () (setq syntax-ppss-table nil)))
+(custom-set-faces '(mmm-default-submode-face ((t (:background nil)))))
+(setq mmm-js-mode-enter-hook (lambda () (setq syntax-ppss-table nil)))
+(setq mmm-typescript-mode-enter-hook (lambda () (setq syntax-ppss-table nil)))
 
+;; (setq 'web-mode-javascript-indentation 2)
+(setq-default indent-tabs-mode nil)
 (use-package lua-mode
   :defer t)

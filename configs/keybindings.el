@@ -9,11 +9,13 @@
 
     "d" 'dup-debug
 
-
+    "o" 'org-mode
     "q" 'kill-current-buffer
     "v" 'vterm
     "`" 'vterm-toggle-cd
     "i" 'git-messenger:popup-message
+    "t" 'google-translate-at-point
+    "T" 'google-translate-query-translate
 
     "a" 'counsel-org-agenda-headlines
     "c" 'dired-create-empty-file

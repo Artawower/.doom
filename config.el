@@ -7,7 +7,8 @@
       user-mail-address "artawower@33gmail.com")
 
 ;; (load-theme 'atom-one-dark t)
-(setq doom-theme 'doom-material)
+;; (setq doom-theme 'doom-material)
+(setq doom-theme 'doom-one)
 
 (setq display-line-numbers-type 'relative)
 
