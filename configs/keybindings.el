@@ -2,7 +2,7 @@
   :defer t
   :config
   (evil-leader/set-key
-    "f" 'evilem-motion-next-line
+    "f" 'avy-goto-char
     "b" 'evilem-motion-previous-line
     "p" 'prettier-prettify
     "k" 'save-buffer-without-dtw
@@ -20,6 +20,11 @@
     "a" 'counsel-org-agenda-headlines
     "c" 'dired-create-empty-file
     "p" '+format/buffer
+    "s" 'publish-org-blog
+    "g" 'dogears-go
+
+    "h" 'lsp-ui-doc-show
+    "e" 'lsp-treemacs-errors-list
     )
   :init
   (global-evil-leader-mode)
@@ -51,5 +56,6 @@
 (global-set-key (kbd "s-e") 'emmet-expand-line)
 (global-set-key (kbd "C-s") 'save-buffer)
 (global-set-key (kbd "C-x C-/") 'company-tide)
+(global-set-key (kbd "C-x C-i") 'company-tabnine)
 
 (provide 'keybindings)

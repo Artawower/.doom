@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: rust
-# key: +r
+# key: rs
 # --
 
 #+BEGIN_SRC rust

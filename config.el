@@ -5,13 +5,14 @@
 (menu-bar-mode t)
 (setq user-full-name "Artur Yaroshenko"
       user-mail-address "artawower@33gmail.com")
-
+(setq use-package-verbose t)
 ;; (load-theme 'atom-one-dark t)
 ;; (setq doom-theme 'doom-material)
-(setq doom-theme 'doom-one)
+;; (setq doom-theme 'doom-moonlight)
+(setq doom-theme 'zaiste)
 
-(setq display-line-numbers-type 'relative)
-
+;; (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type nil)
 
 ;; Fix mac os error
 (when (string= system-type "darwin")
@@ -38,7 +39,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TEMPORARY SECTION
-(use-package ranger)
+;; (use-package ranger)
 (setq-default evil-kill-on-visual-paste nil)
 
 (defun my-exec-path-from-shell-initialize ()

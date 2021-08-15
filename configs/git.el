@@ -5,8 +5,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (require 'ssh-agency)
-
 (use-package git-gutter
   :defer t
   :init
@@ -17,9 +15,7 @@
 
 (use-package magit
   :defer t
-  :init
-  ;; (require 'keychain-environment)
-  ;; (keychain-refresh-environment)
+  :config
   (setq magit-git-debug t)
   ;; Open remote repo
   (defun parse-url (url)
@@ -62,22 +58,22 @@
 
   )
 
-
-;; (use-package doom-themes
-;;   :preface (defvar doom-nord-region-highlight t)
-;;   :init (load-theme 'doom-one t))
-
-
-
-;; (use-package forge
-;;   :after magit
-;;   )
+(use-package forge
+  :after magit
+  :config
+  ;; (setq auth-sources '((:source "~/.authinfo")))
+  (setq auth-sources '("~/.authinfo"))
+  (push '("git.palex-soft.com" "git.palex-soft.com/api/v4"
+          "gpalex" forge-gitlab-repository)
+        forge-alist)
+  (add-to-list 'ghub-insecure-hosts "git.palex-soft.com/api/v4")
+  )
 
 
 (use-package pretty-hydra
   :after git-messenger
   :bind ("<f6>" . toggles-hydra/body)
-  :init
+  :config
   (setq centaur-icon t)                          ;
   (defun icons-displayable-p ()
     "Return non-nil if `all-the-icons' is displayable."
@@ -99,18 +95,16 @@
               " "))))
        (propertize title 'face face)))))
 
-
-
-
 (use-package git-messenger
   ;; :defer t
   :bind (:map vc-prefix-map
          ("p" . git-messenger:popup-message)
          :map git-messenger-map
          ("m" . git-messenger:copy-message))
-  :init (setq git-messenger:show-detail t
-              git-messenger:use-magit-popup t)
   :config
+  (setq git-messenger:show-detail t
+        git-messenger:use-magit-popup t)
+  ;; :config
   (with-no-warnings
     (with-eval-after-load 'hydra
       (defhydra git-messenger-hydra (:color blue)
@@ -192,6 +186,7 @@
     ;; (advice-add #'git-messenger:popup-close :override #'(setq modal-opened 0))
     (advice-add #'git-messenger:popup-message :override #'my-git-messenger:popup-message)))
 
+;; Ligatures only for normal mode
 ;; (require 'evil)
 ;; (defun idle-commit-message()
 ;;   (cond

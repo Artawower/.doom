@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: structure key
+# key: jk
+# --
+
+$1: $2 \`json:"$1"\`

@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: jsdoc
+# key: d
+# --
+/**
+ * $1
+ * @param ${2:param name} {${3:type}} ${4:description}
+ * @example
+ * // returns 2
+ * globalNS.method1(5, 10);
+ * @example
+ * // returns 3
+ * globalNS.method(5, 15);
+ * @returns {Number} Returns the value of x for the equation.
+ */

@@ -74,7 +74,17 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; spellcheck
+(package! wucuo)
+(package! guess-language)
 
+(package! tree-sitter)
+(package! tree-sitter-langs)
+
+;; (package! prism) ;; Colorized nested block [useless]
+(package! ivy
+  :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
+  :recipe (:host github :repo "abo-abo/swiper"))
 ;; themes
 (package! atom-one-dark-theme)
 (package! all-the-icons-ivy-rich)
@@ -85,6 +95,9 @@
 (package! exec-path-from-shell)
 (package! bm)
 (package! google-translate)
+(package! dogears
+    :recipe (:host github :repo "alphapapa/dogears.el")
+)
 
 
 ;; dired
@@ -96,6 +109,7 @@
 ;; vim like navigation
 (package! evil-leader)
 (package! evil-easymotion)
+(package! evil-matchit)
 
 (package! wakatime-mode)
 
@@ -159,11 +173,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(package! ranger) ;; TEST
+;; (package! ranger) ;; TEST, nice but not so needfull
 ;; tools
 (package! origami)
 (package! restclient)
-;; (package! floobits)
+(package! floobits)
 
 ;; (package! nginx-mode)
 ;; (package! dockerfile-mode)
@@ -177,8 +191,13 @@
 (package! git-messenger) ;; butiful popup
 (package! pretty-hydra)
 
-;; Json exporter
+;; JSON exporter
 (package! ox-json)
 
 (when (featurep! :completion company)
   (package! company-tabnine))
+
+
+(package! night-owl-theme)
+(package! rebecca-theme)
+(package! kaolin-themes)

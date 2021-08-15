@@ -11,11 +11,16 @@
   :config
   (setenv "GOPATH" (concat (getenv "HOME") "/go"))
   (setenv "PATH" (concat (getenv "HOME") "/go/bin"))
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  :hook ((js-mode . lsp)
+         (go-mode . lsp)
+         (javascript-mode . lsp)
+         (web-mode . lsp)
+         (vue-mode . lsp))
   :custom
   (lsp-rust-analyzer-cargo-watch-command "clippy")
   (lsp-eldoc-render-all t)
-  (lsp-idle-delay 0.6)
+  (lsp-idle-delay 0.3)
   (lsp-rust-analyzer-server-display-inlay-hints t)
   ;; (add-hook 'before-save-hook #'lsp-format-buffer t t)
   :init
@@ -46,6 +51,7 @@
 
 (use-package lsp-ui
   :after lsp
+  :hook (lsp-mode . lsp-ui-mode)
   :config
   ;; (setq lsp-ui-doc-position 'top)
   ;; (setq lsp-ui-doc-max-width 180)
@@ -65,6 +71,12 @@
   (setq lsp-ui-sideline-diagnostic-max-lines 5)
   )
 
+(use-package prettier-js
+  :defer t
+  :hook ((ng2-html-mode . prettier-js-mode)
+         (ng2-ts-mode . prettier-js-mode)
+         (js-mode . prettier-js-mode))
+  )
 ;; AI completion
 (defun add-company-tabnine ()
   (add-to-list (make-local-variable 'company-backends) 'company-tabnine))
@@ -77,9 +89,11 @@
   )
 
 (use-package! company-tabnine
-  :config
+  :after company-mode
+  :init
   (setq +lsp-company-backends '(company-tabnine company-capf))
-  (setq company-backends '(company-tabnine))
+  (setq company-backends '(company-tabnine company-capf))
+  :config
   (add-company-tabnine))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -108,7 +122,7 @@
 
 (use-package dap-go
   :after go-mode
-  :init
+  :config
   (require 'dap-ui)
   (setq dap-auto-configure-features '(sessions locals controls tooltip))
   (set-fringe-style (quote (14 . 10))) ;; Left breakpoint sqr size ;)
@@ -133,7 +147,7 @@
 
 (use-package pipenv
   :hook (python-mode . pipenv-mode)
-  :init
+  :config
   (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
   (setq
    pipenv-projectile-after-switch-function
@@ -146,7 +160,7 @@
   (pyvenv-tracking-mode 1))
 
 (use-package python-mode
-  :init
+  :config
   (add-hook 'python-mode-hook
             (lambda ()
               (setq tab-width 4)
@@ -154,7 +168,6 @@
               (setq global-flycheck-mode 1)
               )
             )
-  :config
   (add-to-list 'company-backends #'company-tabnine)
   (add-to-list (make-local-variable 'company-backends) 'company-tabnine)
   )
@@ -174,23 +187,14 @@
 ;;                          (lsp))))  ; or lsp-deferred
 
 (use-package lsp-python-ms
-  :ensure t
   :init (setq lsp-python-ms-auto-install-server t)
   :hook (python-mode . (lambda ()
                          (require 'lsp-python-ms)
                          (lsp))))
 
 ;; Rust
-;;
-;; (use-package rust-mode
-;;   :init
-;;   (setq rust-format-on-save t)
-;;   (add-hook 'rust-mode-hook
-;;             (lambda () (setq indent-tabs-more nil)))
-;;   )
-;;   https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/
+(setq lsp-ui-sideline-diagnostic-max-lines 4)
 (use-package rustic
-  :ensure
   :bind (:map rustic-mode-map
          ("M-j" . lsp-ui-imenu)
          ("M-?" . lsp-find-references)
@@ -226,13 +230,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package js
+  :after lsp
+  :hook (js-mode . lsp-mode)
   :config
   (setenv "TSSERVER_LOG_FILE" "/tmp/tsserver.log")
-
   )
 (use-package ng2-mode
   :after lsp
-  :init
+  :config
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
   (setq read-process-output-max (* 1024 1024))
 
@@ -276,7 +281,7 @@
 (add-hook 'before-save-hook #'+format/buffer nil t)
 (use-package web-mode
   :defer t
-  :init
+  :config
   (require 'flycheck)
   (require 'lsp-ui-flycheck)
   (require 'lsp-ui)
@@ -301,6 +306,8 @@
   (setq-default indent-tabs-mode nil)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (setq typescript-indent-level 2)
+
   (setq mmm-vue-html-mode-exit-hook (lambda ()
                                       (message "Run when leaving vue-html mode")
                                       (emmet-mode -1)))
@@ -309,7 +316,6 @@
                                        (emmet-mode 1)))
   )
 (use-package vue-mode
-  :ensure t
   :mode ("\\.vue\\'")
   :init
   ;; 0, 1, or 2, representing (respectively) none, low, and high coloring

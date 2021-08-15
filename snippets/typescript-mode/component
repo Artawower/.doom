@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: component
+# key: nc
+# --
+
+@Component({
+    selector: 'app-$1',
+    templateUrl: './$1.component.html',
+    styleUrls: ['./$1.component.scss']
+})
+export class $2 {
+    constructor() {}
+}

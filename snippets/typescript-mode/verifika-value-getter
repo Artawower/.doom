@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Tmp value getter
+# key: tvg
+# --
+
+valueGetter: (params: GridColumn<QualityIssue>) => {
+  return params.data.$1;
+},

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org golang
+# key: +g
+# --
+
+#+BEGIN_SRC go
+$1
+#+END_SRC
