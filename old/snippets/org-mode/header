@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: Org mode header
+# key: !
+# --
+
+:PROPERTIES:
+:ID: $1
+:END:
+
+#+TITLE: $2
+#+DESCRIOTION: $3
+#+ROAM_TAGS: $4
+#+ID:$1
+#+ACTIVE:

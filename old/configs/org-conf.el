@@ -25,6 +25,7 @@
    '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
    '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
    )
+  (setq org-indent-mode-turns-on-hiding-stars t)
   (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
   (appendq! +ligatures-extra-symbols
             `(:checkbox      "☐"

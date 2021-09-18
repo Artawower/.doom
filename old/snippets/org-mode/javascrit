@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: javascrit
+# key: +j
+# --
+
+#+BEGIN_SRC js :cmd "org-babel-node" :results output drawer
+{$1:content}
+#+END_SRC

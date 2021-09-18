@@ -1,0 +1,11 @@
+# key: doc
+# name: doc
+# --
+/**
+ * $1
+ *
+ * @example <caption>$2</caption>
+ * \`\`\`\`
+ * $3 
+ * \`\`\`\`
+ */

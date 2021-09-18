@@ -25,6 +25,7 @@
 
     "h" 'lsp-ui-doc-show
     "e" 'lsp-treemacs-errors-list
+    "r" 'treemacs-select-window
     )
   :init
   (global-evil-leader-mode)
@@ -42,7 +43,11 @@
   ;;                                           (prettify-symbols-mode 1)))
 
   )
-
+(use-package reverse-im
+  :ensure t
+  :defer 0.1
+  :config
+  (reverse-im-activate "russian-computer"))
 (global-set-key (kbd "C-S-k") 'shrink-window)
 (global-set-key (kbd "C-S-j") 'enlarge-window)
 (global-set-key (kbd "C-S-l") 'enlarge-window-horizontally)

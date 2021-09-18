@@ -185,7 +185,7 @@
   :config
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
-        '((light . doom-nord-light)
+        '((light . zaiste)
           (dark . doom-moonlight))) ;; Themes can be the list: (dark . (tsdh-dark wombat))
   ;; Optionall, load themes without asking for confirmation.
   (setq heaven-and-hell-load-theme-no-confirm t)
@@ -204,6 +204,7 @@
   :defer t
   :config
   (setq treemacs-width 45)
+  (setq treemacs-position 'right)
   )
 
 ;; Another file manager
@@ -214,7 +215,6 @@
   :after vterm
   :config
   (setq vterm-toggle-scope 'project)
-
   )
 
 (use-package ivy-posframe
@@ -262,6 +262,17 @@
   (global-set-key (kbd "s-b") 'bm-toggle)
   (global-set-key (kbd "C-M-n") 'bm-next)
   (global-set-key (kbd "C-M-p") 'bm-previous)
+  :config
+  (setq bm-face
+        '((((class grayscale)
+            (background light)) (:background nil))
+          (((class grayscale)
+            (background dark))  (:background nil))
+          (((class color)
+            (background light)) (:foreground "red" :background nil))
+          (((class color)
+            (background dark))  (:foreground "red" :background nil)))
+        )
   (define-key global-map [f8] 'bookmark-jump)
   (define-key global-map [f9] 'bookmark-set)
 
@@ -291,13 +302,18 @@
 
 ;; indent
 (use-package indent-guide
-  :defer
   :init
-  (indent-guide-global-mode)
+  (indent-guide-global-mode 1)
+  :custom-face
+  (indent-guide-face ((t (:foreground "#7592e8" :slant normal))))
+
   :config
   (setq indent-guide-threshold 0)
-  (setq indent-guide-char ".")
+  (setq indent-guide-char "¦")
+  ;; (set-face-attribute 'indent-guide-face nil
+  ;;                     :foreground "#d2ecff")
 
+  (set-face-foreground 'indent-guide-face "red")
   (add-hook 'ng2-html-mode 'indent-guide-mode)
   (add-hook 'ng2-ts-mode 'indent-guide-mode)
   (add-hook 'yaml-mode 'indent-guide-mode)
@@ -368,3 +384,7 @@
 ;;                                  TMP!
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (+format/buffer)
+
+;; (format-all)

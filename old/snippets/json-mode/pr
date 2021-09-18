@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: pr
+# key: pr
+# --
+
+{
+    "venvPath": "$1",
+    "venv": "$2"
+}

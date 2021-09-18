@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org src json
+# key: +json
+# --
+
+#+BEGIN_SRC json
+$0
+#+END_SRC

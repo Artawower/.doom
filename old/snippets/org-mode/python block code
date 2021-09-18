@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: python block code
+# key: +p
+# --
+
+#+BEGIN_SRC python
+$1
+#+END_SRC

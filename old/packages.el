@@ -48,73 +48,157 @@
                                         ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
                                         ;(unpin! t)
+;;
 
-(package! all-the-icons-ivy-rich)
-(package! ivy-posframe)
-(package! all-the-icons-dired)
-(package! bm)
-(package! google-translate)
-(package! vterm-toggle)
-(package! rainbow-mode)
-(package! heaven-and-hell)
-(package! nyan-mode)
-(package! wakatime-mode)
-(package! indent-guide)
-(package! paren-face)
-(package! company-tabnine)
-(package! lsp-mode)
-(package! lsp-ui)
-(package! exec-path-from-shell)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;                                  org
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; org mode
+(package! org-superstar)
+(package! ob-restclient)
+(package! org-gcal)
+(package! company-org-roam)
+;; (package! org-roam)
+(package! org-roam-server)
+;; (package! org-pretty-tags) ;; ??
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;                                  editor
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; spellcheck
+(package! wucuo)
+(package! guess-language)
+
 (package! tree-sitter)
 (package! tree-sitter-langs)
-(package! typescript-mode)
-(package! ng2-mode)
 
-(package! pipenv)
-(package! python-mode)
-(package! lsp-python-ms)
-(package! web-mode)
-(package! forge)
-(package! evil-leader)
-(package! org-superstar)
-(package! org-roam)
-(package! org-sticky-header)
-(unpin! org-roam)
-(package! websocket)
-(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
-(package! restclient)
-(package! evil-matchit)
-(package! docker-compose-mode)
-(package! dockerfile-mode)
-(package! jenkinsfile-mode)
-(package! ob-restclient)
-(package! emmet-mode)
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
-(package! dap-mode)
-(package! undo-tree)
-(package! reverse-im)
-(package! pug-mode)
-(package! prettier)
-(package! package-lint)
-(package! package-build)
-(package! git-messenger)
-(package! hydra)
-(package! lsp-ivy)
-(package! company-box)
-;; (package! prettier-js)
-(package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
-(package! atom-one-dark-theme)
-(package! origami)
-;; (package! affe)
-;; (package! markdown-preview-mode)
-(package! org-fancy-priorities)
+;; (package! prism) ;; Colorized nested block [useless]
 (package! ivy
   :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
   :recipe (:host github :repo "abo-abo/swiper"))
+;; themes
+(package! atom-one-dark-theme)
+(package! all-the-icons-ivy-rich)
+(package! heaven-and-hell)
+(package! nyan-mode)
+(package! treemacs-all-the-icons)
+;; common
+(package! exec-path-from-shell)
+(package! bm)
+(package! google-translate)
+(package! dogears
+    :recipe (:host github :repo "alphapapa/dogears.el")
+)
 
-;; TMP
-;; Not its not so usefull like company mode. But performance is totally better!
-;; (package! corfu)
-;; (package! orderless)
 
-(package! outline-minor-faces)
+;; dired
+(package! all-the-icons-dired)
+
+;; Ivy
+(package! ivy-posframe)
+
+;; vim like navigation
+(package! evil-leader)
+(package! evil-easymotion)
+(package! evil-matchit)
+
+(package! wakatime-mode)
+
+;; (package! origami) ; Package for good folding
+
+;; ivy
+(package! all-the-icons-ivy-rich)
+
+;; indent
+(package! indent-guide)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;                                  languages/frameworks
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; AI completion
+(package! company-tabnine)
+(package! lsp-mode)
+;; (package! company-web)
+;; (package! company-posframe)
+
+;; frontend
+(package! ng2-mode)
+(package! web-mode)
+(package! prettier-js)
+
+;; Golang
+(package! company-go)
+(package! go-eldoc)
+(package! go-scratch)
+(package! go-dlv)
+(package! dap-mode)
+(package! go-playground)
+
+;; Python
+(package! python-mode)
+(package! lsp-pyright)
+(package! lsp-python-ms)
+(package! pipenv)
+;; (package! pyenv-mode)
+(package! pyimport)
+
+(package! lua-mode)
+(package! vue-mode)
+
+;; (package! rust-mode)
+(package! rustic)
+
+;; Markup
+(package! pug-mode)
+(package! emmet-mode)
+;; (package! ac-emmet) ;; autocomplete for emmet
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;                                  tools
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(package! reverse-im)
+;; (package! ranger) ;; TEST, nice but not so needfull
+;; tools
+(package! origami)
+(package! restclient)
+(package! floobits)
+
+;; (package! nginx-mode)
+;; (package! dockerfile-mode)
+;; (package! docker-compose-mode)
+;;
+;; Database
+;; (package! edbi)
+
+;; Git
+;; (package! forge) ;; remote access git
+(package! git-messenger) ;; butiful popup
+(package! pretty-hydra)
+
+;; JSON exporter
+(package! ox-json)
+
+(when (featurep! :completion company)
+  (package! company-tabnine))
+
+
+(package! night-owl-theme)
+(package! rebecca-theme)
+(package! kaolin-themes)

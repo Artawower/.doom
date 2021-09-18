@@ -1,0 +1,26 @@
+# key: +st
+# name: stories
+# --
+import { moduleMetadata } from '@storybook/angular';
+
+import { AppAnimationsModule } from 'src/app/app-animations.module';
+
+export default {
+  title: '$1',
+  decorators: [
+    moduleMetadata({
+      imports: [$2, AppAnimationsModule],
+    }),
+  ],
+};
+
+export const $3 = () => ({
+  props: {},
+  templateUrl: '$4.stories.html',
+  styles: [
+    \`
+     .row, .box {
+         width: 100%;
+      }\`,
+  ],
+})

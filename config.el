@@ -1,57 +1,1043 @@
-
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-;; performance
-(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
-(menu-bar-mode t)
-(setq user-full-name "Artur Yaroshenko"
-      user-mail-address "artawower@33gmail.com")
-(setq use-package-verbose t)
-;; (load-theme 'atom-one-dark t)
-;; (setq doom-theme 'doom-material)
-;; (setq doom-theme 'doom-moonlight)
-(setq doom-theme 'zaiste)
 
-;; (setq display-line-numbers-type 'relative)
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets.
+(setq user-full-name "darkawower"
+      user-mail-address "artawower@mail.ru")
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
+;; are the three important ones:
+;;
+;; + `doom-font'
+;; + `doom-variable-pitch-font'
+;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;;
+;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+;; font string. You generally only need these two:
+;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
+;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+(setq doom-theme 'doom-moonlight)
+
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type nil)
-
-;; Fix mac os error
-(when (string= system-type "darwin")
-  (setq dired-use-ls-dired nil))
+(setq display-line-numbers nil)
 
 
-
-(add-to-list 'load-path "~/.doom.d/configs/")
-
-
-(load! "./configs/editor.el")
-(load! "./configs/org-conf.el")
-(load! "./configs/keybindings.el")
-(load! "./configs/tools.el")
-(load! "./configs/languages.el")
-(load! "./configs/git.el")
-
-;; Specific frameworks
-;; (load! "./configs/angular2.el")
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Here are some additional functions/macros that could help you configure Doom:
 ;;
-;;                                  Common configs
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
 ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TEMPORARY SECTION
-;; (use-package ranger)
-(setq-default evil-kill-on-visual-paste nil)
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
 
-(defun my-exec-path-from-shell-initialize ()
+;;; Variables
+;;;; Additional colors
+(setq +m-color-main "#61AFEF"
+      +m-color-secondary "red")
 
-  (setenv "PERL5LIB" (concat "~/perl5/lib/perl5" ":"
-                             (getenv "PERL5LIB")))
+;;; My custom functions
+(defun toggle-maximize-buffer () "Maximize buffer"
+       (interactive)
+       (if (= 1 (length (window-list)))
+           (jump-to-register '_)
+         (progn
+           (window-configuration-to-register '_)
+           (delete-other-windows))))
 
-  (setenv "LC_ALL" "en_US.UTF-8")
+;;; Fonts
+
+(set-frame-font "JetBrainsMono Nerd Font 15" nil t)
+
+(defconst jetbrains-ligature-mode--ligatures
+  '("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
+    "<=>" "==" "!=" "<=" ">=" "=:=" "!==" "&&" "||" "..." ".."
+    "|||" "///" "&&&" "===" "++" "--" "=>" "|>" "<|" "||>" "<||"
+    "|||>" "<|||" ">>" "<<" "::=" "|]" "[|" "{|" "|}"
+    "[<" ">]" ":?>" ":?" "/=" "[||]" "!!" "?:" "?." "::"
+    "+++" "??" "###" "##" ":::" "####" ".?" "?=" "=!=" "<|>"
+    "<:" ":<" ":>" ">:" "<>" "***" ";;" "/==" ".=" ".-" "__"
+    "=/=" "<-<" "<<<" ">>>" "<=<" "<<=" "<==" "<==>" "==>" "=>>"
+    ">=>" ">>=" ">>-" ">-" "<~>" "-<" "-<<" "=<<" "---" "<-|"
+    "<=|" "/\\" "\\/" "|=>" "|~>" "<~~" "<~" "~~" "~~>" "~>"
+    "<$>" "<$" "$>" "<+>" "<+" "+>" "<*>" "<*" "*>" "</>" "</" "/>"
+    "<->" "..<" "~=" "~-" "-~" "~@" "^=" "-|" "_|_" "|-" "||-"
+    "|=" "||=" "#{" "#[" "]#" "#(" "#?" "#_" "#_(" "#:" "#!" "#="
+    "&="))
+
+(sort jetbrains-ligature-mode--ligatures (lambda (x y) (> (length x) (length y))))
+
+(dolist (pat jetbrains-ligature-mode--ligatures)
+  (set-char-table-range composition-function-table
+                        (aref pat 0)
+                        (nconc (char-table-range composition-function-table (aref pat 0))
+                               (list (vector (regexp-quote pat)
+                                             0
+                                             'compose-gstring-for-graphic)))))
+
+;;; Core
+(setq warning-minimum-level :emergency)
+(setq read-process-output-max (* 1024 1024))
+
+(setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
+(set-window-buffer nil (current-buffer))
+
+
+
+;; Spaces insted of tabs
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+
+;;; Completion
+(use-package ivy-rich
+  :hook (ivy-mode . ivy-rich-mode)
+  :after ivy)
+
+(use-package counsel-projectile
+  :defer 0.1)
+
+(use-package all-the-icons-ivy-rich
+  :defer 0.1)
+
+(use-package all-the-icons-ivy-rich
+  :after (all-the-icons ivy-rich counsel-projectile all-the-icons-ivy-rich)
+  :config
+  (all-the-icons-ivy-rich-mode 1)
+  (ivy-rich-mode 1)
+
+  (let* ((col-def '((all-the-icons-ivy-rich-file-icon)
+                    (file-name-nondirectory (:width 0.2 :face (:foreground "#61AFEF" :slant 'italic)))
+                    ((lambda (str) (string-join (butlast (split-string (counsel-projectile-find-file-transformer str) "/")) "/")) (:width 0.4))
+                    ;; (counsel-projectile-find-file-transformer (:width 0.4))
+                    (all-the-icons-ivy-rich-project-file-size (:width 7 :face all-the-icons-ivy-rich-size-face))
+                    (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-file-modes-face))
+                    (all-the-icons-ivy-rich-project-file-id (:width 12 :face all-the-icons-ivy-rich-file-owner-face))
+                    (all-the-icons-ivy-rich-project-file-modification-time (:face all-the-icons-ivy-rich-time-face)))))
+    (ivy-rich-set-columns 'projectile-find-file col-def)
+    (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
+    (ivy-rich-set-columns 'projectile--find-file col-def)))
+
+(use-package ivy-posframe
+  :after ivy
+  :custom-face
+  (ivy-posframe-border ((t (:background ,+m-color-main))))
+  :init
+  (ivy-posframe-mode 1)
+  :config
+  (setq ivy-posframe-parameters '((internal-border-width . 3) (left-fringe . 18) (right-fringe . 18))
+        ivy-posframe-height 14
+        ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
+  ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
+  (defun ivy-posframe-get-size ()
+    "Func for detect ivy posframe size after resize dynamically"
+    (list
+     :height ivy-posframe-height
+     :width ivy-posframe-width
+     :min-height (or ivy-posframe-min-height
+                     (let ((height (+ ivy-height 1)))
+                       (min height (or ivy-posframe-height height))
+                       ))
+     :min-width (or ivy-posframe-min-width
+                    (let ((width (round (* (frame-width) 0.9))))
+                      (min width (or ivy-posframe-width width))
+                      ))
+     ))
+  )
+
+;;; Formatter
+
+;; Improve counsel search (async)
+(use-package format-all
+  :defer 0.1
+  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . format-all-mode)
+  :config
+  (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
+
+(defun my-ecmascript-formatter ()
+  "My custom chaif of formatters for ecmascript and html."
+  (interactive)
+  (prettier-prettify)
+  (+format/buffer))
+
+(defun my-install-formatter ()
+  (add-hook 'before-save-hook 'my-ecmascript-formatter))
+
+(use-package prettier
+  :defer 0.3
+  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . my-install-formatter))
+
+;; (use-package prettier-js
+;;   :defer 0.3
+;;   ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . prettier-js-mode)
+;;   :config
+;;   (setq prettier-js-args '(
+;;                            "--trailing-comma" "all"
+;;                            "--bracket-spacing" "true")))
+
+
+;;; Undo
+(use-package undo-tree
+  :defer 0.3
+  :config
+  (setq undo-tree-auto-save-history t)
+  (setq undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
+  ;; (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode))
+
+;;; Spell check
+;; (setq ispell-program-name "aspell")
+;; You could add extra option "--camel-case" for since Aspell 0.60.8
+;; @see https://github.com/redguardtoo/emacs.d/issues/796
+;; (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+(setq-default flyspell-prog-text-faces
+              '(tree-sitter-hl-face:comment
+                tree-sitter-hl-face:doc
+                tree-sitter-hl-face:string
+                font-lock-comment-face
+                font-lock-doc-face
+                font-lock-string-face))
+
+(setq spell-fu-directory "~/.doom.d/dictionary") ;; Please create this directory manually.
+(setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
+(after! ispell
+  (setq ispell-program-name "aspell"
+        ;; Notice the lack of "--run-together"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+  (ispell-kill-ispell t))
+
+(add-hook 'text-mode-hook 'flyspell-mode!)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+;;; Folding
+;;;; Html
+(use-package origami
+  :defer 0.3
+  :bind (:map evil-normal-state-map
+         ("SPC z a" . origami-toggle-node)
+         ("SPC z r" . origami-open-all-nodes)
+         ("SPC z m" . origami-close-all-node))
+  :hook ((ng2-html-mode html-mode) . origami-mode))
+;;;; Outline
+(use-package outline-minor-faces
+  :after outline
+  :config (add-hook 'outline-minor-mode-hook
+                    'outline-minor-faces-add-font-lock-keywords))
+
+;;; File managers
+;;;; treemacs
+(use-package treemacs
+  :defer 0.1
+  :custom
+  (treemacs-width 45))
+
+;;;; Dired
+(use-package all-the-icons-dired
+  :defer 0.2
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+;;; Bookmarks
+;;;; quick bm
+(use-package bm
+  :defer 0.1
+  :custom-face
+  (bm-face ((t (:foreground ,+m-color-secondary))))
+  :bind (("C-M-n" . bm-next)
+         ("C-M-p" . bm-previous)
+         ("s-b" . bm-toggle)))
+
+;;;; Doom bm
+(use-package bookmark
+  :config
+  (setq bookmark-save-flag 1)
+  (setq bookmark-default-file "~/.doom.d/bookmarks"))
+
+
+;;; Google translate
+(use-package google-translate
+  :defer 0.1
+  :bind
+  (:map google-translate-minibuffer-keymap
+   ("C-k" . google-translate-next-translation-direction))
+  :config
+  (require 'google-translate-smooth-ui)
+  (setq google-translate-backend-method 'curl)
+  (setq google-translate-translation-directions-alist
+        '(("en" . "ru") ("ru" . "en") ))
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+
+
+;;; Terminal
+(use-package vterm-toggle
+  :defer 0.1
+  :config
+  (setq vterm-toggle-scope 'project))
+
+
+;;; Colors
+(use-package rainbow-mode
+  :hook (((css-mode scss-mode org-mode emacs-lisp-mode typescript-mode js-mode). rainbow-mode))
+  :defer 0.3)
+
+;; TODO
+;; (use-package hl-todo
+;;
+;;   :defer 0.1
+;;   :init
+;;   (global-hl-todo-mode 1)
+;;   :config
+;;   (setq hl-todo-keyword-faces
+;;         '(("TODO"   . "#E5C07B")
+;;           ("FIXME"  . "#E06C75")
+;;           ("DEBUG"  . "#C678DD")
+;;           ("GOTCHA" . "#FF4500")
+;;           ("NOTE"   . "#98C379")
+;;           ("STUB"   . "#61AFEF"))))
+
+;;; Themes
+;;;; Theme switcher
+(use-package heaven-and-hell
+  :after doom-themes
+  :init
+  (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
+  (setq heaven-and-hell-themes
+        '((light . zaiste)
+          (dark . doom-moonlight)))
+  (setq heaven-and-hell-load-theme-no-confirm t)
+  :hook (after-init . heaven-and-hell-init-hook)
+  :bind (("<f5>" . heaven-and-hell-toggle-theme)))
+
+;;;; Modeline
+;; The most important package in the world
+(use-package nyan-mode
+  :after doom-modeline
+  :init
+  (nyan-mode))
+
+(use-package doom-modeline
+  :defer 0.1
+  :config
+  (setq doom-modeline-buffer-file-name-style 'file-name))
+
+;;; Time track
+(use-package wakatime-mode
+  :defer 0.2
+  :config
+  (global-wakatime-mode))
+
+;;; Indent guide
+(use-package indent-guide
+  :defer 0.2
+  :hook ((web-mode
+          emacs-lisp-mode
+          html-mode
+          scss-mode
+          css-mode
+          go-mode
+          typescript-mode
+          js-mode
+          ng2-ts-mode
+          python-mode) . indent-guide-mode)
+  :custom-face
+  (indent-guide-face ((t (:foreground ,+m-color-main))))
+  :config
+  (setq indent-guide-char "|")
+  (setq indent-guide-delay 0.2))
+
+;;; Fast commenting
+(use-package turbo-log
+  :bind (("C-s-l" . turbo-log-print)
+         ("C-s-h" . turbo-log-comment-all-logs)
+         ("C-s-s" . turbo-log-uncomment-all-logs)
+         ("C-s-x" . turbo-log-delete-all-logs))
+  :config
+  (setq turbo-console--prefix "✰")
+  (setq turbo-log--ecmascript-loggers '("console.log" "console.debug")))
+
+;;; Quickly type converting
+(use-package quicktype
+  :bind (("C-x j v" . quicktype-json-to-type)
+         ("C-x j p" . quicktype-paste-json-as-type)
+         ("C-x j q" . quicktype)))
+
+;;; Programming
+;; Common configurations for all programming languages
+;;;; Lsp
+(use-package lsp
+  :defer 0.1
+  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode) . lsp-deferred))
+  :custom
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-idle-delay 0.3)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-eldoc-render-all nil)
+  (lsp-prefer-flymake nil)
+  (lsp-file-watch-threshold 4000)
+  (lsp-modeline-diagnostics-scope :workspace)
+  (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
+  :config
+  (let ((home-path (getenv "HOME")))
+    (setenv "GOPATH" (concat home-path "/go"))
+    (setenv "PATH" (concat home-path "/go/bin")))
+  (setq lsp-disabled-clients '(html html-ls))
+
+  (setq lsp-eldoc-hook nil))
+
+(use-package lsp-ivy
+  :after lsp)
+
+(use-package lsp-ui
+  :after lsp-mode
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-sideline-diagnostic-max-line-length 200
+        lsp-ui-sideline-diagnostic-max-lines 5
+        lsp-ui-doc-delay 2
+        lsp-ui-doc-show-with-mouse nil
+        lsp-ui-doc-border +m-color-main))
+
+;;;; Syntax highlight
+(use-package tree-sitter-langs
+  :defer 0.1)
+
+(use-package tree-sitter
+  :after tree-sitter-langs
+  :hook ((go-mode typescript-mode css-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode) . tree-sitter-hl-mode)
+  :config
+  (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
+  (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
+  (push '(scss-mode . css) tree-sitter-major-mode-language-alist))
+
+
+;;;; Company
+(defun my-setup-tabnine ()
+  (interactive)
+  (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
+  (setq-local company-backends '((company-tabnine :separate company-capf))))
+;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf company-yasnippet)))
+;; (setq-local company-backends '((company-tabnine :separate company-capf company-yasnippet))))
+;; (setq-local +lsp-company-backends '(company-tabnine :separate company-capf company-yasnippet))
+;; (setq-local company-backends '(company-tabnine :separate company-capf company-yasnippet)))
+
+(my-setup-tabnine)
+;; Autocomplete with AI
+(use-package company-tabnine
+  :after company
+  :bind (("C-x C-i" . company-tabnine))
+  :config
+  (setq company-idle-delay 0.2)
+  (setq company-show-numbers nil)
+  (setq company-tabnine-show-annotation t)
+  (my-setup-tabnine))
+
+(add-hook! (go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode emacs-lisp-mode)
+           #'reset-lsp-backends)
+
+(defun reset-lsp-backends-straightaway ()
+  (my-setup-tabnine))
+
+(defun reset-lsp-backends ()
+  (run-at-time "1 sec" nil #'reset-lsp-backends-straightaway))
+
+(advice-add 'lsp :after #'reset-lsp-backends)
+
+(use-package company-box
+  :after company
+  :hook (company-mode . company-box-mode))
+
+;; Languages
+;;;; Lisp
+;; (use-package paren-face
+;;   :defer 0.3
+;;   :init
+;;   (global-paren-face-mode 1))
+
+(use-package elisp-mode
+  :defer 0.3
+  :bind (("C-c o" . outline-cycle)
+         ("C-c r" . outline-show-all)
+         ("C-c m" . outline-hide-body)
+         ("C-c ]" . outline-next-heading)
+         ("C-c [" . outline-previous-heading)
+         ("C-c c" . counsel-outline)
+         ("C-c e" . outline-hide-entry)
+         ("C-c t" . outline-toggle-children)
+         ("C-c b" . outline-cycle-buffer)))
+
+(use-package package-build
+  :defer 0.3)
+
+(use-package package-lint
+  :defer 0.1)
+
+;;;; Typescript
+(setenv "TSSERVER_LOG_FILE" "/tmp/tsserver.log")
+(use-package typescript-mode
+  :defer 0.1
+  :config
+  (setq typescript-indent-level 2)
+  (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
+
+(use-package ng2-mode
+  :after typescript-mode
+  :hook (ng2-html-mode . web-mode)
+  :config
+  (setq lsp-clients-angular-language-server-command
+        '("node"
+          "/usr/local/lib/node_modules/@angular/language-server"
+          "--ngProbeLocations"
+          "/usr/local/lib/node_modules"
+          "--tsProbeLocations"
+          "/usr/local/lib/node_modules"
+          "--stdio")))
+
+
+;;;; Rust
+(use-package rustic
+  :defer 0.1
+  :bind (:map rustic-mode-map
+         ("M-j" . lsp-ui-imenu)
+         ("M-?" . lsp-find-references)
+         ("C-c C-c l" . flycheck-list-errors)
+         ("C-c C-c a" . lsp-execute-code-action)
+         ("C-c C-c r" . lsp-rename)
+         ("C-c C-c q" . lsp-workspace-restart)
+         ("C-c C-c Q" . lsp-workspace-shutdown)
+         ("C-c C-c s" . lsp-rust-analyzer-status))
+  :config
+  ;; uncomment for less flashiness
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+
+  ;; comment to disable rustfmt on save
+  (setq rustic-format-on-save t
+        rustic-format-display-method 'ignore)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+(defun rk/rustic-mode-hook ()
+  ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+  ;; save rust buffers that are not file visiting. Once
+  ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+  ;; no longer be necessary.
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t)))
+
+;;;; Python
+(use-package pipenv
+  :defer 0.1
+  :hook (python-mode . pipenv-mode)
+  :config
+  (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
+  (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+
+(use-package python-mode
+  :defer 0.1
+  :hook (python-mode . format-all-mode)
+  :config
+  (setq pytnon-indent-level 4))
+
+(use-package lsp-python-ms
+  :defer 0.1
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-python-ms)
+                         (lsp)))
+  :init
+  (setq lsp-python-ms-auto-install-server t))
+
+;;;; Web mode
+(use-package web-mode
+  :defer 0.1
+  :config
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+  (setq web-mode-comment-formats
+        '(("java"       . "/*")
+          ("javascript" . "//")
+          ("typescript" . "//")
+          ("vue"        . "//")
+          ("php"        . "/*")
+          ("pug"        . "//")
+          ("css"        . "/*")))
+  ;; (add-to-list 'web-mode-comment-formats '("pug" . "//"))
+  ;; (setcdr (assoc "javascript" web-mode-comment-formats) "//")
+  ;; (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2))
+
+;;;; Pug
+(use-package pug-mode
+  :defer 0.3)
+
+;;;; Html
+(use-package emmet-mode
+  :hook ((scss-mode . emmet-mode) (css-mode . emmet-mode) (ng2-html-mode . emmet-mode) (html-mode . emmet-mode))
+  :defer 0.1)
+
+;;;; Json
+(use-package json-mode
+  :defer 0.1
+  :hook (json-mode . format-all-mode))
+
+;;;; Debug
+(use-package dap-mode
+  :defer 0.3)
+
+;;;; Docker compose
+(use-package docker-compose-mode
+  :defer 0.1)
+
+;;;; Docker
+(use-package dockerfile-mode
+  :defer 0.1)
+
+;;;; Jenkins
+(use-package jenkinsfile-mode
+  :defer 0.1
+  :config)
+
+;;; Git
+(use-package magit
+  :defer 0.3
+  :config
+  (define-key transient-map        "q" 'transient-quit-one)
+  (define-key transient-edit-map   "q" 'transient-quit-one)
+  (define-key transient-sticky-map "q" 'transient-quit-seq))
+
+(use-package forge
+  :after magit
+  :config
+  (setq auth-sources '("~/.authinfo"))
+  (push '("git.palex-soft.com" "git.palex-soft.com/api/v4"
+          "gpalex" forge-gitlab-repository)
+        forge-alist)
+  ;; (add-to-list 'ghub-insecure-hosts "git.palex-soft.com/api/v4")
+  )
+
+(use-package git-gutter
+  :defer t
+  :init
+  (global-git-gutter-mode)
+  (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
+  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
+  )
+
+;;;; Git messanger
+(use-package git-messenger
+  :defer 0.1
+  :bind (:map vc-prefix-map
+         ("p" . git-messenger:popup-message)
+         :map git-messenger-map
+         ("m" . git-messenger:copy-message))
+  :config
+  (setq git-messenger:show-detail t
+        git-messenger:use-magit-popup t)
+  ;; :config
+  (with-no-warnings
+    (with-eval-after-load 'hydra
+      (defhydra git-messenger-hydra (:color blue)
+        ("s" git-messenger:popup-show "show")
+        ("c" git-messenger:copy-commit-id "copy hash")
+        ("m" git-messenger:copy-message "copy message")
+        ("," (catch 'git-messenger-loop (git-messenger:show-parent)) "go parent")
+        ("q" git-messenger:popup-close "quit")))
+
+    (defun my-git-messenger:format-detail (vcs commit-id author message)
+      (if (eq vcs 'git)
+          (let ((date (git-messenger:commit-date commit-id))
+                (colon (propertize ":" 'face 'font-lock-comment-face)))
+            (concat
+             (format "%s%s %s \n%s%s %s\n%s  %s %s \n"
+                     (propertize "Commit" 'face 'font-lock-keyword-face) colon
+                     (propertize (substring commit-id 0 8) 'face 'font-lock-comment-face)
+                     (propertize "Author" 'face 'font-lock-keyword-face) colon
+                     (propertize author 'face 'font-lock-string-face)
+                     (propertize "Date" 'face 'font-lock-keyword-face) colon
+                     (propertize date 'face 'font-lock-string-face))
+             (propertize (make-string 38 ?─) 'face 'font-lock-comment-face)
+             message
+             (propertize "\nPress q to quit" 'face '(:inherit (font-lock-comment-face italic)))))
+        (git-messenger:format-detail vcs commit-id author message)))
+
+    (defun my-git-messenger:popup-message ()
+      "Popup message with `posframe', `pos-tip', `lv' or `message', and dispatch actions with `hydra'."
+      (interactive)
+      (let* ((vcs (git-messenger:find-vcs))
+             (file (buffer-file-name (buffer-base-buffer)))
+             (line (line-number-at-pos))
+             (commit-info (git-messenger:commit-info-at-line vcs file line))
+             (commit-id (car commit-info))
+             (author (cdr commit-info))
+             (msg (git-messenger:commit-message vcs commit-id))
+             (popuped-message (if (git-messenger:show-detail-p commit-id)
+                                  (my-git-messenger:format-detail vcs commit-id author msg)
+                                (cl-case vcs
+                                  (git msg)
+                                  (svn (if (string= commit-id "-")
+                                           msg
+                                         (git-messenger:svn-message msg)))
+                                  (hg msg)))))
+        (setq git-messenger:vcs vcs
+              git-messenger:last-message msg
+              git-messenger:last-commit-id commit-id)
+        (run-hook-with-args 'git-messenger:before-popup-hook popuped-message)
+        (git-messenger-hydra/body)
+        (cond ((and (fboundp 'posframe-workable-p) (posframe-workable-p))
+               (let ((buffer-name "*git-messenger*"))
+                 (posframe-show buffer-name
+                                :string popuped-message
+                                :left-fringe 8
+                                :right-fringe 8
+                                ;; :poshandler #'posframe-poshandler-window-top-right-corner
+                                :poshandler #'posframe-poshandler-window-top-right-corner
+                                ;; Position broken with xwidgets and emacs 28
+                                ;; :position '(-1 . 0)
+                                :y-pixel-offset 20
+                                :x-pixel-offset -20
+                                :internal-border-width 2
+                                :lines-truncate t
+                                :internal-border-color (face-foreground 'font-lock-comment-face)
+                                :accept-focus nil)
+                 (unwind-protect
+                     (push (read-event) unread-command-events)
+                   (posframe-delete buffer-name))))
+              ((and (fboundp 'pos-tip-show) (display-graphic-p))
+               (pos-tip-show popuped-message))
+              ((fboundp 'lv-message)
+               (lv-message popuped-message)
+               (unwind-protect
+                   (push (read-event) unread-command-events)
+                 (lv-delete-window)))
+              (t (message "%s" popuped-message)))
+        (run-hook-with-args 'git-messenger:after-popup-hook popuped-message)))
+    (advice-add #'git-messenger:popup-close :override #'ignore)
+    ;; (advice-add #'git-messenger:popup-close :override #'(setq modal-opened 0))
+    (advice-add #'git-messenger:popup-message :override #'my-git-messenger:popup-message)))
+
+;;; Keybinding
+;;;; Ru/en keybinding
+(use-package reverse-im
+
+  :defer 0.1
+  :config
+  (reverse-im-activate "russian-computer"))
+
+;;;; Global keybinding
+(global-set-key (kbd "C-S-k") 'shrink-window)
+(global-set-key (kbd "C-S-j") 'enlarge-window)
+(global-set-key (kbd "C-S-l") 'enlarge-window-horizontally)
+(global-set-key (kbd "C-S-h") 'shrink-window-horizontally)
+(global-set-key (kbd "C-c l") 'smerge-keep-lower)
+(global-set-key (kbd "C-c u") 'smerge-keep-upper)
+(global-set-key (kbd "C-c a") 'smerge-keep-all)
+(global-set-key (kbd "C-c j") 'smerge-next)
+(global-set-key (kbd "C-c k") 'smerge-prev)
+
+(global-set-key (kbd "s-e") 'emmet-expand-line)
+(global-set-key (kbd "C-s") 'save-buffer)
+
+(use-package evil-leader
+  :after evil
+  :init (global-evil-leader-mode)
+  :bind (:map evil-normal-state-map
+         ("f" . avy-goto-char)
+         ("SPC n r f" . org-roam-node-find)
+         ("SPC t a" . treemacs-add-project-to-workspace)
+         ("SPC g t" . git-timemachine)
+         ;; Org mode
+         ("SPC d t" . org-time-stamp-inactive)
+         ("SPC d T" . org-time-stamp))
+  :config
+  (setq-default evil-kill-on-visual-paste nil)
+  (evil-leader/set-key
+    "f" 'evil-find-char
+    "b" 'evilem-motion-previous-line
+    "x" 'prettier-prettify
+    "k" 'save-buffer-without-dtw
+
+    "d" 'dup-debug
+
+    "o" 'org-mode
+    "q" 'kill-current-buffer
+    "v" 'vterm
+    "`" 'vterm-toggle-cd
+    "i" 'git-messenger:popup-message
+    "t" 'google-translate-smooth-translate
+    "T" 'google-translate-query-translate
+
+    "a" 'counsel-org-agenda-headlines
+    "c" 'dired-create-empty-file
+    "p" '+format/buffer
+    "s" 'publish-org-blog
+    "g" 'dogears-go
+
+    ;; Lsp
+    "h" 'lsp-ui-doc-show
+    "e" 'lsp-treemacs-errors-list
+    "l" 'lsp-execute-code-action
+
+    "r" 'treemacs-select-window
+    "1" 'my-setup-tabnine
+
+    "m" 'toggle-maximize-buffer
+    "y" 'yas-expand
+    ))
+
+;;; Navigation
+(use-package evil-matchit
+  :after evil-mode)
+(evilmi-load-plugin-rules '(ng2-html-mode) '(html))
+(global-evil-matchit-mode 1)
+
+;;; Org mode
+(use-package org
+  :mode (("\\.org$" . org-mode))
+  :defer 0.3
+  ;; :demand t
+  ;; :bind
+  ;; (:map org-mode-map ("C-o f" . format-org-mode-block))
+  :config
+  (progn
+    (define-key org-mode-map "\C-x a f" "\C-x h \C-M-\\ \C-c")
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((restclient . t)))
+    (custom-set-faces
+     '(org-document-title ((t (:inherit outline-1 :height 2.5))))
+     '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
+     '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
+     '(org-level-3 ((t (:inherit outline-3 :height 1.25))))
+     '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
+     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+     )
+    (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((restclient . t)))
+
+
+    (defun publish-org-blog()
+      "Publish this note to du-blog!"
+      (interactive)
+
+      (message (concat
+                "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js"
+                (buffer-file-name)))
+      (shell-command
+       (concat
+        "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js "
+        (buffer-file-name))
+       ))
+
+    (setenv "NODE_PATH"
+            (concat
+             (getenv "HOME") "/org-node/node_modules"  ":"
+             (getenv "NODE_PATH")
+             )
+            )
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((js . t)))
+
+    (defun org-babel-execute:typescript (body params)
+      (let ((org-babel-js-cmd "npx ts-node < "))
+        (org-babel-execute:js body params)))
+
+    (defvar org-babel-js-function-wrapper
+      ""
+      "Javascript code to print value of body.")))
+
+;;;; Org superstar
+(use-package org-superstar
+
+  :defer 0.3
+  :hook ((org-mode . org-superstar-mode))
+  :config
+  (setq org-directory "~/Yandex.Disk.localized/org")
+  (setq org-agenda-files '("~/Yandex.Disk.localized/org/articles"))
+  (setq org-agenda-files '("~/Yandex.Disk.localized/org/strudy"))
+  (setq org-agenda-files (directory-files-recursively "~/Yandex.Disk.localized/org/" "\\.org$")))
+
+;;;; Roam
+(use-package org-roam
+  :defer 0.1
+
+  :init
+  (setq org-roam-v2-ack t)
+  :config
+  (cl-defmethod org-roam-node-compositetitle ((node org-roam-node))
+    "Return customized title of roam node"
+    (let* ((tags (org-roam-node-tags node))
+           (title (org-roam-node-title node)))
+      (if (not tags)
+          title
+        (setq joined-text (string-join tags ", "))
+        (concat (propertize (format "(%s) " joined-text) 'face `(:foreground ,+m-color-main :weight bold :slant italic)) title)
+        )
+      )
+    )
+  ;; (message m-color-main)
+  (setq org-roam-completion-system 'ivy)
+  (setq org-roam-node-display-template "${compositetitle:100}")
+  (setq org-roam-directory (file-truename "~/Yandex.Disk.localized/org-roam"))
+  (org-roam-db-autosync-mode))
+
+(use-package! org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+;;;; Sticky header
+(use-package org-sticky-header
+
+  :hook (org-mode . org-sticky-header-mode)
+  :defer t)
+
+;;;; Org ligatures
+(add-hook 'org-mode-hook (lambda ()
+                           "Beautify Org Checkbox Symbol"
+                           (push '("[ ]" .  "☐") prettify-symbols-alist)
+                           (push '("[X]" . "☑" ) prettify-symbols-alist)
+                           (push '("[-]" . "❍" ) prettify-symbols-alist)
+                           (push '("#+BEGIN_SRC" . "↦" ) prettify-symbols-alist)
+                           (push '("#+END_SRC" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+BEGIN_EXAMPLE" . "↦" ) prettify-symbols-alist)
+                           (push '("#+END_EXAMPLE" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+BEGIN_QUOTE" . "↦" ) prettify-symbols-alist)
+                           (push '("#+END_QUOTE" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+begin_quote" . "↦" ) prettify-symbols-alist)
+                           (push '("#+end_quote" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+begin_example" . "↦" ) prettify-symbols-alist)
+                           (push '("#+end_example" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+begin_src" . "↦" ) prettify-symbols-alist)
+                           (push '("#+end_src" . "⇤" ) prettify-symbols-alist)
+                           (push '("#+TITLE:" . "") prettify-symbols-alist)
+                           (push '("#+DESCRIPTION:" . "") prettify-symbols-alist)
+                           (push '("#+ID:" . "") prettify-symbols-alist)
+                           (push '("#+FILETAGS:" . "") prettify-symbols-alist)
+                           (push '("#+ACTIVE:" . "") prettify-symbols-alist)
+                           (push '("#+START_SPOILER:" . "") prettify-symbols-alist)
+                           (push '("#+START_SPOILER" . "") prettify-symbols-alist)
+                           (push '("#+END_SPOILER" . "") prettify-symbols-alist)
+                           (prettify-symbols-mode)))
+
+;;;; Awesome priority
+(use-package org-fancy-priorities
+  :defer 0.4
+  :hook
+  (org-mode . org-fancy-priorities-mode)
+  :config
+  (setq org-fancy-priorities-list '("⚡" "⬆" "■" "⬇" "❓")))
+
+;;;; Org indent
+(use-package org-indent
+  :defer t
+  :init
+  (add-hook 'org-mode-hook 'org-indent-mode))
+
+;;;; Org rest client
+(use-package ob-restclient
+  :defer 0.1)
+
+(defun format-org-mode-block ()
+  "Format org mode code block"
+  (interactive "p")
+  ;; (execute-kbd-macro (kbd "C-c ' C-x h C-M-\\ C-c '"))
+  ;; (execute-kbd-macro (read-kbd-macro "C-c ' C-x h C-M-\\ C-c '"))
+  (org-edit-special)
+  (format-all-ensure-formatter)
+  (format-all-buffer)
+  (org-edit-src-exit))
+
+
+;;; Dependencies
+(use-package! websocket
+  :after org-roam)
+
+(use-package restclient
+  :defer 0.1)
+
+
+;;; Environment
+(use-package exec-path-from-shell
+  :defer 0.3
+  :config
+  (custom-set-variables
+   '(exec-path-from-shell-arguments (quote ("-l"))))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "SSH_AGENT_PID")
   (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
 
-(use-package exec-path-from-shell
-  :init
-  (add-hook 'after-init-hook 'my-exec-path-from-shell-initialize))
+;;; Temporary section
+;; (use-package corfu
+;;   ;; Optional customizations
+;;   :custom
+;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-auto t)                 ;; Enable auto completion
+;;   (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+;;   (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+;;   (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+;;   (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
+
+;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
+;;   :bind (:map corfu-map
+;;          ("TAB" . corfu-next)
+;;          ([tab] . corfu-next)
+;;          ("C-j" . corfu-next)
+;;          ("C-k" . corfu-previous)
+;;          ("S-TAB" . corfu-previous)
+;;          ([backtab] . corfu-previous)
+;;          :map evil-insert-state-map
+;;          ("C-x c" . completion-at-point))
+
+;;   ;; You may want to enable Corfu only for certain modes.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
+
+;;   ;; Recommended: Enable Corfu globally.
+;;   ;; This is recommended since dabbrev can be used globally (M-/).
+;;   :init
+;;   (company-mode -1)
+;;   (corfu-global-mode)
+;;   :config
+;;   (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
+;;   (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
+;;   (evil-make-overriding-map corfu-map))
+
+;; Optionally use the `orderless' completion style.
+;; Enable `partial-completion' for files to allow path expansion.
+;; You may prefer to use `initials' instead of `partial-completion'.
+;; (use-package orderless
+;;   :init
+;;   (setq completion-styles '(orderless)
+;;         completion-category-defaults nil
+;;         completion-category-overrides '((file (styles . (partial-completion))))))

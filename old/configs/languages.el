@@ -232,7 +232,7 @@
 (use-package js
   :after lsp
   :hook (js-mode . lsp-mode)
-  :config
+  :init
   (setenv "TSSERVER_LOG_FILE" "/tmp/tsserver.log")
   )
 (use-package ng2-mode
