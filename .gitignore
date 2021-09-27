@@ -1,4 +1,4 @@
 .DS_Store
 logs/*
 bookmarks
-private
+private.el
