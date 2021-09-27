@@ -13,7 +13,11 @@
 ;;
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
-;;
+;
+;; (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 200000000)))
+(after! gcmh
+  (setq gcmh-high-cons-threshold 33554432))
+(add-hook 'focus-out-hook 'garbage-collect)
 
 (doom! :input
        ;;chinese
@@ -21,7 +25,7 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       company            ; the ultimate code completion backend
+       (company +childframe)            ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        (ivy +icons)               ; a search engine for love and life
@@ -132,7 +136,7 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       go         ; the hipster dialect
+       (go +lsp)         ; the hipster dialect
        ;;(haskell +dante)  ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on

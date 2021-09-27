@@ -70,23 +70,32 @@
 (package! typescript-mode)
 (package! ng2-mode)
 
+;;; Pyton
 (package! pipenv)
 (package! python-mode)
-(package! lsp-python-ms)
+;; (package! pyenv-mode)
+;; (package! lsp-python-ms)
+(package! lsp-pyright)
+
+;;; Other
 (package! web-mode)
 (package! forge)
 (package! evil-leader)
-(package! org-superstar)
-(package! org-roam)
-(package! org-sticky-header)
-(unpin! org-roam)
 (package! websocket)
-(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 (package! restclient)
 (package! evil-matchit)
+
+;;; Spelling
+;; (package! spell-fu) ;; totaly awfull behaviour
+
+;;; Infrastucture
 (package! docker-compose-mode)
 (package! dockerfile-mode)
 (package! jenkinsfile-mode)
+(package! company-nginx)
+(package! nginx-mode)
+
+
 (package! ob-restclient)
 (package! emmet-mode)
 (package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
@@ -100,14 +109,13 @@
 (package! git-messenger)
 (package! hydra)
 (package! lsp-ivy)
-(package! company-box)
+;; (package! company-box)
 ;; (package! prettier-js)
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
 (package! atom-one-dark-theme)
 (package! origami)
 ;; (package! affe)
 ;; (package! markdown-preview-mode)
-(package! org-fancy-priorities)
 (package! ivy
   :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
   :recipe (:host github :repo "abo-abo/swiper"))
@@ -118,3 +126,17 @@
 ;; (package! orderless)
 
 (package! outline-minor-faces)
+
+;;; Org mode
+(package! ox-gfm)
+(package! oauth2)
+(package! org-fancy-priorities)
+(package! org-caldav)
+(package! org-superstar)
+(unpin! org-roam)
+(package! org-roam)
+(package! org-sticky-header)
+(package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+
+;;; Temporary
+(package! tui :recipe (:host github :repo "ebpa/tui.el"))
