@@ -140,3 +140,4 @@
 
 ;;; Temporary
 (package! tui :recipe (:host github :repo "ebpa/tui.el"))
+;; (package! icons-in-terminal :recipe (:host github :repo "seagle0128/icons-in-terminal.el"))
