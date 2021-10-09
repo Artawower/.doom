@@ -62,7 +62,7 @@
 (package! indent-guide)
 (package! paren-face)
 (package! company-tabnine)
-(package! lsp-mode)
+;; (package! lsp-mode)
 (package! lsp-ui)
 (package! exec-path-from-shell)
 (package! tree-sitter)
@@ -77,6 +77,8 @@
 ;; (package! lsp-python-ms)
 (package! lsp-pyright)
 
+;;; Go
+(package! go-playground)
 ;;; Other
 (package! web-mode)
 (package! forge)
@@ -108,7 +110,6 @@
 (package! package-build)
 (package! git-messenger)
 (package! hydra)
-(package! lsp-ivy)
 ;; (package! company-box)
 ;; (package! prettier-js)
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
@@ -127,17 +128,31 @@
 
 (package! outline-minor-faces)
 
+;;; Tools
+(package! string-inflection) ;; PASCAL_CASE -> camelCase -> kebab-case
 ;;; Org mode
 (package! ox-gfm)
 (package! oauth2)
-(package! org-fancy-priorities)
 (package! org-caldav)
 (package! org-superstar)
 (unpin! org-roam)
 (package! org-roam)
 (package! org-sticky-header)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+;;; Agenda
 
 ;;; Temporary
-(package! tui :recipe (:host github :repo "ebpa/tui.el"))
+;; (package! doct)
+;; (package! org-super-agenda)
+;; (package! org-fancy-priorities) ;; Nice icons..but can be replaced by pretty symbols alist
+;; (package! tui :recipe (:host github :repo "ebpa/tui.el"))
+;; (package! polymode)
 ;; (package! icons-in-terminal :recipe (:host github :repo "seagle0128/icons-in-terminal.el"))
+;; (package! poly-vue :recipe (:host github :repo "akirak/poly-vue"))
+
+
+
+
+
+;;; Unused
+;; (package! lsp-ivy)

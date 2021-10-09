@@ -105,6 +105,7 @@
 
 (setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
 (set-window-buffer nil (current-buffer))
+(setenv "zstd" "/usr/local/bin/zstd")
 
 
 
@@ -118,10 +119,10 @@
   :after ivy)
 
 (use-package counsel-projectile
-  :defer 0.1)
+  :defer 0.5)
 
 (use-package all-the-icons-ivy-rich
-  :defer 0.1)
+  :defer 0.5)
 
 (use-package all-the-icons-ivy-rich
   :after (all-the-icons ivy-rich counsel-projectile all-the-icons-ivy-rich)
@@ -172,7 +173,7 @@
 ;;; Formatter
 ;; Improve counsel search (async)
 (use-package format-all
-  :defer 0.1
+  :defer 1.5
   :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
   :config
   (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
@@ -189,8 +190,8 @@
   (add-hook 'before-save-hook 'my-ecmascript-formatter))
 
 (use-package prettier
-  :defer 0.3
-  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . prettier-mode))
+  :defer 1.5
+  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode vue-mode) . prettier-mode))
 
 ;; (use-package prettier-js
 ;;   :defer 0.3
@@ -201,13 +202,17 @@
 ;;                            "--bracket-spacing" "true")))
 
 
+;;; Flycheck
+;; (use-package flycheck
+;;   :defer 0.6
+;;   :config)
 ;;; Smartparens
-(after! smartparens
-  (smartparens-global-mode -1))
+(remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 
 (use-package electric
-  :defer 0.2
+  :defer 3
   :config
+  (setq electric-pair-preserve-balance nil)
   (electric-pair-mode 1)
   ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
   ;; NOTE: fix indent after electric pair appear
@@ -231,39 +236,42 @@
   (global-undo-tree-mode))
 
 ;;; Spell check
-;; (setq ispell-program-name "aspell")
-;; You could add extra option "--camel-case" for since Aspell 0.60.8
-;; @see https://github.com/redguardtoo/emacs.d/issues/796
-;; (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
-(setq-default flyspell-prog-text-faces
-              '(tree-sitter-hl-face:comment
-                tree-sitter-hl-face:doc
-                tree-sitter-hl-face:string
-                tree-sitter-hl-face:function
-                tree-sitter-hl-face:variable
-                tree-sitter-hl-face:type
-                tree-sitter-hl-face:method
-                tree-sitter-hl-face:function.method
-                tree-sitter-hl-face:function.special
-                tree-sitter-hl-face:attribute
-                font-lock-comment-face
-                font-lock-doc-face
-                font-lock-string-face
-                lsp-face-highlight-textual
-                default))
+(use-package flyspell
+  :defer 7
+  :config
+  ;; (setq ispell-program-name "aspell")
+  ;; You could add extra option "--camel-case" for since Aspell 0.60.8
+  ;; @see https://github.com/redguardtoo/emacs.d/issues/796
+  ;; (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+  (setq-default flyspell-prog-text-faces
+                '(tree-sitter-hl-face:comment
+                  tree-sitter-hl-face:doc
+                  tree-sitter-hl-face:string
+                  tree-sitter-hl-face:function
+                  tree-sitter-hl-face:variable
+                  tree-sitter-hl-face:type
+                  tree-sitter-hl-face:method
+                  tree-sitter-hl-face:function.method
+                  tree-sitter-hl-face:function.special
+                  tree-sitter-hl-face:attribute
+                  font-lock-comment-face
+                  font-lock-doc-face
+                  font-lock-string-face
+                  lsp-face-highlight-textual
+                  default))
 
-(setq spell-fu-directory "~/.doom.d/dictionary") ;; Please create this directory manually.
-(setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
-(after! ispell
-  (setq ispell-program-name "aspell"
-        ;; Notice the lack of "--run-together"
-        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
-  (ispell-kill-ispell t))
+  (setq spell-fu-directory "~/.doom.d/dictionary") ;; Please create this directory manually.
+  (setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
+  (after! ispell
+    (setq ispell-program-name "aspell"
+          ;; Notice the lack of "--run-together"
+          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+    (ispell-kill-ispell t))
 
-(defun flyspell-buffer-after-pdict-save (&rest _)
-  (flyspell-buffer))
+  (defun flyspell-buffer-after-pdict-save (&rest _)
+    (flyspell-buffer))
 
-(advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
+  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save))
 
 
 ;; (use-package spell-fu
@@ -277,7 +285,7 @@
 ;;; Folding
 ;;;; Html
 (use-package origami
-  :defer 0.3
+  :defer 2
   :bind (:map evil-normal-state-map
          ("SPC z a" . origami-toggle-node)
          ("SPC z r" . origami-open-all-nodes)
@@ -292,19 +300,19 @@
 ;;; File managers
 ;;;; treemacs
 (use-package treemacs
-  :defer 0.1
+  :defer 3
   :custom
   (treemacs-width 45))
 
 ;;;; Dired
 (use-package all-the-icons-dired
-  :defer 0.2
+  :defer 5
   :hook (dired-mode . all-the-icons-dired-mode))
 
 ;;; Bookmarks
 ;;;; quick bm
 (use-package bm
-  :defer 0.1
+  :defer 3
   :custom-face
   (bm-face ((t (:foreground ,+m-color-secondary))))
   :bind (("C-M-n" . bm-next)
@@ -320,7 +328,7 @@
 
 ;;; Google translate
 (use-package google-translate
-  :defer 0.1
+  :defer 30
   :bind
   (:map google-translate-minibuffer-keymap
    ("C-k" . google-translate-next-translation-direction)
@@ -335,7 +343,7 @@
 
 ;;; Terminal
 (use-package vterm-toggle
-  :defer 0.1
+  :defer 3
   :config
   (setq vterm-toggle-scope 'project))
 
@@ -343,7 +351,7 @@
 ;;; Colors
 (use-package rainbow-mode
   :hook (((css-mode scss-mode org-mode emacs-lisp-mode typescript-mode js-mode). rainbow-mode))
-  :defer 0.3)
+  :defer 2.3)
 
 ;; TODO
 ;; (use-package hl-todo
@@ -387,13 +395,13 @@
 
 ;;; Time track
 (use-package wakatime-mode
-  :defer 0.3
+  :defer 1.3
   :config
   (global-wakatime-mode))
 
 ;;; Indent guide
 (use-package indent-guide
-  :defer 0.2
+  :defer 1.2
   :hook ((web-mode
           emacs-lisp-mode
           html-mode
@@ -412,7 +420,7 @@
 
 ;;; Fast commenting
 (use-package turbo-log
-  :defer 0.4
+  :defer 15
   :bind (("C-s-l" . turbo-log-print)
          ("C-s-i" . turbo-log-print-immediately)
          ("C-s-h" . turbo-log-comment-all-logs)
@@ -426,7 +434,7 @@
 
 ;;; Quickly type converting
 (use-package quicktype
-  :defer 0.4
+  :defer 15
   :bind (("C-x j v" . quicktype-json-to-type)
          ("C-x j p" . quicktype-paste-json-as-type)
          ("C-x j q" . quicktype)))
@@ -434,8 +442,16 @@
 ;;; Programming
 ;; Common configurations for all programming languages
 ;;;; Lsp
+;;;;
+;; (defun my-setup-flycheck ()
+;;   (if (eq major-mode 'go-mode)
+;;       ;; (flycheck-add-next-checker 'lsp '('golangci-lint 'go-errcheck 'go-gofmt 'go-goim) 'append)
+;;       (flycheck-add-next-checker 'lsp 'golangci-lint 'append)))
+
 (use-package lsp
   :defer 0.1
+  ;; TIDE check, less laggi?
+  ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
   :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
@@ -447,15 +463,32 @@
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   :config
-  (let ((home-path (getenv "HOME")))
-    (setenv "GOPATH" (concat home-path "/go"))
-    (setenv "PATH" (concat home-path "/go/bin")))
+  ;; Flycheck patch checkers
+  (require 'lsp-diagnostics)
+  (require 'flycheck)
+  (lsp-diagnostics-flycheck-enable)
+  ;; Golang
+  (defun lsp-go-install-save-hooks ()
+    ;; (flycheck-add-next-checker 'lsp '(t . golangci-lint) 'append)
+
+    (flycheck-add-next-checker 'lsp '(warning . go-gofmt) 'append)
+    (flycheck-add-next-checker 'lsp '(warning . go-golint))
+    (flycheck-add-next-checker 'lsp '(warning . go-errcheck))
+    (flycheck-add-next-checker 'lsp '(warning . go-staticcheck))
+
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+
+  ;; Override company backends for lsp
+  ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
+  (setq +lsp-company-backends '(company-tabnine :separate company-yasnippet))
+
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
   (setq lsp-eldoc-hook nil))
-
-(use-package lsp-ivy
-  :after lsp)
 
 (use-package lsp-ui
   :after lsp-mode
@@ -464,16 +497,17 @@
   (setq lsp-ui-sideline-diagnostic-max-line-length 200
         lsp-ui-sideline-diagnostic-max-lines 5
         lsp-ui-doc-delay 2
+        lsp-ui-doc-position 'top
         lsp-ui-doc-show-with-mouse nil
         lsp-ui-doc-border +m-color-main))
 
 ;;;; Syntax highlight
 (use-package tree-sitter-langs
-  :defer 0.1)
+  :defer 6)
 
 (use-package tree-sitter
   :after tree-sitter-langs
-  :hook ((go-mode typescript-mode css-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode) . tree-sitter-hl-mode)
+  :hook ((go-mode typescript-mode css-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
   :config
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
@@ -483,18 +517,12 @@
 ;;;; Company
 (defun my-setup-tabnine ()
   (interactive)
-  (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
-  (setq-local company-backends '((company-tabnine :separate company-capf))))
+  (setq-local company-backends '(company-tabnine :separate company-capf)))
 
 ;;;; Only tabnine
 (defun my-setup-tabnine-2 ()
   (interactive)
-  (setq-local +lsp-company-backends '((company-tabnine)))
-  (setq-local company-backends '((company-tabnine))))
-;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf company-yasnippet)))
-;; (setq-local company-backends '((company-tabnine :separate company-capf company-yasnippet))))
-;; (setq-local +lsp-company-backends '(company-tabnine :separate company-capf company-yasnippet))
-;; (setq-local company-backends '(company-tabnine :separate company-capf company-yasnippet)))
+  (setq-local company-backends '(company-tabnine)))
 
 (defun my-setup-tabnine-3 ()
   (interactive)
@@ -504,36 +532,21 @@
 ;; (my-setup-tabnine)
 ;; Autocomplete with AI
 (use-package company-tabnine
-  :after company
+  :after (company lsp)
   :bind (("C-x C-i" . company-tabnine))
+  :when (featurep! :completion company)
   :config
   (setq company-idle-delay 0.1)
   (setq company-show-numbers nil)
   (setq company-minimum-prefix-length 1)
   (setq company-tabnine-show-annotation t)
-  (setq company-dabbrev-char-regexp "[А-Яа-я]")
+  (setq company-dabbrev-char-regexp "[A-z:-]"))
 
-  (my-setup-tabnine))
-
-(add-hook! (go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode emacs-lisp-mode)
-           #'reset-lsp-backends)
-
-(defun reset-lsp-backends-straightaway ()
-  (my-setup-tabnine))
-
-(defun reset-lsp-backends (&optional arg)
-  (run-at-time "3 sec" nil #'reset-lsp-backends-straightaway))
-
-(advice-add 'lsp :after #'reset-lsp-backends)
-
-;; (use-package company-box
-;;   :after company
-;;   :hook (company-mode . company-box-mode))
 
 ;; Languages
 ;;;; Lisp
 (use-package elisp-mode
-  :defer 0.3
+  :defer 4
   :bind (("C-c o" . outline-cycle)
          ("C-c r" . outline-show-all)
          ("C-c m" . outline-hide-body)
@@ -545,15 +558,15 @@
          ("C-c b" . outline-cycle-buffer)))
 
 (use-package package-build
-  :defer 0.3)
+  :defer 15)
 
 (use-package package-lint
-  :defer 0.1)
+  :defer 15)
 
 ;;;; Typescript
 (setenv "TSSERVER_LOG_FILE" "/tmp/tsserver.log")
 (use-package typescript-mode
-  :defer 0.1
+  :defer 0.5
   :config
   (setq typescript-indent-level 2)
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
@@ -572,9 +585,19 @@
           "--stdio")))
 
 
+;;;; Golang
+(use-package go-playground
+  :defer 15)
+
+;; (defun my-go-mode-hook ()
+;;   (flycheck-add-next-checker 'lsp 'golangci-lint 'go-errcheck 'go-gofmt 'go-goim 'append))
+;; (use-package go-mode
+;;   :defer 0.3
+;;   :hook (go-mode . my-go-mode-hook))
+
 ;;;; Rust
 (use-package rustic
-  :defer 0.1
+  :defer 0.9
   :bind (:map rustic-mode-map
          ("M-j" . lsp-ui-imenu)
          ("M-?" . lsp-find-references)
@@ -605,7 +628,7 @@
 
 ;;;; Python
 (use-package pipenv
-  :defer 0.1
+  :defer 0.5
   :hook (python-mode . pipenv-mode)
   :config
   (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
@@ -613,7 +636,7 @@
 
 
 (use-package python-mode
-  :defer 0.1
+  :defer 0.5
   :hook (python-mode . format-all-mode)
   :config
   (setq pytnon-indent-level 4)
@@ -623,7 +646,7 @@
               (setq tab-width 4))))
 
 (use-package lsp-pyright
-  :defer 0.1
+  :defer 0.5
   :config
   (setq lsp-pyright-auto-import-completions t)
   (setq lsp-pyright-auto-search-paths t)
@@ -631,7 +654,7 @@
 
 ;;;; Web mode
 (use-package web-mode
-  :defer 0.1
+  :defer 0.5
   :config
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
   (setq web-mode-comment-formats
@@ -650,33 +673,33 @@
 
 ;;;; Pug
 (use-package pug-mode
-  :defer 0.3)
+  :defer 3)
 
 ;;;; Html
 (use-package emmet-mode
   :hook ((scss-mode . emmet-mode) (css-mode . emmet-mode) (ng2-html-mode . emmet-mode) (html-mode . emmet-mode))
-  :defer 0.1)
+  :defer 5)
 
 ;;;; Json
 (use-package json-mode
-  :defer 0.1
+  :defer 5
   :hook (json-mode . format-all-mode))
 
 ;;;; Debug
 (use-package dap-mode
-  :defer 0.3)
+  :defer 3)
 
 ;;;; Docker compose
 (use-package docker-compose-mode
-  :defer 0.1)
+  :defer 6)
 
 ;;;; Docker
 (use-package dockerfile-mode
-  :defer 0.1)
+  :defer 6)
 
 ;;;; Jenkins
 (use-package jenkinsfile-mode
-  :defer 0.1
+  :defer 6
   :config)
 
 ;;;; Nginx
@@ -685,9 +708,13 @@
   :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
 
 (use-package nginx-mode
-  :defer 0.4)
+  :defer 10)
 
-
+;;; Help tools
+;;;; PASCAL_CASE -> camelCase -> snake_case
+(use-package string-inflection
+  :defer 10
+  :bind ("C-s-c" . string-inflection-all-cycle))
 ;;; Git
 (use-package magit
   :defer 0.3
@@ -702,21 +729,22 @@
   (setq auth-sources '("~/.authinfo"))
   (push `(,+m-work-gitlab-url ,(concat +m-work-gitlab-url "/api/v4")
                               "gpalex" forge-gitlab-repository)
-        forge-alist)
-  ;; (add-to-list 'ghub-insecure-hosts "git.palex-soft.com/api/v4")
-  )
+        ;; (add-to-list 'ghub-insecure-hosts "git.palex-soft.com/api/v4"))
+        forge-alist))
 
 (use-package git-gutter
-  :defer t
+  :defer 3
   :init
   (global-git-gutter-mode)
   (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
-  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
-  )
+  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk))
+
+(use-package hydra
+  :defer 8)
 
 ;;;; Git messanger
 (use-package git-messenger
-  :defer 0.1
+  :defer 25
   :bind (:map vc-prefix-map
          ("p" . git-messenger:popup-message)
          :map git-messenger-map
@@ -809,7 +837,6 @@
 ;;; Keybinding
 ;;;; Ru/en keybinding
 (use-package reverse-im
-
   :defer 0.1
   :config
   (reverse-im-activate "russian-computer"))
@@ -879,14 +906,15 @@
 
 ;;; Navigation
 (use-package evil-matchit
-  :after evil-mode)
+  :defer 3.5)
+
 (evilmi-load-plugin-rules '(ng2-html-mode) '(html))
 (global-evil-matchit-mode 1)
 
 ;;; Org mode
 (use-package org
   :mode (("\\.org$" . org-mode))
-  :defer 0.3
+  :defer 3
   ;; :demand t
   ;; :bind
   ;; (:map org-mode-map ("C-o f" . format-org-mode-block))
@@ -981,7 +1009,7 @@
 
 ;;;; Org agenda
 (use-package org-caldav
-  :defer 0.6
+  :defer 10
   :config
   (require 'oauth2)
   (setq org-caldav-oauth2-client-secret +m-google-calendar-client-secret)
@@ -1008,7 +1036,7 @@
 
 ;;;; Org superstar
 (use-package org-superstar
-  :defer 0.3
+  :defer 5
   :hook (org-mode . org-superstar-mode)
   :config
   (setq org-directory "~/Yandex.Disk.localized/org")
@@ -1017,8 +1045,7 @@
 
 ;;;; Roam
 (use-package org-roam
-  :defer 0.1
-
+  :defer 8
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -1049,9 +1076,8 @@
 
 ;;;; Sticky header
 (use-package org-sticky-header
-
   :hook (org-mode . org-sticky-header-mode)
-  :defer t)
+  :defer 8)
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()
@@ -1076,30 +1102,27 @@
                            (push '("#+ID:" . "") prettify-symbols-alist)
                            (push '("#+FILETAGS:" . "") prettify-symbols-alist)
                            (push '("#+ACTIVE:" . "") prettify-symbols-alist)
-                           (push '("#+START_SPOILER:" . "") prettify-symbols-alist)
                            (push '("#+START_SPOILER" . "") prettify-symbols-alist)
-                           (push '("#+BEGIN_HIDDEN:" . "") prettify-symbols-alist)
+                           (push '("#+CLOSE_SPOILER" . "") prettify-symbols-alist)
+                           (push '("#+BEGIN_HIDDEN" . "") prettify-symbols-alist)
                            (push '("#+END_HIDDEN" . "") prettify-symbols-alist)
-                           (push '("#+END_SPOILER" . "") prettify-symbols-alist)
+                           (push '("[#A]" . "⚡") prettify-symbols-alist)
+                           (push '("[#B]" . "⬆") prettify-symbols-alist)
+                           (push '("[#C]" . "■") prettify-symbols-alist)
+                           (push '("[#D]" . "⬇") prettify-symbols-alist)
+                           (push '("[#E]" . "❓") prettify-symbols-alist)
                            (prettify-symbols-mode)))
 
-;;;; Awesome priority
-(use-package org-fancy-priorities
-  :defer 0.4
-  :hook
-  (org-mode . org-fancy-priorities-mode)
-  :config
-  (setq org-fancy-priorities-list '("⚡" "⬆" "■" "⬇" "❓")))
 
 ;;;; Org indent
 (use-package org-indent
-  :defer t
+  :defer 8
   :init
   (add-hook 'org-mode-hook 'org-indent-mode))
 
 ;;;; Org rest client
 (use-package ob-restclient
-  :defer 0.1)
+  :defer 8)
 
 (defun format-org-mode-block ()
   "Format org mode code block"
@@ -1117,66 +1140,11 @@
   :after org-roam)
 
 (use-package restclient
-  :defer 0.1)
+  :defer 3)
 
-
-;;; Environment
-(use-package exec-path-from-shell
-  :defer 0.3
-  :config
-  (custom-set-variables
-   '(exec-path-from-shell-arguments (quote ("-l"))))
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "SSH_AGENT_PID")
-  (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
 
 ;;; Temporary section
-;;;; Corfu test
-;; (use-package corfu
-;;   ;; Optional customizations
-;;   :custom
-;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-;;   (corfu-auto t)                 ;; Enable auto completion
-;;   (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-;;   (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
-;;   (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-;;   (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-
-;;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
-;;   :bind (:map corfu-map
-;;          ("TAB" . corfu-next)
-;;          ([tab] . corfu-next)
-;;          ("C-j" . corfu-next)
-;;          ("C-k" . corfu-previous)
-;;          ("S-TAB" . corfu-previous)
-;;          ([backtab] . corfu-previous)
-;;          :map evil-insert-state-map
-;;          ("C-x c" . completion-at-point))
-
-;;   ;; You may want to enable Corfu only for certain modes.
-;;   ;; :hook ((prog-mode . corfu-mode)
-;;   ;;        (shell-mode . corfu-mode)
-;;   ;;        (eshell-mode . corfu-mode))
-
-;;   ;; Recommended: Enable Corfu globally.
-;;   ;; This is recommended since dabbrev can be used globally (M-/).
-;;   :init
-;;   (company-mode -1)
-;;   (corfu-global-mode)
-;;   :config
-;;   (advice-add 'corfu--setup :after 'evil-normalize-keymaps)
-;;   (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
-;;   (evil-make-overriding-map corfu-map))
-
-;; Optionally use the `orderless' completion style.
-;; Enable `partial-completion' for files to allow path expansion.
-;; You may prefer to use `initials' instead of `partial-completion'.
-;; (use-package orderless
-;;   :init
-;;   (setq completion-styles '(orderless)
-;;         completion-category-defaults nil
-;;         completion-category-overrides '((file (styles . (partial-completion))))))
-
-
-;;; Beautiful start screen
-
+(use-package pretty-agenda
+  :load-path "~/.doom.d/"
+  :defer 15)
+;;; Temporary unused
