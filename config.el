@@ -687,7 +687,24 @@
 
 ;;;; Debug
 (use-package dap-mode
-  :defer 3)
+  :defer 3
+  :bind (:map evil-normal-state-map
+         ("SPC d n" . dap-next)
+         ("SPC d i" . dap-step-in)
+         ("SPC d o" . dap-step-out)
+         ("SPC d c" . dap-continue)
+         ("SPC d Q" . dap-disconnect)
+         ("SPC d d" . dap-debug)
+         ("SPC d r" . dap-debug-recent)
+         ("SPC d l" . dap-ui-locals)
+         ("SPC d b" . dap-ui-breakpoints)
+         ("SPC d s" . dap-ui-sessions)
+         ("SPC d l" . dap-debug-last)
+         ("SPC d p" . dap-breakpoint-toggle)
+         ("SPC d e" . dap-debug-edit-template))
+  :config
+  (dap-mode 1)
+  (require 'dap-go))
 
 ;;;; Docker compose
 (use-package docker-compose-mode
@@ -874,7 +891,7 @@
     "x" 'my-ecmascript-formatter
     "k" 'save-buffer-without-dtw
 
-    "d" 'dup-debug
+    "d" 'dap-debug
 
     "o" 'org-mode
     "q" 'kill-current-buffer
@@ -1121,6 +1138,11 @@
   (add-hook 'org-mode-hook 'org-indent-mode))
 
 ;;;; Org rest client
+(use-package ob-async
+  :defer 5
+  :config
+  (setq ob-async-no-async-languages-alist '("ipython")))
+
 (use-package ob-restclient
   :defer 8)
 

@@ -1,4 +1,4 @@
-personal_ws-1.1 en 344 
+personal_ws-1.1 en 345 
 AccountStateModel
 AddedQualityIssues
 AfterViewInit
@@ -71,6 +71,7 @@ ReportProcessingStateModel
 ReportProcessingStatus
 RowSelectedEvent
 SECID
+SPC
 STARTDATEMOEX
 StartTradeDateOnMOSMarket
 StatusedQualityIssues

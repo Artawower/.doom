@@ -98,7 +98,7 @@
 (package! nginx-mode)
 
 
-(package! ob-restclient)
+
 (package! emmet-mode)
 (package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
 (package! dap-mode)
@@ -139,6 +139,9 @@
 (package! org-roam)
 (package! org-sticky-header)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+;;;; Org babel
+(package! ob-restclient)
+(package! ob-async)
 ;;; Agenda
 
 ;;; Temporary

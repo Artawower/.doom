@@ -206,7 +206,7 @@ This function makes sure that dates are aligned for easy reading."
     ("M" "📝" "white")
     ("S" "📝" "white")
     ("C" "⚙" "white")
-    ("o" "🌐" "white")
+    ("o" "🌏" "white")
     ("p" "⤵" "white"))
 )
 
