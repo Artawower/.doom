@@ -26,7 +26,7 @@
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 (setq doom-theme 'doom-moonlight)
-
+(setq fancy-splash-image "/Users/darkawower/.doom.d/icons/I-am-doom.png")
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 
@@ -102,7 +102,6 @@
 ;;; Core
 (setq warning-minimum-level :emergency)
 (setq read-process-output-max (* 1024 1024))
-
 (setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
 (set-window-buffer nil (current-buffer))
 (setenv "zstd" "/usr/local/bin/zstd")
@@ -191,7 +190,7 @@
 
 (use-package prettier
   :defer 1.5
-  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode vue-mode) . prettier-mode))
+  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode vue-mode web-mode) . prettier-mode))
 
 ;; (use-package prettier-js
 ;;   :defer 0.3
@@ -208,23 +207,55 @@
 ;;   :config)
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+;; (use-package smartparens
+;;   :defer 5
+;;   :config
+;;   (defun indent-between-pair (&rest _ignored)
+;;     (newline)
+;;     (indent-according-to-mode)
+;;     (forward-line -1)
+;;     (indent-according-to-mode))
+
+;;   (sp-local-pair 'prog-mode "{" nil :post-handlers '((indent-between-pair "RET")))
+;;   (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
+;;   (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET"))))
+
+(defun new-line-dwim ()
+  (interactive)
+  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
+                             (and (looking-back ">") (looking-at "<"))
+                             (and (looking-back "(") (looking-at ")"))
+                             (and (looking-back "\\[") (looking-at "\\]")))))
+    (newline)
+    (when break-open-pair
+      (save-excursion
+        (newline)
+        (indent-for-tab-command)))
+    (indent-for-tab-command)))
 
 (use-package electric
   :defer 3
+  :bind (:map evil-insert-state-map
+         ("RET" . new-line-dwim))
   :config
-  (setq electric-pair-preserve-balance nil)
-  (electric-pair-mode 1)
+  (setq electric-pair-preserve-balance t
+        electric-pair-delete-adjacent-pairs nil
+        electric-pair-open-newline-between-pairs nil)
+
   ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
   ;; NOTE: fix indent after electric pair appear
-  (defun ~+default-ep-post-self-insert-h ()
-    (when (bound-and-true-p ~+default-ep-do-electric-pair)
-      (electric-pair-post-self-insert-function)
-      (indent-according-to-mode)
-      (setq ~+default-ep-do-electric-pair nil)))
-  (defun ~+default-ep-newline-and-indent-a ()
-    (setq ~+default-ep-do-electric-pair t))
-  (add-hook 'post-self-insert-hook #'~+default-ep-post-self-insert-h)
-  (advice-add 'newline-and-indent :before #'~+default-ep-newline-and-indent-a))
+  ;; BUG not work properly
+  (electric-pair-mode 1))
+
+
+;; (defun my-after-electric-pair-inserted ()
+;;   "Call afer electric paid indention inserted for auto align with current mode."
+;;   (message "Amm was inserted"))
+
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-post-self-insert-function)
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-open-newline-between-pairs-psif)
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-will-use-region)
+
 
 ;;; Undo
 (use-package undo-tree
@@ -427,8 +458,8 @@
          ("C-s-s" . turbo-log-uncomment-all-logs)
          ("C-s-x" . turbo-log-delete-all-logs))
   :config
-  (setq turbo-console--prefix "✰")
-  (setq turbo-log--ecmascript-loggers '("console.log" "console.debug"))
+  (setq turbo-log--prefix "🚀")
+  (setq turbo-log--ecmascript-loggers '("console.log" "console.debug" "console.warn"))
   (setq turbo-log--python-loggers '("print" "logger"))
   (setq turbo-log--golang-loggers '("fmt.Printf" "log.Info().Msgf")))
 
@@ -441,6 +472,11 @@
 
 ;;; Programming
 ;; Common configurations for all programming languages
+;;;; Flycheck
+;; (use-package flycheck
+;;   :defer 0.1
+;;   :bind (:map evil-normal-state-map
+;;          ("SPC f n" . flycheck-next-error)))
 ;;;; Lsp
 ;;;;
 ;; (defun my-setup-flycheck ()
@@ -453,6 +489,8 @@
   ;; TIDE check, less laggi?
   ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
   :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
+  :bind (:map evil-normal-state-map
+         ("SPC f n" . flycheck-next-error))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.3)
@@ -463,9 +501,10 @@
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   :config
+
   ;; Flycheck patch checkers
-  (require 'lsp-diagnostics)
   (require 'flycheck)
+  (require 'lsp-diagnostics)
   (lsp-diagnostics-flycheck-enable)
   ;; Golang
   (defun lsp-go-install-save-hooks ()
@@ -484,7 +523,9 @@
 
   ;; Override company backends for lsp
   ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
-  (setq +lsp-company-backends '(company-tabnine :separate company-yasnippet))
+  ;; (setq +lsp-company-backends '(company-tabnine :separate company-yasnippet))
+  ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
+  (setq +lsp-company-backends '(company-tabnine))
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
@@ -540,6 +581,7 @@
   (setq company-show-numbers nil)
   (setq company-minimum-prefix-length 1)
   (setq company-tabnine-show-annotation t)
+  ;; (setq company-tabnine-auto-balance nil)
   (setq company-dabbrev-char-regexp "[A-z:-]"))
 
 
@@ -547,6 +589,7 @@
 ;;;; Lisp
 (use-package elisp-mode
   :defer 4
+  :hook (elisp-mode . 'my-setup-tabnine-2)
   :bind (("C-c o" . outline-cycle)
          ("C-c r" . outline-show-all)
          ("C-c m" . outline-hide-body)
@@ -754,7 +797,19 @@
   :init
   (global-git-gutter-mode)
   (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
-  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk))
+  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
+  :config
+  ;; TODO: check correct fringe
+  (set-fringe-style (quote (20 . 10)))
+  (setq left-fringe-width 20)
+  (set-fringe-mode '(20 . 10)))
+
+;;; Blamer (own package)
+(use-package turbo-log
+  :hook ((typescript-mode ng2-mode js-mode go-mode python-mode) . blamer-mode)
+  :defer 20
+  :config
+  (setq blamer--idle-time 1))
 
 (use-package hydra
   :defer 8)
@@ -1089,7 +1144,14 @@
   (setq org-roam-ui-sync-theme t
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
+        org-roam-ui-open-on-start t
+        org-roam-ui-browser-function #'xwidget-webkit-browse-url)
+  ;; TODO: make func for preview inside emacs
+  ;; (defun my-view-org-roam ()
+  ;;   "View org roam inside emacs with xwidgets."
+  ;;   (interactive)
+  ;;   (xwidget-webkit-browse-url "http://localhost:35901"))
+  )
 
 ;;;; Sticky header
 (use-package org-sticky-header
@@ -1157,6 +1219,30 @@
   (org-edit-src-exit))
 
 
+;;;; Org inline images from http
+(use-package org-yt
+  :defer 20
+  :config
+  (defun org-image-link (protocol link _description)
+    "Interpret LINK as base64-encoded image data."
+    (cl-assert (string-match "\\`img" protocol) nil
+               "Expected protocol type starting with img")
+    (let ((buf (url-retrieve-synchronously (concat (substring protocol 3) ":" link))))
+      (cl-assert buf nil
+                 "Download of image \"%s\" failed." link)
+      (with-current-buffer buf
+        (goto-char (point-min))
+        (re-search-forward "\r?\n\r?\n")
+        (buffer-substring-no-properties (point) (point-max)))))
+
+  (org-link-set-parameters
+   "imghttp"
+   :image-data-fun #'org-image-link)
+
+  (org-link-set-parameters
+   "imghttps"
+   :image-data-fun #'org-image-link))
+
 ;;; Dependencies
 (use-package! websocket
   :after org-roam)
@@ -1169,4 +1255,5 @@
 (use-package pretty-agenda
   :load-path "~/.doom.d/"
   :defer 15)
+
 ;;; Temporary unused

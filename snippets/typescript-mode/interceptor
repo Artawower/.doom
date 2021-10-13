@@ -1,0 +1,28 @@
+# -*- mode: snippet -*-
+# name: interceptor
+# key: i
+# --
+
+import { Injectable } from '@angular/core';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+} from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+
+@Injectable()
+export class ${1:name} implements HttpInterceptor {
+
+  constructor(${2:dependencies}) {}
+
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+  $3
+  }
+
+}

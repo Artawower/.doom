@@ -3,12 +3,12 @@
 # key: package
 # --
 
-;;; turbo-log.el --- The simple package for fast log selected region                     -*- lexical-binding: t; -*-
+;;; $0.el --- $1                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021 Artur Yaroshenko
 
 ;; Author: Artur Yaroshenko <artawower@protonmail.com>
-;; URL: $0
+;; URL: $2
 ;; Package-Requires: ((emacs "24.4"))
 ;; Version: 0.1
 
@@ -26,7 +26,10 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
+$3
 ;;
 
 ;;; Code:
+
+(provide '$0)
+;;; $0.el ends here
