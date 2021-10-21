@@ -148,7 +148,7 @@
   :init
   (ivy-posframe-mode 1)
   :config
-  (setq ivy-posframe-parameters '((internal-border-width . 3) (left-fringe . 18) (right-fringe . 18))
+  (setq ivy-posframe-parameters '((internal-border-width . 23) (left-fringe . 18) (right-fringe . 18))
         ivy-posframe-height 14
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 12")
@@ -519,6 +519,8 @@
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
   (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+  (add-hook 'emacs-lisp-mode-hook #'(lambda ()
+                                      (setq company-backends '(company-tabnine company-dabbrev))))
 
 
   ;; Override company backends for lsp
@@ -580,6 +582,7 @@
   (setq company-idle-delay 0.1)
   (setq company-show-numbers nil)
   (setq company-minimum-prefix-length 1)
+  (setq company-tabnine-always-trigger nil)
   (setq company-tabnine-show-annotation t)
   ;; (setq company-tabnine-auto-balance nil)
   (setq company-dabbrev-char-regexp "[A-z:-]"))
@@ -805,106 +808,25 @@
   (set-fringe-mode '(20 . 10)))
 
 ;;; Blamer (own package)
-(use-package turbo-log
-  :hook ((typescript-mode ng2-mode js-mode go-mode python-mode) . blamer-mode)
-  :defer 20
+(use-package blamer
+  :defer 2
+  :custom
+  (blamer-idle-time 0.2)
+  (blamer-min-offset 50)
+  (blamer-max-commit-message-length 65)
+  (blamer-offset-per-symbol 11)
+  ;; (blamer-uncommitted-changes-message "(งツ)ว")
+  (blamer-uncommitted-changes-message "uncommitted yet")
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                   :background nil
+                   :height 140
+                   :italic t)))
   :config
-  (setq blamer--idle-time 1))
+  (global-blamer-mode 1))
 
 (use-package hydra
   :defer 8)
-
-;;;; Git messanger
-(use-package git-messenger
-  :defer 25
-  :bind (:map vc-prefix-map
-         ("p" . git-messenger:popup-message)
-         :map git-messenger-map
-         ("m" . git-messenger:copy-message))
-  :config
-  (setq git-messenger:show-detail t
-        git-messenger:use-magit-popup t)
-  ;; :config
-  (with-no-warnings
-    (with-eval-after-load 'hydra
-      (defhydra git-messenger-hydra (:color blue)
-        ("s" git-messenger:popup-show "show")
-        ("c" git-messenger:copy-commit-id "copy hash")
-        ("m" git-messenger:copy-message "copy message")
-        ("," (catch 'git-messenger-loop (git-messenger:show-parent)) "go parent")
-        ("q" git-messenger:popup-close "quit")))
-
-    (defun my-git-messenger:format-detail (vcs commit-id author message)
-      (if (eq vcs 'git)
-          (let ((date (git-messenger:commit-date commit-id))
-                (colon (propertize ":" 'face 'font-lock-comment-face)))
-            (concat
-             (format "%s%s %s \n%s%s %s\n%s  %s %s \n"
-                     (propertize "Commit" 'face 'font-lock-keyword-face) colon
-                     (propertize (substring commit-id 0 8) 'face 'font-lock-comment-face)
-                     (propertize "Author" 'face 'font-lock-keyword-face) colon
-                     (propertize author 'face 'font-lock-string-face)
-                     (propertize "Date" 'face 'font-lock-keyword-face) colon
-                     (propertize date 'face 'font-lock-string-face))
-             (propertize (make-string 38 ?─) 'face 'font-lock-comment-face)
-             message
-             (propertize "\nPress q to quit" 'face '(:inherit (font-lock-comment-face italic)))))
-        (git-messenger:format-detail vcs commit-id author message)))
-
-    (defun my-git-messenger:popup-message ()
-      "Popup message with `posframe', `pos-tip', `lv' or `message', and dispatch actions with `hydra'."
-      (interactive)
-      (let* ((vcs (git-messenger:find-vcs))
-             (file (buffer-file-name (buffer-base-buffer)))
-             (line (line-number-at-pos))
-             (commit-info (git-messenger:commit-info-at-line vcs file line))
-             (commit-id (car commit-info))
-             (author (cdr commit-info))
-             (msg (git-messenger:commit-message vcs commit-id))
-             (popuped-message (if (git-messenger:show-detail-p commit-id)
-                                  (my-git-messenger:format-detail vcs commit-id author msg)
-                                (cl-case vcs
-                                  (git msg)
-                                  (svn (if (string= commit-id "-")
-                                           msg
-                                         (git-messenger:svn-message msg)))
-                                  (hg msg)))))
-        (setq git-messenger:vcs vcs
-              git-messenger:last-message msg
-              git-messenger:last-commit-id commit-id)
-        (run-hook-with-args 'git-messenger:before-popup-hook popuped-message)
-        (git-messenger-hydra/body)
-        (cond ((and (fboundp 'posframe-workable-p) (posframe-workable-p))
-               (let ((buffer-name "*git-messenger*"))
-                 (posframe-show buffer-name
-                                :string popuped-message
-                                :left-fringe 8
-                                :right-fringe 8
-                                ;; :poshandler #'posframe-poshandler-window-top-right-corner
-                                :poshandler #'posframe-poshandler-window-top-right-corner
-                                ;; Position broken with xwidgets and emacs 28
-                                ;; :position '(-1 . 0)
-                                :y-pixel-offset 20
-                                :x-pixel-offset -20
-                                :internal-border-width 2
-                                :lines-truncate t
-                                :internal-border-color (face-foreground 'font-lock-comment-face)
-                                :accept-focus nil)
-                 (unwind-protect
-                     (push (read-event) unread-command-events)
-                   (posframe-delete buffer-name))))
-              ((and (fboundp 'pos-tip-show) (display-graphic-p))
-               (pos-tip-show popuped-message))
-              ((fboundp 'lv-message)
-               (lv-message popuped-message)
-               (unwind-protect
-                   (push (read-event) unread-command-events)
-                 (lv-delete-window)))
-              (t (message "%s" popuped-message)))
-        (run-hook-with-args 'git-messenger:after-popup-hook popuped-message)))
-    (advice-add #'git-messenger:popup-close :override #'ignore)
-    ;; (advice-add #'git-messenger:popup-close :override #'(setq modal-opened 0))
-    (advice-add #'git-messenger:popup-message :override #'my-git-messenger:popup-message)))
 
 ;;; Keybinding
 ;;;; Ru/en keybinding
@@ -929,7 +851,6 @@
 
 (use-package evil-leader
   :after evil
-  :init (global-evil-leader-mode)
   :bind (:map evil-normal-state-map
          ("f" . avy-goto-char)
          ("SPC n r f" . org-roam-node-find)
@@ -938,6 +859,8 @@
          ;; Org mode
          ("SPC d t" . org-time-stamp-inactive)
          ("SPC d T" . org-time-stamp))
+  :init
+  (global-evil-leader-mode)
   :config
   (setq-default evil-kill-on-visual-paste nil)
   (evil-leader/set-key
@@ -1051,33 +974,37 @@
 (after! org
   (setq org-todo-keywords
         '((sequence
-           "TODO(t)"  ; A task that needs doing & is ready to do
-           "PROJ(p)"  ; A project, which usually contains other tasks
-           "IDEA(i)"  ; Idea
-           "STRT(s)"  ; A task that is in progress
-           "WAIT(w)"  ; Something external is holding up this task
-           "REVIEW(r)"; Somebody reviewed your feature
-           "HOLD(h)"  ; This task is paused/on hold because of me
+           "TODO(t)"     ; A task that needs doing & is ready to do
+           "PROJ(p)"     ; A project, which usually contains other tasks
+           "IDEA(i)"     ; Idea
+           "STRT(s)"     ; A task that is in progress
+           "WAIT(w)"     ; Something external is holding up this task
+           "TEST(c)"     ; In TEST statement
+           "FEEDBACK(f)" ; Feedback required
+           "REVIEW(r)"   ; Somebody reviewed your feature
+           "HOLD(h)"     ; This task is paused/on hold because of me
            "|"
-           "DONE(d)"  ; Task successfully completed
-           "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
+           "DONE(d)"     ; Task successfully completed
+           "KILL(k)")    ; Task was cancelled, aborted or is no longer applicable
           (sequence
-           "[ ](T)"   ; A task that needs doing
-           "[-](S)"   ; Task is in progress
-           "[?](W)"   ; Task is being held up or paused
+           "[ ](T)"      ; A task that needs doing
+           "[-](S)"      ; Task is in progress
+           "[?](W)"      ; Task is being held up or paused
            "|"
-           "[X](D)")) ; Task was completed
+           "[X](D)"))    ; Task was completed
         org-todo-keyword-faces
-        '(("[-]"    . +org-todo-active)
-          ("STRT"   . +org-todo-active)
-          ("DONE"   . org-todo)
-          ("IDEA"   . org-todo)
-          ("[?]"    . +org-todo-onhold)
-          ("WAIT"   . +org-todo-onhold)
-          ("REVIEW" . +org-todo-onhold)
-          ("HOLD"   . +org-todo-onhold)
-          ("PROJ"   . +org-todo-project)
-          ("KILL"   . +org-todo-cancel))))
+        '(("[-]"        . +org-todo-active)
+          ("STRT"       . +org-todo-active)
+          ("DONE"       . org-todo)
+          ("IDEA"       . org-todo)
+          ("[?]"        . +org-todo-onhold)
+          ("WAIT"       . +org-todo-onhold)
+          ("TEST"       . +org-todo-active)
+          ("FEEDBACK"   . +org-todo-onhold)
+          ("REVIEW"     . +org-todo-onhold)
+          ("HOLD"       . +org-todo-onhold)
+          ("PROJ"       . +org-todo-project)
+          ("KILL"       . +org-todo-cancel))))
 
 ;;;; Org agenda
 (use-package org-caldav
@@ -1255,5 +1182,13 @@
 (use-package pretty-agenda
   :load-path "~/.doom.d/"
   :defer 15)
+
+(use-package elfeed
+  :defer 3
+  :config
+  (add-hook! 'elfeed-search-mode-hook 'elfeed-update)
+  (setq-default elfeed-search-filter "@2-days-ago +unread")
+  (setq-default elfeed-search-title-max-width 100)
+  (setq-default elfeed-search-title-min-width 100))
 
 ;;; Temporary unused

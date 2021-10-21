@@ -149,8 +149,7 @@
 (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 
 
-
-
+(package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
 
 ;;; Unused
 ;; (package! lsp-ivy)
