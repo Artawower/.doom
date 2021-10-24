@@ -147,6 +147,8 @@
 ;;; Temporary
 (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt"))
 (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+;; (package! multi-vterm)
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "feature/alignment"))
 
 
 (package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))

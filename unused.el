@@ -11,6 +11,7 @@
 (use-package lsp-ivy
   :after lsp)
 
+;; Completion
 (use-package corfu
   ;; Optional customizations
   :custom
@@ -30,7 +31,8 @@
          ("S-TAB" . corfu-previous)
          ([backtab] . corfu-previous)
          :map evil-insert-state-map
-         ("C-x c" . completion-at-point))
+         ("C-x C-o" . completion-at-point)
+         ("S-SPC" . completion-at-point))
 
   ;; You may want to enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
@@ -47,9 +49,9 @@
   (advice-add 'corfu--teardown :after 'evil-normalize-keymaps)
   (evil-make-overriding-map corfu-map))
 
-Optionally use the `orderless' completion style.
-Enable `partial-completion' for files to allow path expansion.
-You may prefer to use `initials' instead of `partial-completion'.
+;; Optionally use the `orderless' completion style.
+;; Enable `partial-completion' for files to allow path expansion.
+;; You may prefer to use `initials' instead of `partial-completion'.
 (use-package orderless
   :init
   (setq completion-styles '(orderless)
@@ -165,3 +167,25 @@ You may prefer to use `initials' instead of `partial-completion'.
     (advice-add #'git-messenger:popup-close :override #'ignore)
     ;; (advice-add #'git-messenger:popup-close :override #'(setq modal-opened 0))
     (advice-add #'git-messenger:popup-message :override #'my-git-messenger:popup-message)))
+
+
+(use-package multi-vterm
+  :after vterm-toggle
+  :config
+  (add-hook 'vterm-mode-hook
+	    (lambda ()
+	      (setq-local evil-insert-state-cursor 'box)
+	      (evil-insert-state)))
+  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+
+  (setq vterm-keymap-exceptions nil)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-i")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "SPC t d")  #'multi-vterm-toggle)
+  (evil-define-key 'normal vterm-mode-map (kbd "C-i")      #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "SPC t m")  #'multi-vterm)
+  (evil-define-key 'normal vterm-mode-map (kbd "SPC ]")    #'multi-vterm-next)
+  (evil-define-key 'normal vterm-mode-map (kbd "SPC [")    #'multi-vterm-prev)
+  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))

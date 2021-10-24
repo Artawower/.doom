@@ -148,7 +148,7 @@
   :init
   (ivy-posframe-mode 1)
   :config
-  (setq ivy-posframe-parameters '((internal-border-width . 23) (left-fringe . 18) (right-fringe . 18))
+  (setq ivy-posframe-parameters '((internal-border-width . 2) (left-fringe . 18) (right-fringe . 18))
         ivy-posframe-height 14
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 12")
@@ -156,8 +156,8 @@
   (defun ivy-posframe-get-size ()
     "Func for detect ivy posframe size after resize dynamically"
     (list
-     :height ivy-posframe-height
-     :width ivy-posframe-width
+     ;; :height ivy-posframe-height
+     ;; :width ivy-posframe-width
      :min-height (or ivy-posframe-min-height
                      (let ((height (+ ivy-height 1)))
                        (min height (or ivy-posframe-height height))
@@ -374,7 +374,22 @@
 
 ;;; Terminal
 (use-package vterm-toggle
-  :defer 3
+  :defer 8
+  :bind (:map evil-normal-state-map
+         ("SPC t ]" . vterm-toggle-forward)
+         ("SPC t [" . vterm-toggle-backward)
+         ("SPC t n" . (lambda () (interactive)
+                        (let ((current-buffer-name (buffer-name)))
+                          (vterm-toggle--new)
+                          (delete-window)
+                          (display-buffer current-buffer-name)
+                          (vterm-toggle-forward))))
+         ("SPC t x" . (lambda (args) (interactive "P")
+                        (when (string-match "vterm" (buffer-name))
+                          (let ((kill-buffer-query-functions nil))
+                            (kill-this-buffer)
+                            (+vterm/toggle args)))))
+         ("SPC t h" . vterm-toggle-hide))
   :config
   (setq vterm-toggle-scope 'project))
 
@@ -446,6 +461,7 @@
   :custom-face
   (indent-guide-face ((t (:foreground ,+m-color-main))))
   :config
+  (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
   (setq indent-guide-char "|")
   (setq indent-guide-delay 0.2))
 
@@ -527,7 +543,7 @@
   ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
   ;; (setq +lsp-company-backends '(company-tabnine :separate company-yasnippet))
   ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
-  (setq +lsp-company-backends '(company-tabnine))
+  (setq +lsp-company-backends '(company-tabnine :separate))
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
@@ -581,6 +597,8 @@
   :config
   (setq company-idle-delay 0.1)
   (setq company-show-numbers nil)
+  (setq company-quick-access-modifier 'super)
+  (setq company-show-quick-access t)
   (setq company-minimum-prefix-length 1)
   (setq company-tabnine-always-trigger nil)
   (setq company-tabnine-show-annotation t)
@@ -814,7 +832,8 @@
   (blamer-idle-time 0.2)
   (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
-  (blamer-offset-per-symbol 11)
+  (blamer-offset-per-symbol 17)
+  (blamer-view 'overlay-right)
   ;; (blamer-uncommitted-changes-message "(งツ)ว")
   (blamer-uncommitted-changes-message "uncommitted yet")
   :custom-face
@@ -1178,7 +1197,7 @@
   :defer 3)
 
 
-;;; Temporary section
+;;; Not programming
 (use-package pretty-agenda
   :load-path "~/.doom.d/"
   :defer 15)
@@ -1190,5 +1209,6 @@
   (setq-default elfeed-search-filter "@2-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100))
+;;; Temporary section
 
 ;;; Temporary unused

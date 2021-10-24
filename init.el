@@ -25,8 +25,9 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company +childframe)            ; the ultimate code completion backend
-       ;; company ; the ultimate code completion backend
+       ;; TODO: Child frame is so luggy, check sometime
+       ;; (company +childframe)            ; the ultimate code completion backend
+       company ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        (ivy +icons)               ; a search engine for love and life
