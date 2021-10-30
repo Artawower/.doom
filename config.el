@@ -554,13 +554,16 @@
 (use-package tree-sitter-langs
   :defer 6)
 
+
 (use-package tree-sitter
   :after tree-sitter-langs
-  :hook ((go-mode typescript-mode css-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
+  :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
   :config
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
-  (push '(scss-mode . css) tree-sitter-major-mode-language-alist))
+  (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
+  (tree-sitter-require 'tsx)
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
 
 ;;;; Company
@@ -713,8 +716,10 @@
 ;;;; Web mode
 (use-package web-mode
   :defer 0.5
+  :mode (("\\.vue\\'" . web-mode)
+         ("\\.tsx\\'" . typescript-tsx-mode)
+         ("\\.jsx\\'" . web-mode))
   :config
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
   (setq web-mode-comment-formats
         '(("java"       . "/*")
           ("javascript" . "//")
@@ -723,9 +728,10 @@
           ("php"        . "/*")
           ("pug"        . "//")
           ("css"        . "/*")))
-  ;; (add-to-list 'web-mode-comment-formats '("pug" . "//"))
-  ;; (setcdr (assoc "javascript" web-mode-comment-formats) "//")
-  ;; (add-to-list 'web-mode-comment-formats '("javascript" . "//"))
+  ;; Crutch for tsx mode
+  (setq font-lock-defaults '('(web-mode-fontify) t))
+  (setq tree-sitter-hl-use-font-lock-keywords nil)
+  ;; ---------------------------END CRUTCH HERE -------------------------------------
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-css-indent-offset 2))
 
@@ -823,13 +829,13 @@
   :defer 2
   :custom
   (blamer-idle-time 0.35)
-  ;; (blamer-min-offset 50)
+  (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
   (blamer-commit-formatter "• %s")
-  ;; (blamer-author-formatter )
+  (blamer-entire-formatter "  > %s")
   ;; (blamer-offset-per-symbol 17)
-  (blamer-view 'overlay-right)
-  ;; (blamer-view 'overlay)
+  ;; (blamer-view 'overlay-right)
+  (blamer-view 'overlay)
   ;; (blamer-uncommitted-changes-message "(งツ)ว")
   (blamer-uncommitted-changes-message "uncommitted yet")
   :custom-face
