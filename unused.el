@@ -189,3 +189,159 @@
   (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
   (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
   (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+;;; Autopairs
+(defun new-line-dwim ()
+  (interactive)
+  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
+                             (and (looking-back ">") (looking-at "<"))
+                             (and (looking-back "(") (looking-at ")"))
+                             (and (looking-back "\\[") (looking-at "\\]")))))
+    (newline)
+    (when break-open-pair
+      (save-excursion
+        (newline)
+        (indent-for-tab-command)))
+    (indent-for-tab-command)))
+
+(use-package electric
+  :defer 3
+  :bind (:map evil-insert-state-map
+         ("RET" . new-line-dwim))
+  :config
+  (setq electric-pair-preserve-balance t
+        electric-pair-delete-adjacent-pairs nil
+        electric-pair-open-newline-between-pairs nil)
+
+  ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
+  ;; NOTE: fix indent after electric pair appear
+  ;; BUG not work properly
+  (electric-pair-mode 1))
+
+;;; VUE JS (This solution doesn't work properly)
+(use-package polymode
+        :ensure t
+        :defer t
+        :hook (vue-mode . lsp-deferred)
+        :mode ("\\.vue\\'" . vue-mode)
+        :config
+
+
+        (define-innermode poly-vue-template-innermode
+          :mode 'html-mode
+          :head-matcher "<[[:space:]]*template[[:space:]]*[[:space:]]*>"
+          :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-innermode poly-vue-script-innermode
+          :mode 'js-mode
+          :head-matcher "<[[:space:]]*script[[:space:]]*[[:space:]]*>"
+          :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-innermode poly-vue-typescript-innermode
+          :mode 'typescript-mode
+          :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*ts[[:space:]]*[\"'][[:space:]]*>"
+          :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-innermode poly-vue-javascript-innermode
+          :mode 'js2-mode
+          :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*js[[:space:]]*[\"'][[:space:]]*>"
+          :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-auto-innermode poly-vue-template-tag-lang-innermode
+          :head-matcher "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
+          :tail-matcher "</[[:space:]]*template[[:space:]]*[[:space:]]*>"
+          :mode-matcher (cons  "<[[:space:]]*template[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-auto-innermode poly-vue-script-tag-lang-innermode
+          :head-matcher "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
+          :tail-matcher "</[[:space:]]*script[[:space:]]*[[:space:]]*>"
+          :mode-matcher (cons  "<[[:space:]]*script[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-auto-innermode poly-vue-style-tag-lang-innermode
+          :head-matcher "<[[:space:]]*style[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*>"
+          :tail-matcher "</[[:space:]]*style[[:space:]]*[[:space:]]*>"
+          :mode-matcher (cons  "<[[:space:]]*style[[:space:]]*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*>" 1)
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-innermode poly-vue-style-innermode
+          :mode 'css-mode
+          :head-matcher "<[[:space:]]*style[[:space:]]*[[:space:]]*>"
+          :tail-matcher "</[[:space:]]*style[[:space:]]*[[:space:]]*>"
+          :head-mode 'host
+          :tail-mode 'host)
+
+        (define-polymode vue-mode
+          :hostmode 'poly-sgml-hostmode
+          :innermodes '(
+                        poly-vue-typescript-innermode
+                        poly-vue-javascript-innermode
+                        poly-vue-template-tag-lang-innermode
+                        poly-vue-script-tag-lang-innermode
+                        poly-vue-style-tag-lang-innermode
+                        poly-vue-template-innermode
+                        poly-vue-script-innermode
+                        poly-vue-style-innermode
+                        )))
+
+
+;;; Elfeed xwidgets
+
+  (define-minor-mode lordpretzel-elfeed-xwidgets-mode
+    "Minor mode for setting up keys when viewing elfeed entry in xwidgets."
+    :init-value nil
+    :lighter "elfeed-browsing"
+    :keymap
+    `((,(kbd "q")
+       . lordpretzel/elfeed-search-window-only))
+    :global nil)
+
+  ;; register minor mode with xwidgets-reuse to turn it on or off
+  (xwidgets-reuse-register-minor-mode 'lordpretzel-elfeed-xwidgets-mode)
+
+  (defun lordpretzel/elfeed-search-window-only ()
+    "Show only the search window of elfeed."
+    (interactive)
+    (switch-to-buffer (elfeed-search-buffer))
+    (delete-other-windows)
+    )
+
+  (defun lordpretzel/elfeed-open-entry-in-xwidgets
+      (entry)
+    (interactive
+     (list
+      (elfeed-search-selected :ignore-region)))
+    (require 'elfeed-show)
+    (when
+        (elfeed-entry-p entry)
+      (elfeed-untag entry 'unread)
+      (elfeed-search-update-entry entry)
+      (forward-line)
+      (let
+          ((link
+            (elfeed-entry-link entry)))
+        (when link
+          (let
+              ((window
+                (selected-window))
+               newwindow)
+            (delete-other-windows)
+            (setq newwindow
+                  (split-window-right))
+            (select-window newwindow)
+            (lordpretzel/elfeed-xwidget-reuse-browse-url link)
+            (select-window window))))))
+
+  (define-key elfeed-show-mode-map (kbd "<RET>") lordpretzel/elfeed-open-entry-in-xwidgets)

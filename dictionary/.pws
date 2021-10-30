@@ -1,4 +1,4 @@
-personal_ws-1.1 en 397 
+personal_ws-1.1 en 405 
 AccountStateModel
 AddedQualityIssues
 AfterViewInit
@@ -62,6 +62,7 @@ OnChanges
 OnDestroy
 OnInit
 OnPush
+PatchOrCreateValues
 ProjectChangedEvent
 QASettings
 QI
@@ -121,6 +122,7 @@ clojure
 closable
 collapseIdenticalGroups
 collectBonds
+combineLatest
 commentService
 commentoCountScript
 config
@@ -214,6 +216,7 @@ isForExpertTrader
 isFullTagHighlight
 isIgnored
 isLowLiquid
+isNetworkError
 isNightMode
 isNotEmptyWordform
 isOnlyOneSelected
@@ -297,6 +300,7 @@ openContextViewer
 os
 param
 params
+patchOrCreate
 posframe
 postgres
 previousWrapperNotExist
@@ -312,6 +316,7 @@ refreshTokenTimeout
 renderer
 repo
 reportErrorModalTemplate
+reportId
 req
 rerender
 res
@@ -388,8 +393,11 @@ urlPath
 uuid
 verifika
 void
+watchAvaiableUpdates
+watchCommonHubReconnected
 watchQualityIssueExpanding
 watchQualityIssueIgnored
+watchQualityIssueLoaded
 webp
 yAxis
 yieldCalc

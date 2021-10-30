@@ -61,6 +61,12 @@
       +m-color-secondary "red")
 
 ;;; My custom functions
+;;;; Switch to first finded buffer
+(defun switch-to-first-matching-buffer (regex)
+  (switch-to-buffer (car (remove-if-not (apply-partially #'string-match-p regex)
+                                        (mapcar #'buffer-name (buffer-list))))));;;
+
+;;;; Maximize current buffer
 (defun toggle-maximize-buffer () "Maximize buffer"
        (interactive)
        (if (= 1 (length (window-list)))
@@ -207,9 +213,14 @@
 ;;   :config)
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+(use-package autopair
+  :defer 5
+  :config
+  (autopair-global-mode))
 ;; (use-package smartparens
 ;;   :defer 5
 ;;   :config
+
 ;;   (defun indent-between-pair (&rest _ignored)
 ;;     (newline)
 ;;     (indent-according-to-mode)
@@ -220,32 +231,7 @@
 ;;   (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
 ;;   (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET"))))
 
-(defun new-line-dwim ()
-  (interactive)
-  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
-                             (and (looking-back ">") (looking-at "<"))
-                             (and (looking-back "(") (looking-at ")"))
-                             (and (looking-back "\\[") (looking-at "\\]")))))
-    (newline)
-    (when break-open-pair
-      (save-excursion
-        (newline)
-        (indent-for-tab-command)))
-    (indent-for-tab-command)))
 
-(use-package electric
-  :defer 3
-  :bind (:map evil-insert-state-map
-         ("RET" . new-line-dwim))
-  :config
-  (setq electric-pair-preserve-balance t
-        electric-pair-delete-adjacent-pairs nil
-        electric-pair-open-newline-between-pairs nil)
-
-  ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
-  ;; NOTE: fix indent after electric pair appear
-  ;; BUG not work properly
-  (electric-pair-mode 1))
 
 
 ;; (defun my-after-electric-pair-inserted ()
@@ -296,7 +282,7 @@
   (after! ispell
     (setq ispell-program-name "aspell"
           ;; Notice the lack of "--run-together"
-          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
     (ispell-kill-ispell t))
 
   (defun flyspell-buffer-after-pdict-save (&rest _)
@@ -459,10 +445,11 @@
           ng2-ts-mode
           python-mode) . indent-guide-mode)
   :custom-face
-  (indent-guide-face ((t (:foreground ,+m-color-main))))
+  (indent-guide-face ((t (:inherit default :foreground ,+m-color-main))))
   :config
   (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
   (setq indent-guide-char "|")
+  ;; (setq indent-guide-char ":")
   (setq indent-guide-delay 0.2))
 
 ;;; Fast commenting
@@ -474,6 +461,8 @@
          ("C-s-s" . turbo-log-uncomment-all-logs)
          ("C-s-x" . turbo-log-delete-all-logs))
   :config
+  (add-to-list 'turbo-log--modes '(js2-mode . turbo-log--ecmascript-print))
+
   (setq turbo-log--prefix "🚀")
   (setq turbo-log--ecmascript-loggers '("console.log" "console.debug" "console.warn"))
   (setq turbo-log--python-loggers '("print" "logger"))
@@ -518,6 +507,7 @@
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   :config
 
+  (set-face-attribute 'lsp-face-highlight-read nil :background "#61AFEF")
   ;; Flycheck patch checkers
   (require 'flycheck)
   (require 'lsp-diagnostics)
@@ -648,6 +638,10 @@
           "/usr/local/lib/node_modules"
           "--stdio")))
 
+;;;; Javascript
+(use-package js2-mode
+  :defer t
+  :hook (js2-mode . js2-highlight-unused-variables-mode))
 
 ;;;; Golang
 (use-package go-playground
@@ -810,7 +804,6 @@
   (setq auth-sources '("~/.authinfo"))
   (push `(,+m-work-gitlab-url ,(concat +m-work-gitlab-url "/api/v4")
                               "gpalex" forge-gitlab-repository)
-        ;; (add-to-list 'ghub-insecure-hosts "git.palex-soft.com/api/v4"))
         forge-alist))
 
 (use-package git-gutter
@@ -829,17 +822,21 @@
 (use-package blamer
   :defer 2
   :custom
-  (blamer-idle-time 0.2)
-  (blamer-min-offset 50)
+  (blamer-idle-time 0.35)
+  ;; (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
-  (blamer-offset-per-symbol 17)
+  (blamer-commit-formatter "• %s")
+  ;; (blamer-author-formatter )
+  ;; (blamer-offset-per-symbol 17)
   (blamer-view 'overlay-right)
+  ;; (blamer-view 'overlay)
   ;; (blamer-uncommitted-changes-message "(งツ)ว")
   (blamer-uncommitted-changes-message "uncommitted yet")
   :custom-face
-  (blamer-face ((t :foreground "#7a88cf"
+  (blamer-face ((t :inherit font-lock-comment-face
+                   :foreground "#7a88cf"
                    :background nil
-                   :height 140
+                   ;; :height 140
                    :italic t)))
   :config
   (global-blamer-mode 1))
@@ -1043,22 +1040,22 @@
 
   (setq org-caldav-calendars
         ;; Work
-        `((:calendar-id ,+m-work-calendar-id :files ("~/Yandex.Disk.localized/org/calendar/work.org")
+        `((:calendar-id ,+m-work-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/work.org")
            :inbox "~/Yandex.Disk.localized/org/calendar/fromwork.org")
           ;; Live and self education
-          (:calendar-id ,+m-live-calendar-id :files ("~/Yandex.Disk.localized/org/calendar/live.org")
-           :inbox "~/Yandex.Disk.localized/org/fromlive.org")
+          (:calendar-id ,+m-live-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/live.org")
+           :inbox "~/Yandex.Disk.localized/org/Dropbox/fromlive.org")
           ;; Pet projects
-          (:calendar-id ,+m-pet-calendar-id :files ("~/Yandex.Disk.localized/org/calendar/pet.org")
-           :inbox "~/Yandex.Disk.localized/org/frompet.org"))))
+          (:calendar-id ,+m-pet-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/pet.org")
+           :inbox "~/Yandex.Disk.localized/Dropbox/org/frompet.org"))))
 
 ;;;; Org superstar
 (use-package org-superstar
   :defer 5
   :hook (org-mode . org-superstar-mode)
   :config
-  (setq org-directory "~/Yandex.Disk.localized/org")
-  (setq org-agenda-files (append (directory-files-recursively "~/Yandex.Disk.localized/org/" "\\.org$")
+  (setq org-directory "~/Yandex.Disk.localized/Dropbox/org")
+  (setq org-agenda-files (append (directory-files-recursively "~/Yandex.Disk.localized/Dropbox/org/" "\\.org$")
                                  (directory-files-recursively "~/projects/pet" "\\.org$"))))
 
 ;;;; Roam
@@ -1074,14 +1071,12 @@
       (if (not tags)
           title
         (setq joined-text (string-join tags ", "))
-        (concat (propertize (format "(%s) " joined-text) 'face `(:foreground ,+m-color-main :weight bold :slant italic)) title)
-        )
-      )
-    )
+        (concat (propertize (format "(%s) " joined-text) 'face `(:foreground ,+m-color-main :weight bold :slant italic)) title))))
+
   ;; (message m-color-main)
   (setq org-roam-completion-system 'ivy)
   (setq org-roam-node-display-template "${compositetitle:100}")
-  (setq org-roam-directory (file-truename "~/Yandex.Disk.localized/org-roam"))
+  (setq org-roam-directory (file-truename "~/Yandex.Disk.localized/Dropbox/org-roam"))
   (org-roam-db-autosync-mode))
 
 (use-package! org-roam-ui
@@ -1091,13 +1086,7 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t
-        org-roam-ui-browser-function #'xwidget-webkit-browse-url)
-  ;; TODO: make func for preview inside emacs
-  ;; (defun my-view-org-roam ()
-  ;;   "View org roam inside emacs with xwidgets."
-  ;;   (interactive)
-  ;;   (xwidget-webkit-browse-url "http://localhost:35901"))
-  )
+        org-roam-ui-browser-function #'xwidget-webkit-browse-url))
 
 ;;;; Sticky header
 (use-package org-sticky-header
@@ -1202,13 +1191,21 @@
   :load-path "~/.doom.d/"
   :defer 15)
 
+;;; RSS
 (use-package elfeed
   :defer 3
   :config
   (add-hook! 'elfeed-search-mode-hook 'elfeed-update)
   (setq-default elfeed-search-filter "@2-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
-  (setq-default elfeed-search-title-min-width 100))
+  (setq-default elfeed-search-title-min-width 100)
+  ;; (setq browse-url-generic-program #'xwidget-webkit-browse-url)
+  (setq browse-url-browser-function #'xwidget-webkit-browse-url)
+  (advice-add 'browse-url :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
+  (advice-add 'browse-url-generic :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit"))))
+
+
+;;;
 ;;; Temporary section
 
 ;;; Temporary unused

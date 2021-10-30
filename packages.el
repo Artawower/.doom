@@ -108,7 +108,14 @@
 (package! prettier)
 (package! package-lint)
 (package! package-build)
+;;; GIT
+(package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "hotfix/entire-msg-formatter"))
+
 (package! git-messenger)
+
+
+;;; ~UNCATEGORIZED YET
 (package! hydra)
 ;; (package! company-box)
 ;; (package! prettier-js)
@@ -146,12 +153,14 @@
 
 ;;; Temporary
 (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt"))
-(package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 ;; (package! multi-vterm)
-;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "feature/alignment"))
 
+(package! autopair :recipe (:host github :repo "joaotavora/autopair"))
 
 (package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
+
+;;; Not a programming
+;; (package! xwidgets-reuse)
 
 ;;; Unused
 ;; (package! lsp-ivy)
