@@ -1,4 +1,4 @@
-personal_ws-1.1 en 405 
+personal_ws-1.1 en 415 
 AccountStateModel
 AddedQualityIssues
 AfterViewInit
@@ -85,6 +85,7 @@ SPC
 STARTDATEMOEX
 SeoService
 StartTradeDateOnMOSMarket
+StatelessComponent
 StatusedQualityIssues
 TerminologyQualityIssueAdditionalData
 TextNormalizationService
@@ -237,10 +238,14 @@ js
 json
 julia
 kotlin
+languageByCode
+languageById
 lastInGroup
 lastNkdUpdateTime
 limitUp
 linkedin
+listByCodes
+listByIds
 loadQualityIssuesByIds
 loaded
 loc
@@ -285,6 +290,7 @@ onAddCorrectWordform
 onAddIncorrectWordform
 onAddedWordform
 onCellValueChanged
+onClick
 onColumnResized
 onEditedWordform
 onFirstDataRendered
@@ -301,6 +307,7 @@ os
 param
 params
 patchOrCreate
+png
 posframe
 postgres
 previousWrapperNotExist
@@ -310,6 +317,7 @@ protonmail
 qaSettings
 qualityIssueId
 queryParams
+rawLocationLng
 recheckTranslationUnit
 refreshTokenPair
 refreshTokenTimeout
@@ -369,11 +377,13 @@ subscribeOnShowInvisibles
 subscribeOnSpellingIssues
 subscribeOnTagView
 suggestBonds
+svg
 swCache
 swiper
 targetLabel
 targetSegmentChanged
 tinkoff
+tmp
 translationUnitId
 tryAuthWithRefreshToken
 tsconfig

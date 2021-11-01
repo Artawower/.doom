@@ -109,7 +109,8 @@
 (package! package-lint)
 (package! package-build)
 ;;; GIT
-(package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+(package! blamer)
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "hotfix/entire-msg-formatter"))
 
 (package! git-messenger)
@@ -144,7 +145,6 @@
 (package! org-superstar)
 (unpin! org-roam)
 (package! org-roam)
-(package! org-sticky-header)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 ;;;; Org babel
 (package! ob-restclient)
@@ -152,17 +152,23 @@
 ;;; Agenda
 
 ;;; Temporary
-(package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt"))
 ;; (package! multi-vterm)
 
 (package! autopair :recipe (:host github :repo "joaotavora/autopair"))
+(package! ranger)
+(package! counsel-dash)
+(package! modus-themes)
+;; (package! dash-docs)
 
-(package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
+
 
 ;;; Not a programming
 ;; (package! xwidgets-reuse)
 
 ;;; Unused
+;; (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt")) Youtrack. Awfully.
+;; (package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
+
 ;; (package! lsp-ivy)
 ;; (package! doct)
 ;; (package! org-super-agenda)
@@ -171,3 +177,4 @@
 ;; (package! polymode)
 ;; (package! icons-in-terminal :recipe (:host github :repo "seagle0128/icons-in-terminal.el"))
 ;; (package! poly-vue :recipe (:host github :repo "akirak/poly-vue"))
+;; (package! org-sticky-header) ;; Just unsused

@@ -53,6 +53,7 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;; (use-package doom-deep-atom-one-dark)
 (load! "~/.doom.d/private.el")
 
 ;;; Variables
@@ -78,6 +79,11 @@
 ;;; Fonts
 
 (set-frame-font "JetBrainsMono Nerd Font 15" nil t)
+(fringe-mode '16)
+;; (set-frame-font "Fira Code 15" nil t)
+;; (set-frame-font "Ligamonacop Nerd Font 15" nil t)
+
+
 
 (defconst jetbrains-ligature-mode--ligatures
   '("-->" "//" "/**" "/*" "*/" "<!--" ":=" "->>" "<<-" "->" "<-"
@@ -321,6 +327,19 @@
   :custom
   (treemacs-width 45))
 
+(use-package ranger
+  :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC r" . ranger))
+  :config
+  (setq ranger-preview-file t)
+  (setq ranger-footer-delay 0.2)
+  (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
+  (setq ranger-show-literal t)
+  (setq ranger-dont-show-binary t)
+  (setq ranger-max-preview-size 10)
+  (setq ranger-preview-delay 0.040))
+
 ;;;; Dired
 (use-package all-the-icons-dired
   :defer 5
@@ -359,6 +378,15 @@
 
 
 ;;; Terminal
+(use-package vterm
+  :defer t
+  :config
+  (set-face-attribute 'fixed-pitch nil ':font "Fira Code 14")
+  (add-hook 'vterm-mode-hook
+          (lambda ()
+            (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+                 (buffer-face-mode t))))
+
 (use-package vterm-toggle
   :defer 8
   :bind (:map evil-normal-state-map
@@ -401,6 +429,9 @@
 ;;           ("STUB"   . "#61AFEF"))))
 
 ;;; Themes
+;;; Modus
+(use-package modus-themes
+  :defer t)
 ;;;; Theme switcher
 (use-package heaven-and-hell
   :after doom-themes
@@ -408,7 +439,8 @@
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
         '((light . zaiste)
-          (dark . doom-moonlight)))
+          (dark . deep-atom)))
+          ;; (dark . doom-moonlight)))
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
   :bind (("<f5>" . heaven-and-hell-toggle-theme)))
@@ -492,8 +524,8 @@
 (use-package lsp
   :defer 0.1
   ;; TIDE check, less laggi?
-  ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
-  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode) . lsp-deferred))
+  ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
+  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error))
   :custom
@@ -580,6 +612,10 @@
   (interactive)
   (setq-local +lsp-company-backends '((company-capf)))
   (setq-local company-backends '((company-capf))))
+
+(use-package company
+  :defer t
+  :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)))
 
 ;; (my-setup-tabnine)
 ;; Autocomplete with AI
@@ -729,8 +765,8 @@
           ("pug"        . "//")
           ("css"        . "/*")))
   ;; Crutch for tsx mode
-  (setq font-lock-defaults '('(web-mode-fontify) t))
-  (setq tree-sitter-hl-use-font-lock-keywords nil)
+  ;; (setq font-lock-defaults '('(web-mode-fontify) t))
+  ;; (setq tree-sitter-hl-use-font-lock-keywords nil)
   ;; ---------------------------END CRUTCH HERE -------------------------------------
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-css-indent-offset 2))
@@ -796,9 +832,25 @@
 (use-package string-inflection
   :defer 10
   :bind ("C-s-c" . string-inflection-all-cycle))
+
+;;;; Offline documentation
+(use-package counsel-dash
+  :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC i d" . counsel-dash))
+  :config
+  (setq counsel-dash-docsets-path "~/.doom.d/.docsets")
+  (setq counsel-dash-docsets-url "https://raw.github.com/Kapeli/feeds/master")
+  (setq counsel-dash-common-docsets '("Javascript" "HTML" "React" "Angular")))
+
+;; (use-package dash-docs
+;;   :defer t
+;;   :config
+;;   (setq dash-docs-docsets-path "~/.doom.d/.docsets"))
+
 ;;; Git
 (use-package magit
-  :defer 0.3
+  :defer t
   :config
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
@@ -813,20 +865,15 @@
         forge-alist))
 
 (use-package git-gutter
-  :defer 3
+  :defer 9
   :init
   (global-git-gutter-mode)
   (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
-  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk)
-  :config
-  ;; TODO: check correct fringe
-  (set-fringe-style (quote (20 . 10)))
-  (setq left-fringe-width 20)
-  (set-fringe-mode '(20 . 10)))
+  (global-set-key (kbd "C-x n") 'git-gutter:next-hunk))
 
 ;;; Blamer (own package)
 (use-package blamer
-  :defer 2
+  :defer 15
   :custom
   (blamer-idle-time 0.35)
   (blamer-min-offset 50)
@@ -848,12 +895,12 @@
   (global-blamer-mode 1))
 
 (use-package hydra
-  :defer 8)
+  :defer t)
 
 ;;; Keybinding
 ;;;; Ru/en keybinding
 (use-package reverse-im
-  :defer 0.1
+  :defer 5
   :config
   (reverse-im-activate "russian-computer"))
 
@@ -923,7 +970,7 @@
 
 ;;; Navigation
 (use-package evil-matchit
-  :defer 3.5)
+  :defer 15)
 
 (evilmi-load-plugin-rules '(ng2-html-mode) '(html))
 (global-evil-matchit-mode 1)
@@ -931,7 +978,7 @@
 ;;; Org mode
 (use-package org
   :mode (("\\.org$" . org-mode))
-  :defer 3
+  :defer t
   ;; :demand t
   ;; :bind
   ;; (:map org-mode-map ("C-o f" . format-org-mode-block))
@@ -1030,7 +1077,7 @@
 
 ;;;; Org agenda
 (use-package org-caldav
-  :defer 10
+  :defer t
   :config
   (require 'oauth2)
   (setq org-caldav-oauth2-client-secret +m-google-calendar-client-secret)
@@ -1094,10 +1141,6 @@
         org-roam-ui-open-on-start t
         org-roam-ui-browser-function #'xwidget-webkit-browse-url))
 
-;;;; Sticky header
-(use-package org-sticky-header
-  :hook (org-mode . org-sticky-header-mode)
-  :defer 8)
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()
@@ -1132,7 +1175,6 @@
                            (push '("[#D]" . "⬇") prettify-symbols-alist)
                            (push '("[#E]" . "❓") prettify-symbols-alist)
                            (prettify-symbols-mode)))
-
 
 ;;;; Org indent
 (use-package org-indent
@@ -1205,8 +1247,10 @@
   (setq-default elfeed-search-filter "@2-days-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100)
+
   ;; (setq browse-url-generic-program #'xwidget-webkit-browse-url)
-  (setq browse-url-browser-function #'xwidget-webkit-browse-url)
+  ;; (setq browse-url-browser-function #'xwidget-webkit-browse-url)
+  (setq browse-url-browser-function #'browse-url-default-browser)
   (advice-add 'browse-url :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
   (advice-add 'browse-url-generic :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit"))))
 

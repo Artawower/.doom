@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: git ignore js
+# key: .gj
+# --
+
+
+node_modules/*

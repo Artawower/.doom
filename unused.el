@@ -345,3 +345,9 @@
             (select-window window))))))
 
   (define-key elfeed-show-mode-map (kbd "<RET>") lordpretzel/elfeed-open-entry-in-xwidgets)
+
+
+;;;; Sticky header
+(use-package org-sticky-header
+  :hook (org-mode . org-sticky-header-mode)
+  :defer 8)
