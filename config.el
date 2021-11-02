@@ -79,10 +79,16 @@
 ;;; Fonts
 
 (set-frame-font "JetBrainsMono Nerd Font 15" nil t)
-(fringe-mode '16)
+
+
+(defun correct-my-fringe (&optional ignore)
+  (unless (eq fringe-mode '18)
+    (fringe-mode '18)))
+
+(add-hook 'after-init-hook #'correct-my-fringe)
+(add-hook 'buffer-list-update-hook #'correct-my-fringe)
 ;; (set-frame-font "Fira Code 15" nil t)
 ;; (set-frame-font "Ligamonacop Nerd Font 15" nil t)
-
 
 
 (defconst jetbrains-ligature-mode--ligatures
@@ -378,14 +384,11 @@
 
 
 ;;; Terminal
-(use-package vterm
-  :defer t
-  :config
-  (set-face-attribute 'fixed-pitch nil ':font "Fira Code 14")
-  (add-hook 'vterm-mode-hook
+(set-face-attribute 'fixed-pitch nil ':font "Fira Code 14")
+(add-hook 'vterm-mode-hook
           (lambda ()
             (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
-                 (buffer-face-mode t))))
+            (buffer-face-mode t)))
 
 (use-package vterm-toggle
   :defer 8
@@ -440,7 +443,7 @@
   (setq heaven-and-hell-themes
         '((light . zaiste)
           (dark . deep-atom)))
-          ;; (dark . doom-moonlight)))
+  ;; (dark . doom-moonlight)))
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
   :bind (("<f5>" . heaven-and-hell-toggle-theme)))
@@ -876,18 +879,18 @@
   :defer 15
   :custom
   (blamer-idle-time 0.35)
-  (blamer-min-offset 50)
+  ;; (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
   (blamer-commit-formatter "• %s")
   (blamer-entire-formatter "  > %s")
   ;; (blamer-offset-per-symbol 17)
-  ;; (blamer-view 'overlay-right)
-  (blamer-view 'overlay)
+  (blamer-view 'overlay-right)
+  ;; (blamer-view 'overlay)
   ;; (blamer-uncommitted-changes-message "(งツ)ว")
   (blamer-uncommitted-changes-message "uncommitted yet")
   :custom-face
   (blamer-face ((t :inherit font-lock-comment-face
-                   :foreground "#7a88cf"
+                   ;; :foreground "#7a88cf"
                    :background nil
                    ;; :height 140
                    :italic t)))

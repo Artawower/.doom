@@ -1,4 +1,4 @@
-personal_ws-1.1 en 415 
+personal_ws-1.1 en 417 
 AccountStateModel
 AddedQualityIssues
 AfterViewInit
@@ -104,6 +104,7 @@ agInit
 agda
 angular
 api
+applyUpdate
 asc
 async
 auth
@@ -360,6 +361,7 @@ sql
 sqls
 src
 startRefreshTokenTimer
+stopWatchingOnApplicationUpdates
 strconv
 subGroupParams
 subscribeEmptyList
