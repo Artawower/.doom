@@ -351,3 +351,67 @@
 (use-package org-sticky-header
   :hook (org-mode . org-sticky-header-mode)
   :defer 8)
+
+
+(use-package beacon
+  :defer 12
+  :custom
+  (beacon-color "#61AFEF")
+  :config
+  (beacon-mode 1))
+
+
+;;; Gist
+;; not work
+(defun my-setup-gist-bindings (&rest _)
+    (interactive)
+    (evil-normal-state)
+    (define-key gist-list-menu-mode-map "n" 'git-timemachine-show-next-revision)
+    (define-key gist-list-menu-mode-map "x" 'gist-kill-current)
+    (define-key gist-list-menu-mode-map "p" 'gist-print-current-url)
+    (define-key gist-list-menu-mode-map "+" 'gist-add-buffer)
+    (define-key gist-list-menu-mode-map "e" 'gist-edit-current-description)
+    (define-key gist-list-menu-mode-map "s" 'gist-star)
+    (define-key gist-list-menu-mode-map "u" 'gist-unstar)
+    (define-key gist-list-menu-mode-map "r" 'gist-reload)
+    (define-key gist-list-menu-mode-map "RET" 'gist-fetch-current)
+    (define-key gist-list-menu-mode-map "TAB" 'gist-fetch-current-noselect)
+
+    ;; (define-key evil-normal-state-local-map "n" 'git-timemachine-show-next-revision)
+    ;; (define-key evil-normal-state-local-map "x" 'gist-kill-current)
+    ;; (define-key evil-normal-state-local-map "p" 'gist-print-current-url)
+    ;; (define-key evil-normal-state-local-map "+" 'gist-add-buffer)
+    ;; (define-key evil-normal-state-local-map "e" 'gist-edit-current-description)
+    ;; (define-key evil-normal-state-local-map "s" 'gist-star)
+    ;; (define-key evil-normal-state-local-map "u" 'gist-unstar)
+    ;; (define-key evil-normal-state-local-map "r" 'gist-reload)
+    ;; (define-key evil-normal-state-local-map "RET" 'gist-fetch-current)
+    ;; (define-key evil-normal-state-local-map "TAB" 'gist-fetch-current-noselect))
+
+(use-package lsp-grammarly
+  :defer 20
+  :hook (text-mode . (lambda ()
+                       (require 'lsp-grammarly)
+                       (lsp))))  ; or lsp-deferred
+
+;;; Org mode
+;; (use-package polymode
+;;   :defer t)
+;; (use-package poly-org
+;;   :hook (org-mode . poly-org-mode)
+;;   :defer 15)
+
+;;;; Offline documentation
+(use-package counsel-dash
+  :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC i d" . counsel-dash))
+  :config
+  (setq counsel-dash-docsets-path "~/.doom.d/.docsets")
+  (setq counsel-dash-docsets-url "https://raw.github.com/Kapeli/feeds/master")
+  (setq counsel-dash-common-docsets '("Javascript" "HTML" "React" "Angular")))
+
+;; (use-package dash-docs
+;;   :defer t
+;;   :config
+;;   (setq dash-docs-docsets-path "~/.doom.d/.docsets"))

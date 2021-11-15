@@ -79,11 +79,17 @@
 ;;; Fonts
 
 (set-frame-font "JetBrainsMono Nerd Font 15" nil t)
+(custom-set-faces
+ `(font-lock-comment-face ((t (:font "ChalkBoard SE" :italic t :height 1.0))))
+ `(font-lock-string-face ((t (:italic t :height 1.0)))))
+;; `(font-lock-string-face ((t (:font "ChalkBoard SE" :italic t :height 136)))))
+;; `(doom-themes-treemacs-file-face ((t (:font "JetBrainsMono Nerd Font 14" :italic t))))
+;; `(doom-themes-treemacs-file-face ((t (:inherit all-the-icons-ivy-rich-icon-face)))))
 
 
 (defun correct-my-fringe (&optional ignore)
-  (unless (eq fringe-mode '18)
-    (fringe-mode '18)))
+  (unless (eq fringe-mode '16)
+    (fringe-mode '16)))
 
 (add-hook 'after-init-hook #'correct-my-fringe)
 (add-hook 'buffer-list-update-hook #'correct-my-fringe)
@@ -131,9 +137,14 @@
 (setq-default tab-width 2)
 
 ;;; Completion
+(use-package ivy
+  :defer t
+  :bind (:map ivy-mode-map ("C-<return>" . ivy-immediate-done)))
+
 (use-package ivy-rich
   :hook (ivy-mode . ivy-rich-mode)
-  :after ivy)
+  :after ivy
+  :config)
 
 (use-package counsel-projectile
   :defer 0.5)
@@ -155,6 +166,7 @@
                     (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-file-modes-face))
                     (all-the-icons-ivy-rich-project-file-id (:width 12 :face all-the-icons-ivy-rich-file-owner-face))
                     (all-the-icons-ivy-rich-project-file-modification-time (:face all-the-icons-ivy-rich-time-face)))))
+    (set-face-attribute 'all-the-icons-ivy-rich-doc-face nil :font "ChalkBoard SE" :italic t :height 136)
     (ivy-rich-set-columns 'projectile-find-file col-def)
     (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
     (ivy-rich-set-columns 'projectile--find-file col-def)))
@@ -301,8 +313,6 @@
     (flyspell-buffer))
 
   (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save))
-
-
 ;; (use-package spell-fu
 ;;   :defer 0.1
 ;;   :config
@@ -329,14 +339,23 @@
 ;;; File managers
 ;;;; treemacs
 (use-package treemacs
-  :defer 3
+  :defer t
+  :custom-face
+  (font-lock-doc-face ((t (:inherit nil))))
+  (doom-themes-treemacs-file-face ((t (:inherit font-lock-doc-face :slant italic))))
+  (doom-themes-treemacs-root-face ((t (:inherit nil :slant italic))))
+  (treemacs-root-face ((t (:inherit variable-pitch :slant italic))))
   :custom
-  (treemacs-width 45))
+  (treemacs-width 45)
+  :config
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
 
 (use-package ranger
   :defer t
   :bind (:map evil-normal-state-map
-         ("SPC r" . ranger))
+         ("SPC r r" . ranger))
   :config
   (setq ranger-preview-file t)
   (setq ranger-footer-delay 0.2)
@@ -413,8 +432,8 @@
 
 ;;; Colors
 (use-package rainbow-mode
-  :hook (((css-mode scss-mode org-mode emacs-lisp-mode typescript-mode js-mode). rainbow-mode))
-  :defer 2.3)
+  :hook (((css-mode scss-mode org-mode typescript-mode js-mode). rainbow-mode))
+  :defer 15)
 
 ;; TODO
 ;; (use-package hl-todo
@@ -441,8 +460,11 @@
   :init
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
-        '((light . zaiste)
-          (dark . deep-atom)))
+        '((light . pinky-winky)
+          (dark . pinky-winky-dark)))
+  ;; (setq heaven-and-hell-themes
+  ;;       '((light . zaiste)
+  ;;         (dark . deep-atom)))
   ;; (dark . doom-moonlight)))
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
@@ -470,7 +492,6 @@
 (use-package indent-guide
   :defer 1.2
   :hook ((web-mode
-          emacs-lisp-mode
           html-mode
           scss-mode
           css-mode
@@ -480,7 +501,7 @@
           ng2-ts-mode
           python-mode) . indent-guide-mode)
   :custom-face
-  (indent-guide-face ((t (:inherit default :foreground ,+m-color-main))))
+  (indent-guide-face ((t (:foreground ,+m-color-main :font "Fira Code" :height 0.9))))
   :config
   (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
   (setq indent-guide-char "|")
@@ -528,7 +549,7 @@
   :defer 0.1
   ;; TIDE check, less laggi?
   ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
-  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
+  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode clojure-mode) . lsp-deferred))
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error))
   :custom
@@ -609,7 +630,8 @@
 ;;;; Only tabnine
 (defun my-setup-tabnine-2 ()
   (interactive)
-  (setq-local company-backends '(company-tabnine)))
+  (setq-local +lsp-company-backends '((company-tabnine company-dabbrev)))
+  (setq-local company-backends '(company-tabnine company-dabbrev)))
 
 (defun my-setup-tabnine-3 ()
   (interactive)
@@ -638,11 +660,15 @@
   (setq company-dabbrev-char-regexp "[A-z:-]"))
 
 
-;; Languages
+;;; Languages
 ;;;; Lisp
+
 (use-package elisp-mode
-  :defer 4
-  :hook (elisp-mode . 'my-setup-tabnine-2)
+  :defer t
+  :hook ((emacs-lisp-mode . paren-face-mode)
+         (emacs-lisp-mode . my-setup-tabnine-2)
+         (emacs-lisp-mode . rainbow-delimiters-mode-disable))
+
   :bind (("C-c o" . outline-cycle)
          ("C-c r" . outline-show-all)
          ("C-c m" . outline-hide-body)
@@ -651,7 +677,17 @@
          ("C-c c" . counsel-outline)
          ("C-c e" . outline-hide-entry)
          ("C-c t" . outline-toggle-children)
-         ("C-c b" . outline-cycle-buffer)))
+         ("C-c b" . outline-cycle-buffer))
+  :config
+  (setq rainbow-delimiters-mode -1))
+
+(use-package clojure-mode
+  :hook ((clojure-mode . format-all-mode)
+         (clojure-mode . paren-face-mode))
+  :defer t)
+
+(use-package cider
+  :defer t)
 
 (use-package package-build
   :defer 15)
@@ -733,6 +769,10 @@
   :config
   (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+
+;;;;; Python check depdendencies
+(use-package pippel
+  :defer t)
 
 
 (use-package python-mode
@@ -836,21 +876,6 @@
   :defer 10
   :bind ("C-s-c" . string-inflection-all-cycle))
 
-;;;; Offline documentation
-(use-package counsel-dash
-  :defer t
-  :bind (:map evil-normal-state-map
-         ("SPC i d" . counsel-dash))
-  :config
-  (setq counsel-dash-docsets-path "~/.doom.d/.docsets")
-  (setq counsel-dash-docsets-url "https://raw.github.com/Kapeli/feeds/master")
-  (setq counsel-dash-common-docsets '("Javascript" "HTML" "React" "Angular")))
-
-;; (use-package dash-docs
-;;   :defer t
-;;   :config
-;;   (setq dash-docs-docsets-path "~/.doom.d/.docsets"))
-
 ;;; Git
 (use-package magit
   :defer t
@@ -858,6 +883,20 @@
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
   (define-key transient-sticky-map "q" 'transient-quit-seq))
+
+
+(use-package gist                       ;
+  :defer t
+  :bind (:map gist-list-menu-mode-map
+         ("j" . next-line)
+         ("k" . previous-line)
+         ("c" . gist-fork)
+         ("x" . gist-kill-current)
+         ("f" . avy-goto-char)
+         ("v" . evil-visual-char)
+         :map evil-normal-state-map
+         ("SPC g l g" . gist-list)))
+
 
 (use-package forge
   :after magit
@@ -882,19 +921,39 @@
   ;; (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
   (blamer-commit-formatter "• %s")
+  ;; (blamer-entire-formatter "   %s")
   (blamer-entire-formatter "  > %s")
   ;; (blamer-offset-per-symbol 17)
-  (blamer-view 'overlay-right)
-  ;; (blamer-view 'overlay)
-  ;; (blamer-uncommitted-changes-message "(งツ)ว")
+  ;; (blamer-view 'overlay-right)
+  (blamer-view 'overlay)
+  ;; (blamer-uncommitted-changes-message "(งツ)
   (blamer-uncommitted-changes-message "uncommitted yet")
   :custom-face
-  (blamer-face ((t :inherit font-lock-comment-face
-                   ;; :foreground "#7a88cf"
-                   :background nil
-                   ;; :height 140
-                   :italic t)))
+  (blamer-face ((t :inherit company-preview
+                   :italic t
+                   :font "Fira Code 14"
+                   :height 0.9
+                   :background nil)))
   :config
+  (defun blamer-callback-show-commit-diff (commit-info)
+    (interactive)
+    (message "Blamer my custom callback")
+    (message "%s" commit-info)
+    (let ((commit-hash (plist-get commit-info :commit-hash)))
+      (when commit-hash
+        (magit-show-commit commit-hash))))
+
+  (defun blamer-callback-open-remote (commit-info)
+    (interactive)
+    (message "Copy authro")
+    (let ((commit-hash (plist-get commit-info :commit-hash)))
+      (when commit-hash
+        (message commit-hash)
+        (forge-browse-commit commit-hash))))
+
+  (setq blamer-bindings '(("<mouse-3>" . blamer-callback-open-remote)
+                          ("<mouse-1>" . blamer-callback-show-commit-diff)))
+
   (global-blamer-mode 1))
 
 (use-package hydra
@@ -930,7 +989,9 @@
          ("SPC g t" . git-timemachine)
          ;; Org mode
          ("SPC d t" . org-time-stamp-inactive)
-         ("SPC d T" . org-time-stamp))
+         ("SPC d T" . org-time-stamp)
+         ("SPC r p" . +python/open-ipython-repl)
+         ("SPC r n" . nodejs-repl))
   :init
   (global-evil-leader-mode)
   :config
@@ -940,6 +1001,10 @@
     "b" 'evilem-motion-previous-line
     "x" 'my-ecmascript-formatter
     "k" 'save-buffer-without-dtw
+    "w" 'avy-goto-word-0
+    "f" 'avy-goto-word-1
+    "]" 'flycheck-next-error
+    "[" 'flycheck-previous-error
 
     "d" 'dap-debug
 
@@ -988,9 +1053,6 @@
   :config
   (progn
     (define-key org-mode-map "\C-x a f" "\C-x h \C-M-\\ \C-c")
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((restclient . t)))
     (custom-set-faces
      '(org-document-title ((t (:inherit outline-1 :height 2.5))))
      '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
@@ -1001,9 +1063,6 @@
      )
     (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((restclient . t)))
 
 
     (defun publish-org-blog()
@@ -1032,7 +1091,9 @@
 
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '((js . t)))
+     '((typescript . t)
+       (js . t)
+       (restclient . t)))
 
     (defun org-babel-execute:typescript (body params)
       (let ((org-babel-js-cmd "npx ts-node < "))
@@ -1041,6 +1102,17 @@
     (defvar org-babel-js-function-wrapper
       ""
       "Javascript code to print value of body.")))
+
+;; (defun my-org-mode-hook ()
+;;   "Custom `org-mode' behaviours."
+;;   (add-hook  #'(lambda ()
+;;                  (message "Amma inside org mode")
+;;                  (prettier-mode -1))
+;;              'org-in-src-block-p
+;;              nil :local))
+
+;; (add-hook 'org-mode-hook 'my-org-mode-hook)
+;; )
 
 ;;;; Org mode todos list
 (after! org
@@ -1097,10 +1169,10 @@
   (setq org-caldav-calendars
         ;; Work
         `((:calendar-id ,+m-work-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/work.org")
-           :inbox "~/Yandex.Disk.localized/org/calendar/fromwork.org")
+           :inbox "~/Yandex.Disk.localized/Dropbox/org/calendar/fromwork.org")
           ;; Live and self education
           (:calendar-id ,+m-live-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/live.org")
-           :inbox "~/Yandex.Disk.localized/org/Dropbox/fromlive.org")
+           :inbox "~/Yandex.Disk.localized/Dropbox/org/fromlive.org")
           ;; Pet projects
           (:calendar-id ,+m-pet-calendar-id :files ("~/Yandex.Disk.localized/Dropbox/org/calendar/pet.org")
            :inbox "~/Yandex.Disk.localized/Dropbox/org/frompet.org"))))
@@ -1244,7 +1316,7 @@
 
 ;;; RSS
 (use-package elfeed
-  :defer 3
+  :defer 30
   :config
   (add-hook! 'elfeed-search-mode-hook 'elfeed-update)
   (setq-default elfeed-search-filter "@2-days-ago +unread")
@@ -1252,13 +1324,29 @@
   (setq-default elfeed-search-title-min-width 100)
 
   ;; (setq browse-url-generic-program #'xwidget-webkit-browse-url)
-  ;; (setq browse-url-browser-function #'xwidget-webkit-browse-url)
   (setq browse-url-browser-function #'browse-url-default-browser)
-  (advice-add 'browse-url :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
-  (advice-add 'browse-url-generic :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit"))))
+  ;; For built in browser
+  ;; (setq browse-url-browser-function #'xwidget-webkit-browse-url)
+  ;; (advice-add 'browse-url :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
+  ;; (advice-add 'browse-url-generic :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
+  )
 
-
+(use-package elfeed-score
+  :after elfeed
+  :config
+  (setq elfeed-score-score-file "~/.doom.d/elfeed.score")
+  (progn
+    (elfeed-score-enable)
+    (define-key elfeed-search-mode-map "=" elfeed-score-map)))
 ;;;
 ;;; Temporary section
+
+
+;; (use-package shikimori
+;;   :defer t
+;;   :custom
+;;   (shikimori-default-browser 'browse-url-default-browser)
+;;   :config
+;;   (setq shikimori-default-browser #'browse-url-firefox))
 
 ;;; Temporary unused

@@ -60,7 +60,6 @@
 (package! nyan-mode)
 (package! wakatime-mode)
 (package! indent-guide)
-(package! paren-face)
 (package! company-tabnine)
 ;; (package! lsp-mode)
 (package! lsp-ui)
@@ -69,6 +68,10 @@
 (package! tree-sitter-langs)
 (package! typescript-mode)
 (package! ng2-mode)
+
+;; Languages
+;;; CLojure
+(package! cider)
 
 ;;; Pyton
 (package! pipenv)
@@ -111,7 +114,8 @@
 ;;; GIT
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 (package! blamer)
-;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "hotfix/entire-msg-formatter"))
+(package! gist)
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "feature/clickable-annotations"))
 
 (package! git-messenger)
 
@@ -138,7 +142,14 @@
 
 ;;; Tools
 (package! string-inflection) ;; PASCAL_CASE -> camelCase -> kebab-case
+
+;;;; Brackets
+(package! autopair :recipe (:host github :repo "joaotavora/autopair")) ;; Autorpair colors
+(package! paren-face)
+;;
 ;;; Org mode
+;; (package! polymode)
+;; (package! poly-org)
 (package! ox-gfm)
 (package! oauth2)
 (package! org-caldav)
@@ -154,17 +165,13 @@
 ;;; Temporary
 ;; (package! multi-vterm)
 
-(package! autopair :recipe (:host github :repo "joaotavora/autopair"))
+(package! elfeed-score)
 (package! ranger)
-(package! counsel-dash)
-(package! modus-themes)
-;; (package! dash-docs)
-
+(package! pippel)
+;; (package! elfeed-goodies :disable t)
 
 
 ;;; Not a programming
-;; (package! xwidgets-reuse)
-
 ;;; Unused
 ;; (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt")) Youtrack. Awfully.
 ;; (package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
@@ -178,3 +185,14 @@
 ;; (package! icons-in-terminal :recipe (:host github :repo "seagle0128/icons-in-terminal.el"))
 ;; (package! poly-vue :recipe (:host github :repo "akirak/poly-vue"))
 ;; (package! org-sticky-header) ;; Just unsused
+
+;; (package! beacon)
+;; (package! dash-docs)
+;; (package! shikimori :recipe (:host nil :repo "https://git.sr.ht/~akagi/shikimori.el"))
+
+;; (package! xwidgets-reuse)
+;; (package! lsp-grammarly)
+
+;; (package! modus-themes)
+
+;; (package! counsel-dash)

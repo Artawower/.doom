@@ -1,0 +1,19 @@
+;;; Elfeed score file                                     -*- lisp -*-
+(("title"
+  (:text "emacs" :value 1000 :type S))
+ ("feed"
+  (:text "emacs-news – sacha chua" :value 900 :type S :attr t :comment "Essential!"))
+ ("authors"
+   (:text "Jim Geraghty" :value 500 :type s))
+ ("tag"
+  (:tags (t . emacs)
+   :value 1000
+   :comment "Add 1000 points to any entry with a tag of emacs")
+  (:tags (t . science) :value 600)
+  (:tags (t . typescript) :value 450)
+  (:tags (t . go)
+   :value 400
+   :comment "Add 1000 points to any entry with a tag of go and typescript")
+  (:tags (t . python) :value 350)
+  (:tags (t . clojure) :value 300))
+ (mark -2500))

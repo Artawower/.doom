@@ -239,7 +239,7 @@ This function makes sure that dates are aligned for easy reading."
     (goto-char 0)
     ;; TODO: make with one iteration
     (while (search-forward-regexp "[\-a-zA-Z\/\!=\(\),\:]+" nil 'noerror)
-      (replace-match (propertize (match-string 0) 'face 'font-lock-comment-face)))
+      (replace-match (propertize (match-string 0) 'face 'widget-inactive)))
     (goto-char 0)
     (while (search-forward-regexp "  \\(?1:[A-Z><#/?*]\\)  " nil 'noerror)
       (let* ((agenda-cmd (match-string 1))
