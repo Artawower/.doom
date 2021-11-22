@@ -185,6 +185,7 @@ Can be an integer to determine the exact padding."
 ;;; Smerge marjers
 (smerge-markers :background base2 :foreground yellow)
 (smerge-upper :background (doom-lighten red 0.8))
+(parenthesis :foreground base2)
 ;;;; Evil
 (evil-ex-lazy-highlight :foreground bg :background (doom-lighten green 0.3))
 ;;;; hl-line mod e

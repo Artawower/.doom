@@ -69,26 +69,30 @@
 (package! typescript-mode)
 (package! ng2-mode)
 
-;; Languages
-;;; CLojure
+;;; Languages
+;;;; CLojure
 (package! cider)
 
-;;; Pyton
+
+;;;; Pyton
 (package! pipenv)
 (package! python-mode)
 ;; (package! pyenv-mode)
 ;; (package! lsp-python-ms)
 (package! lsp-pyright)
 
-;;; Go
+;;;; Go
 (package! go-playground)
-;;; Other
+;;;; Other
 (package! web-mode)
 (package! forge)
 (package! evil-leader)
 (package! websocket)
 (package! restclient)
 (package! evil-matchit)
+;;;; Vue volar lsp
+(package! lsp-volar :recipe (:host github :repo "jadestrong/lsp-volar"))
+
 
 ;;; Spelling
 ;; (package! spell-fu) ;; totally awfully behaviour
@@ -115,7 +119,7 @@
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 (package! blamer)
 (package! gist)
-;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "feature/clickable-annotations"))
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "hotfix/narrowing"))
 
 (package! git-messenger)
 
@@ -160,19 +164,21 @@
 ;;;; Org babel
 (package! ob-restclient)
 (package! ob-async)
+;;; Rss
+(package! elfeed-score)
 ;;; Agenda
 
+;;; Colloboration
+(package! floobits)
 ;;; Temporary
-;; (package! multi-vterm)
-
-(package! elfeed-score)
 (package! ranger)
-(package! pippel)
-;; (package! elfeed-goodies :disable t)
+(package! code-review :recipe (:host github :repo "wandersoncferreira/code-review"))
 
 
 ;;; Not a programming
 ;;; Unused
+;; (package! multi-vterm)
+;; (package! pippel)
 ;; (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt")) Youtrack. Awfully.
 ;; (package! youtrack :recipe (:host github :repo "jaseemabid/elisp"))
 

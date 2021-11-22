@@ -1,9 +1,24 @@
-personal_ws-1.1 en 8 
+personal_ws-1.1 en 23 
+AxiosInstance
+AxiosRequestConfig
 DalGetReport
 DalService
+Input
+Wakatime
 alists
 apiServices
 ecmascript
+getLanguageById
+gocron
 golang
+languageByCode
+languageById
+languagesIdMap
 loadReferencesIfNotExist
+loc
+ngOnDestroy
+ngOnInit
+onBlur
+onChange
+preloadData
 swtest

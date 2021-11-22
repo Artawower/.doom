@@ -1,40 +1,30 @@
-# Emacs doom configuration
+#+TITLE: Emacs doom configuration
 
-## Install emacs
+* Install emacs
 
 This is instalation without bar and with webkit support
 
-```bash
+#+BEGIN_SRC bash
 brew install emacs-plus@28 --with-xwidgets --with-modern-papirus-icon --with-no-titlebar
-```
+#+END_SRC
 
 For correct working with markdown pandoc should be installed
 
 Mac os example
 
-```bash
+#+BEGIN_SRC bash
 brew install pandoc
-```
+#+END_SRC
 
-## Install Email dependencies
 
-_Term_
-
-```bash
-brew install cmake
-```
-
-_Email_
-
-```bash
-brew install mu
-brew install offlineimap
-```
-
-more information see [here](https://kirang.in/post/emacs-as-email-client-with-offlineimap-and-mu4e-on-osx/)
 
 ## Work with databases
 
-```bash
+#+BEGIN_SRC bash
 cpan RPC::EPC::Service DBI DBD::SQLite DBD::Pg DBD::mysql
-```
+#+END_SRC
+* Dependencies
+** Custom sass formatter
+#+BEGIN_SRC bash
+yarn global add sass-lint-auto-fix
+#+END_SRC

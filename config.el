@@ -76,6 +76,11 @@
            (window-configuration-to-register '_)
            (delete-other-windows))))
 
+;;; Transparent bg
+(progn
+  (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+  (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
+
 ;;; Fonts
 
 (set-frame-font "JetBrainsMono Nerd Font 15" nil t)
@@ -181,6 +186,8 @@
   (setq ivy-posframe-parameters '((internal-border-width . 2) (left-fringe . 18) (right-fringe . 18))
         ivy-posframe-height 14
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
+
         ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 12")
   ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
   (defun ivy-posframe-get-size ()
@@ -195,9 +202,22 @@
      :min-width (or ivy-posframe-min-width
                     (let ((width (round (* (frame-width) 0.9))))
                       (min width (or ivy-posframe-width width))
-                      ))
-     ))
-  )
+                      ))))
+
+  (defun posframe-poshandler-frame-top-center-with-offset (info)
+    "Posframe's position handler.
+
+Let posframe(0.5, 0) align to frame(0.5, 0).  The structure of
+INFO can be found in docstring of `posframe-show'."
+    (cons (/ (- (plist-get info :parent-frame-width)
+                (plist-get info :posframe-width))
+             2)
+          40))
+
+  (defun ivy-posframe-display-at-frame-top-center-with-offset (str)
+  (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
+
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center-with-offset))))
 
 ;;; Formatter
 ;; Improve counsel search (async)
@@ -432,7 +452,7 @@
 
 ;;; Colors
 (use-package rainbow-mode
-  :hook (((css-mode scss-mode org-mode typescript-mode js-mode). rainbow-mode))
+  :hook (((css-mode scss-mode org-mode typescript-mode js-mode emacs-list-mode). rainbow-mode))
   :defer 15)
 
 ;; TODO
@@ -489,24 +509,25 @@
   (global-wakatime-mode))
 
 ;;; Indent guide
-(use-package indent-guide
-  :defer 1.2
-  :hook ((web-mode
-          html-mode
-          scss-mode
-          css-mode
-          go-mode
-          typescript-mode
-          js-mode
-          ng2-ts-mode
-          python-mode) . indent-guide-mode)
-  :custom-face
-  (indent-guide-face ((t (:foreground ,+m-color-main :font "Fira Code" :height 0.9))))
-  :config
-  (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
-  (setq indent-guide-char "|")
-  ;; (setq indent-guide-char ":")
-  (setq indent-guide-delay 0.2))
+;; NOTE: can i live without it?
+;; (use-package indent-guide
+;;   :defer 1.2
+;;   :hook ((web-mode
+;;           html-mode
+;;           scss-mode
+;;           css-mode
+;;           go-mode
+;;           typescript-mode
+;;           js-mode
+;;           ng2-ts-mode
+;;           python-mode) . indent-guide-mode)
+;;   :custom-face
+;;   (indent-guide-face ((t (:foreground ,+m-color-main :font "Fira Code" :height 0.9))))
+;;   :config
+;;   (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
+;;   (setq indent-guide-char "|")
+;;   ;; (setq indent-guide-char ":")
+;;   (setq indent-guide-delay 0.2))
 
 ;;; Fast commenting
 (use-package turbo-log
@@ -549,9 +570,21 @@
   :defer 0.1
   ;; TIDE check, less laggi?
   ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
-  :hook (((go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode clojure-mode) . lsp-deferred))
+  :hook (((go-mode
+           scss-mode
+           css-mode
+           js-mode
+           typescript-mode
+           vue-mode
+           web-mode
+           ng2-html-mode
+           ng2-ts-mode
+           python-mode
+           typescript-tsx-mode
+           clojure-mode) . lsp-deferred))
   :bind (:map evil-normal-state-map
-         ("SPC f n" . flycheck-next-error))
+         ("SPC f n" . flycheck-next-error)
+         ("g i" . lsp-goto-implementation))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.3)
@@ -792,6 +825,11 @@
   (setq lsp-pyright-auto-search-paths t)
   (setq lsp-pyright-log-level "trace"))
 
+;;;; Vue
+;; npm install -g @volar/server
+(use-package! lsp-volar
+  :defer t)
+
 ;;;; Web mode
 (use-package web-mode
   :defer 0.5
@@ -822,6 +860,27 @@
 (use-package emmet-mode
   :hook ((scss-mode . emmet-mode) (css-mode . emmet-mode) (ng2-html-mode . emmet-mode) (html-mode . emmet-mode))
   :defer 5)
+
+;;;; Scss
+(use-package css-mode
+  :defer 10
+  :hook ((css-mode . my-setup-tabnine) (scss-mode . my-setup-tabnine))
+  :config
+  (my-setup-tabnine)
+  (defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
+
+  (defun run-sass-auto-fix ()
+    "Run sass auto fix if cli tool exist"
+    (interactive)
+    (let ((default-directory (file-name-directory buffer-file-name)))
+      (shell-command "sass-lint-auto-fix")
+      (revert-buffer-no-confirm)
+      (message "SASS FORMATTED")
+      ))
+  (add-hook 'scss-mode-hook '(lambda () (add-hook 'after-save-hook #'run-sass-auto-fix t t))))
 
 ;;;; Json
 (use-package json-mode
@@ -883,7 +942,6 @@
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
   (define-key transient-sticky-map "q" 'transient-quit-seq))
-
 
 (use-package gist                       ;
   :defer t
@@ -965,7 +1023,43 @@
   :defer 5
   :config
   (reverse-im-activate "russian-computer"))
+(defun xah-copy-to-register-1 ()
+  "Copy current line or text selection to register 1.
+See also: `xah-paste-from-register-1', `copy-to-register'.
 
+;;;; Register copy past
+URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
+Version 2017-01-23"
+  (interactive)
+  (let ($p1 $p2)
+    (if (region-active-p)
+        (progn (setq $p1 (region-beginning))
+               (setq $p2 (region-end)))
+      (progn (setq $p1 (line-beginning-position))
+             (setq $p2 (l(defun xah-paste-from-register-1 ()
+                           "Paste text from register 1.
+See also: `xah-copy-to-register-1', `insert-register'.
+URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
+Version 2015-12-08"
+                           (interactive)
+                           (when (use-region-p)
+                             (delete-region (region-beginning) (region-end)))
+                           (insert-register ?1 t))ine-end-position))))
+    (copy-to-register ?1 $p1 $p2)
+    (message "Copied to register 1: 「%s」." (buffer-substring-no-properties $p1 $p2))))
+
+(defun xah-paste-from-register-1 ()
+  "Paste text from register 1.
+See also: `xah-copy-to-register-1', `insert-register'.
+URL `http://xahlee.info/emacs/emacs/elisp_copy-paste_register_1.html'
+Version 2015-12-08"
+  (interactive)
+  (when (use-region-p)
+    (delete-region (region-beginning) (region-end)))
+  (insert-register ?1 t))
+
+;; (global-set-key (kbd "s-1") 'xah-copy-to-register-1)
+;; (global-set-key (kbd "s-2") 'xah-paste-from-register-1)
 ;;;; Global keybinding
 (global-set-key (kbd "C-S-k") 'shrink-window)
 (global-set-key (kbd "C-S-j") 'enlarge-window)
@@ -991,7 +1085,16 @@
          ("SPC d t" . org-time-stamp-inactive)
          ("SPC d T" . org-time-stamp)
          ("SPC r p" . +python/open-ipython-repl)
-         ("SPC r n" . nodejs-repl))
+         ("SPC r n" . nodejs-repl)
+         ("s-2" . xah-paste-from-register-1)
+         :map evil-insert-state-map
+         ("s-2" . xah-paste-from-register-1)
+         :map evil-visual-state-map
+         ("s-1" . xah-copy-to-register-1)
+         ("s-2" . xah-paste-from-register-1)
+         :map ivy-mode-map
+         ("s-1" . xah-copy-to-register-1)
+         ("s-2" . xah-paste-from-register-1))
   :init
   (global-evil-leader-mode)
   :config
@@ -1314,12 +1417,23 @@
   :load-path "~/.doom.d/"
   :defer 15)
 
+(use-package wakatime-ui
+  :load-path "~/.doom.d/"
+  :custom
+  ;; (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/bb8cf0d7-3554-4297-ac4d-01f8a155073c.svg")
+  (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/af1bfb85-2c8b-44e4-9873-c4a91b512e8d.png")
+  :config
+  (wakatime-ui-mode))
+
+;;; COlloboration
+(use-package floobits
+  :defer t)
 ;;; RSS
 (use-package elfeed
   :defer 30
   :config
   (add-hook! 'elfeed-search-mode-hook 'elfeed-update)
-  (setq-default elfeed-search-filter "@2-days-ago +unread")
+  (setq-default elfeed-search-filter "@12-hours-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100)
 
@@ -1350,3 +1464,6 @@
 ;;   (setq shikimori-default-browser #'browse-url-firefox))
 
 ;;; Temporary unused
+
+;; (use-package code-review
+;;   :defer t)

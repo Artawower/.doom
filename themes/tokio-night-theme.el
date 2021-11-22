@@ -143,6 +143,8 @@ Can be an integer to determine the exact padding."
    (ivy-current-match :background dark-blue :distant-foreground base0 :weight 'normal)
    ;;;; LaTeX-mode
    (font-latex-math-face :foreground green)
+;;; Treemacs
+   (font-lock-doc-face :foreground (doom-lighten blue 0.1))
    ;;;; markdown-mode
    (markdown-markup-face :foreground base5)
    (markdown-header-face :inherit 'bold :foreground red)

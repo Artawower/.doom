@@ -143,9 +143,13 @@ Can be an integer to determine the exact padding."
    ;;;; elscreen
    (elscreen-tab-other-screen-face :background "#353a42" :foreground "#1e2022")
    ;;;; ivy
-   (ivy-current-match :background dark-blue :distant-foreground base0 :weight 'normal)
+   (ivy-current-match :background red :foreground base0 :distant-foreground base0 :weight 'bold)
+   (ivy-minibuffer-match-face-2 :background green :foreground base0)
+
    ;;;; LaTeX-mode
    (font-latex-math-face :foreground green)
+;;; Treemacs
+(font-lock-doc-face :foreground (doom-lighten red 0.1))
    ;;;; markdown-mode
    (markdown-markup-face :foreground base5)
    (markdown-header-face :inherit 'bold :foreground red)

@@ -415,3 +415,11 @@
 ;;   :defer t
 ;;   :config
 ;;   (setq dash-docs-docsets-path "~/.doom.d/.docsets"))
+
+;;; Anime
+;; (use-package shikimori
+;;   :defer t
+;;   :custom
+;;   (shikimori-default-browser 'browse-url-default-browser)
+;;   :config
+;;   (setq shikimori-default-browser #'browse-url-firefox))
