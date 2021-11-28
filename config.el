@@ -215,7 +215,7 @@ INFO can be found in docstring of `posframe-show'."
           40))
 
   (defun ivy-posframe-display-at-frame-top-center-with-offset (str)
-  (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
+    (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
 
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center-with-offset))))
 
@@ -359,7 +359,7 @@ INFO can be found in docstring of `posframe-show'."
 ;;; File managers
 ;;;; treemacs
 (use-package treemacs
-  :defer t
+  :defer 10
   :custom-face
   (font-lock-doc-face ((t (:inherit nil))))
   (doom-themes-treemacs-file-face ((t (:inherit font-lock-doc-face :slant italic))))
@@ -387,13 +387,13 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Dired
 (use-package all-the-icons-dired
-  :defer 5
+  :defer 15
   :hook (dired-mode . all-the-icons-dired-mode))
 
 ;;; Bookmarks
 ;;;; quick bm
 (use-package bm
-  :defer 3
+  :defer t
   :custom-face
   (bm-face ((t (:foreground ,+m-color-secondary))))
   :bind (("C-M-n" . bm-next)
@@ -402,6 +402,7 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Doom bm
 (use-package bookmark
+  :defer t
   :config
   (setq bookmark-save-flag 1)
   (setq bookmark-default-file "~/.doom.d/bookmarks"))
@@ -430,7 +431,7 @@ INFO can be found in docstring of `posframe-show'."
             (buffer-face-mode t)))
 
 (use-package vterm-toggle
-  :defer 8
+  :defer 10
   :bind (:map evil-normal-state-map
          ("SPC t ]" . vterm-toggle-forward)
          ("SPC t [" . vterm-toggle-backward)
@@ -474,6 +475,7 @@ INFO can be found in docstring of `posframe-show'."
 ;;; Modus
 (use-package modus-themes
   :defer t)
+
 ;;;; Theme switcher
 (use-package heaven-and-hell
   :after doom-themes
@@ -504,7 +506,7 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;; Time track
 (use-package wakatime-mode
-  :defer 1.3
+  :defer 2
   :config
   (global-wakatime-mode))
 
@@ -543,7 +545,7 @@ INFO can be found in docstring of `posframe-show'."
   (setq turbo-log--prefix "🚀")
   (setq turbo-log--ecmascript-loggers '("console.log" "console.debug" "console.warn"))
   (setq turbo-log--python-loggers '("print" "logger"))
-  (setq turbo-log--golang-loggers '("fmt.Printf" "log.Info().Msgf")))
+  (setq turbo-log--golang-loggers '("fmt.Printf" "log.Info().Msgf" "spew.Dump")))
 
 ;;; Quickly type converting
 (use-package quicktype
@@ -567,7 +569,7 @@ INFO can be found in docstring of `posframe-show'."
 ;;       (flycheck-add-next-checker 'lsp 'golangci-lint 'append)))
 
 (use-package lsp
-  :defer 0.1
+  :defer 3
   ;; TIDE check, less laggi?
   ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
   :hook (((go-mode
@@ -674,6 +676,9 @@ INFO can be found in docstring of `posframe-show'."
 (use-package company
   :defer t
   :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)))
+;; :map company-active-map ("<tab>" . company-complete-selection)
+;; ("<return>" . nil)
+;; ("RET" . nil)))
 
 ;; (my-setup-tabnine)
 ;; Autocomplete with AI
@@ -723,15 +728,15 @@ INFO can be found in docstring of `posframe-show'."
   :defer t)
 
 (use-package package-build
-  :defer 15)
+  :defer t)
 
 (use-package package-lint
-  :defer 15)
+  :defer t)
 
 ;;;; Typescript
 (setenv "TSSERVER_LOG_FILE" "/tmp/tsserver.log")
 (use-package typescript-mode
-  :defer 0.5
+  :defer 10
   :config
   (setq typescript-indent-level 2)
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
@@ -756,7 +761,7 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Golang
 (use-package go-playground
-  :defer 15)
+  :defer t)
 
 ;; (defun my-go-mode-hook ()
 ;;   (flycheck-add-next-checker 'lsp 'golangci-lint 'go-errcheck 'go-gofmt 'go-goim 'append))
@@ -766,7 +771,7 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Rust
 (use-package rustic
-  :defer 0.9
+  :defer t
   :bind (:map rustic-mode-map
          ("M-j" . lsp-ui-imenu)
          ("M-?" . lsp-find-references)
@@ -797,19 +802,16 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Python
 (use-package pipenv
-  :defer 0.5
+  :defer t
   :hook (python-mode . pipenv-mode)
   :config
   (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 
-;;;;; Python check depdendencies
-(use-package pippel
-  :defer t)
 
 
 (use-package python-mode
-  :defer 0.5
+  :defer t
   :hook (python-mode . format-all-mode)
   :config
   (setq pytnon-indent-level 4)
@@ -819,7 +821,7 @@ INFO can be found in docstring of `posframe-show'."
               (setq tab-width 4))))
 
 (use-package lsp-pyright
-  :defer 0.5
+  :defer t
   :config
   (setq lsp-pyright-auto-import-completions t)
   (setq lsp-pyright-auto-search-paths t)
@@ -827,16 +829,18 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Vue
 ;; npm install -g @volar/server
+;; Check it
 (use-package! lsp-volar
   :defer t)
 
 ;;;; Web mode
 (use-package web-mode
-  :defer 0.5
+  :defer t
   :mode (("\\.vue\\'" . web-mode)
          ("\\.tsx\\'" . typescript-tsx-mode)
          ("\\.jsx\\'" . web-mode))
   :config
+  (setq web-mode-enable-auto-quoting nil)
   (setq web-mode-comment-formats
         '(("java"       . "/*")
           ("javascript" . "//")
@@ -854,7 +858,7 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Pug
 (use-package pug-mode
-  :defer 3)
+  :defer t)
 
 ;;;; Html
 (use-package emmet-mode
@@ -875,12 +879,14 @@ INFO can be found in docstring of `posframe-show'."
   (defun run-sass-auto-fix ()
     "Run sass auto fix if cli tool exist"
     (interactive)
-    (let ((default-directory (file-name-directory buffer-file-name)))
-      (shell-command "sass-lint-auto-fix")
-      (revert-buffer-no-confirm)
-      (message "SASS FORMATTED")
-      ))
-  (add-hook 'scss-mode-hook '(lambda () (add-hook 'after-save-hook #'run-sass-auto-fix t t))))
+    (save-window-excursion
+      (let ((default-directory (file-name-directory buffer-file-name)))
+        (async-shell-command "sass-lint-auto-fix")
+        ;; (revert-buffer-no-confirm)
+        (message "SASS FORMATTED")
+        )))
+  ;; (add-hook 'scss-mode-hook '(lambda () (add-hook 'after-save-hook #'run-sass-auto-fix t t)))
+  (add-hook 'scss-mode-hook '(lambda () (add-hook 'before-save-hook #'format-all-buffer nil t))))
 
 ;;;; Json
 (use-package json-mode
@@ -910,15 +916,15 @@ INFO can be found in docstring of `posframe-show'."
 
 ;;;; Docker compose
 (use-package docker-compose-mode
-  :defer 6)
+  :defer t)
 
 ;;;; Docker
 (use-package dockerfile-mode
-  :defer 6)
+  :defer t)
 
 ;;;; Jenkins
 (use-package jenkinsfile-mode
-  :defer 6
+  :defer t
   :config)
 
 ;;;; Nginx
@@ -932,7 +938,7 @@ INFO can be found in docstring of `posframe-show'."
 ;;; Help tools
 ;;;; PASCAL_CASE -> camelCase -> snake_case
 (use-package string-inflection
-  :defer 10
+  :defer t
   :bind ("C-s-c" . string-inflection-all-cycle))
 
 ;;; Git
@@ -965,13 +971,13 @@ INFO can be found in docstring of `posframe-show'."
         forge-alist))
 
 (use-package git-gutter
-  :defer 9
+  :defer 10
   :init
   (global-git-gutter-mode)
   (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
   (global-set-key (kbd "C-x n") 'git-gutter:next-hunk))
 
-;;; Blamer (own package)
+;;; Blamer
 (use-package blamer
   :defer 15
   :custom
@@ -1023,6 +1029,7 @@ INFO can be found in docstring of `posframe-show'."
   :defer 5
   :config
   (reverse-im-activate "russian-computer"))
+
 (defun xah-copy-to-register-1 ()
   "Copy current line or text selection to register 1.
 See also: `xah-paste-from-register-1', `copy-to-register'.

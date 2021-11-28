@@ -172,11 +172,12 @@
 (package! floobits)
 ;;; Temporary
 (package! ranger)
-(package! code-review :recipe (:host github :repo "wandersoncferreira/code-review"))
-
+(package! benchmark-init)
 
 ;;; Not a programming
 ;;; Unused
+;; (package! code-review :recipe (:host github :repo "wandersoncferreira/code-review"))
+
 ;; (package! multi-vterm)
 ;; (package! pippel)
 ;; (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt")) Youtrack. Awfully.

@@ -423,3 +423,16 @@
 ;;   (shikimori-default-browser 'browse-url-default-browser)
 ;;   :config
 ;;   (setq shikimori-default-browser #'browse-url-firefox))
+
+;;;;; Python check depdendencies
+(use-package pippel
+  :defer t)
+
+;;; Debug
+
+;; (use-package benchmark-init
+;;   :config
+
+  ;; To disable collection of benchmark data after init is done.
+  ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
+  ;; )

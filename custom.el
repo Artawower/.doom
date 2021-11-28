@@ -3,9 +3,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(blamer-tooltip-function nil)
  '(custom-enabled-themes '(pinky-winky-dark))
  '(custom-safe-themes
-   '("eb93bd42c43e3ac14080ac7157ce8a93572f0a8583abbe96952c536cd60b45b2" "8aa984613bc927f1966558bfa8c686a069ba27547126833e8f862c76f0418f2b" "5550e9e2505922b339c96fee20562d76ac4a594aafd31644ef32b0d384841208" "f1938227a38cfe55a12076dac514f03a1d9aa1a47957870b690cc80db5e7a1b3" "745d03d647c4b118f671c49214420639cb3af7152e81f132478ed1c649d4597d" default))
+   '("f9b36a79e3ff92b776e8116d1707931e481df983bb67420da8b6d61ac1b48287" "eb93bd42c43e3ac14080ac7157ce8a93572f0a8583abbe96952c536cd60b45b2" "8aa984613bc927f1966558bfa8c686a069ba27547126833e8f862c76f0418f2b" "5550e9e2505922b339c96fee20562d76ac4a594aafd31644ef32b0d384841208" "f1938227a38cfe55a12076dac514f03a1d9aa1a47957870b690cc80db5e7a1b3" "745d03d647c4b118f671c49214420639cb3af7152e81f132478ed1c649d4597d" default))
+ '(dockerfile-build-args '("--progress=plain"))
  '(exec-path-from-shell-arguments '("-l"))
  '(fringe-mode 28 nil (fringe))
  '(package-selected-packages
@@ -27,13 +29,6 @@
  '(hdefd-variables ((t (:foreground "#e06c75" :slant normal))))
  '(indent-guide-face ((t (:inherit default :foreground "#61AFEF" :font "Fira Code 14"))))
  '(ivy-highlight-face ((t (:foreground nil))))
- '(ivy-posframe-border ((t (:background "#61AFEF"))))
- '(org-document-title ((t (:inherit outline-1 :height 2.5))))
- '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
- '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
- '(org-level-3 ((t (:inherit outline-3 :height 1.25))))
- '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
- '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
  '(treemacs-root-face ((t (:inherit variable-pitch :slant italic)))))
 (put 'erase-buffer 'disabled nil)
 (put 'customize-group 'disabled nil)

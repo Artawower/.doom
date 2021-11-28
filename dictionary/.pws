@@ -1,24 +1,36 @@
-personal_ws-1.1 en 23 
+personal_ws-1.1 en 35 
 AxiosInstance
 AxiosRequestConfig
 DalGetReport
 DalService
 Input
+UseFormGetValues
 Wakatime
 alists
 apiServices
+dirPath
 ecmascript
 getLanguageById
 gocron
 golang
+highRiskPercantage
+isProduction
 languageByCode
 languageById
 languagesIdMap
 loadReferencesIfNotExist
 loc
+maxNominalCost
+maxPercentProfit
+middleRiskPercantage
+minNominalCost
+minPercentProfit
 ngOnDestroy
 ngOnInit
+ngxsOnInit
 onBlur
 onChange
 preloadData
+projectId
+strategyFormSchema
 swtest
