@@ -60,6 +60,12 @@
 ;;;; Additional colors
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
+;;;;; Browser configs
+;; Mac os only
+(when (eq system-type 'darwin)
+  (setq browse-url-firefox-program "/Applications/Firefox.app/Contents/MacOS/firefox")
+  (setq browse-url-generic-program "/Applications/Firefox.app/Contents/MacOS/firefox"
+        browse-url-browser-function 'browse-url-generic))
 
 ;;; My custom functions
 ;;;; Switch to first finded buffer
@@ -934,6 +940,18 @@ INFO can be found in docstring of `posframe-show'."
 
 (use-package nginx-mode
   :defer 10)
+
+;;;; Markdown
+(use-package grip-mode
+  :after markdown-mode
+  :hook (markdown-mode . grip-mode)
+  :custom
+  (browse-url-browser-function 'browse-url-generic)
+  (grip-url-browser #'browse-url-firefox-program)
+  :config
+  (let ((credential (auth-source-user-and-password "api.github.com")))
+  (setq grip-github-user (car credential)
+        grip-github-password (cadr credential))))
 
 ;;; Help tools
 ;;;; PASCAL_CASE -> camelCase -> snake_case
