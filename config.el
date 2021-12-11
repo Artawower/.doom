@@ -1368,17 +1368,28 @@ Version 2015-12-08"
                            (push '("#+DESCRIPTION:" . "") prettify-symbols-alist)
                            (push '("#+ID:" . "") prettify-symbols-alist)
                            (push '("#+FILETAGS:" . "") prettify-symbols-alist)
+                           (push '("#+STARTUP:" . "") prettify-symbols-alist)
                            (push '("#+ACTIVE:" . "") prettify-symbols-alist)
                            (push '("#+START_SPOILER" . "") prettify-symbols-alist)
                            (push '("#+CLOSE_SPOILER" . "") prettify-symbols-alist)
                            (push '("#+BEGIN_HIDDEN" . "") prettify-symbols-alist)
                            (push '("#+END_HIDDEN" . "") prettify-symbols-alist)
-                           (push '("[#A]" . "⚡") prettify-symbols-alist)
-                           (push '("[#B]" . "⬆") prettify-symbols-alist)
-                           (push '("[#C]" . "■") prettify-symbols-alist)
-                           (push '("[#D]" . "⬇") prettify-symbols-alist)
-                           (push '("[#E]" . "❓") prettify-symbols-alist)
                            (prettify-symbols-mode)))
+
+(use-package org-fancy-priorities
+  :after org
+  :hook (org-mode . org-fancy-priorities-mode)
+  :config
+  (setq org-fancy-priorities-list '((?A . "🔥")
+                                    (?B . "⬆")
+                                    (?C . "❗")
+                                    (?D . "⬇")
+                                    (?E . "❓")
+                                    (?1 . "🔥")
+                                    (?2 . "⚡")
+                                    (?3 . "⮮")
+                                    (?4 . "☕")
+                                    (?I . "Important"))))
 
 ;;;; Org indent
 (use-package org-indent
