@@ -206,6 +206,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
     (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
     (ivy-rich-set-columns 'projectile--find-file col-def)))
 
+(defun posframe-poshandler-frame-top-center-with-offset (info)
+  "Posframe position at top + 40px offset."
+  (cons (/ (- (plist-get info :parent-frame-width)
+              (plist-get info :posframe-width))
+           2)
+        40))
+
 (use-package ivy-posframe
   :after ivy
   :custom-face
@@ -213,9 +220,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :init
   (ivy-posframe-mode 1)
   :config
-  (setq ivy-posframe-parameters '((internal-border-width . 2) (left-fringe . 18) (right-fringe . 18))
+  (setq ivy-posframe-parameters '((internal-border-width . 20) (left-fringe . 18) (right-fringe . 18))
         ivy-posframe-height 14
-        ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ;; ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
 
         ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 12")
@@ -234,15 +241,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
                       (min width (or ivy-posframe-width width))
                       ))))
 
-  (defun posframe-poshandler-frame-top-center-with-offset (info)
-    "Posframe's position handler.
 
-Let posframe(0.5, 0) align to frame(0.5, 0).  The structure of
-INFO can be found in docstring of `posframe-show'."
-    (cons (/ (- (plist-get info :parent-frame-width)
-                (plist-get info :posframe-width))
-             2)
-          40))
 
   (defun ivy-posframe-display-at-frame-top-center-with-offset (str)
     (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
