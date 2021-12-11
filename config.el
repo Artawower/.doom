@@ -1187,10 +1187,14 @@ Version 2015-12-08"
      '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
      '(org-level-3 ((t (:inherit outline-3 :height 1.25))))
      '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
-     '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-     )
+     '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+
     (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
 
+    ;; Increase priorities count
+    (setq org-highest-priority ?A
+          org-default-priority ?C
+          org-lowest-priority ?E)
 
 
     (defun publish-org-blog()
@@ -1249,9 +1253,11 @@ Version 2015-12-08"
            "TODO(t)"     ; A task that needs doing & is ready to do
            "PROJ(p)"     ; A project, which usually contains other tasks
            "IDEA(i)"     ; Idea
-           "STRT(s)"     ; A task that is in progress
+           "PROGRESS(s)" ; A task that is in progress
            "WAIT(w)"     ; Something external is holding up this task
            "TEST(c)"     ; In TEST statement
+           "BLOCK(b)"    ; task blocked
+           "REJECTED(x)" ; somebody rejected idea :(
            "FEEDBACK(f)" ; Feedback required
            "REVIEW(r)"   ; Somebody reviewed your feature
            "HOLD(h)"     ; This task is paused/on hold because of me
@@ -1266,7 +1272,7 @@ Version 2015-12-08"
            "[X](D)"))    ; Task was completed
         org-todo-keyword-faces
         '(("[-]"        . +org-todo-active)
-          ("STRT"       . +org-todo-active)
+          ("PROGRESS"   . org-todo)
           ("DONE"       . org-todo)
           ("IDEA"       . org-todo)
           ("[?]"        . +org-todo-onhold)
@@ -1276,6 +1282,8 @@ Version 2015-12-08"
           ("REVIEW"     . +org-todo-onhold)
           ("HOLD"       . +org-todo-onhold)
           ("PROJ"       . +org-todo-project)
+          ("BLOCK"       . +org-todo-cancel)
+          ("REJECTED"       . +org-todo-cancel)
           ("KILL"       . +org-todo-cancel))))
 
 ;;;; Org agenda
