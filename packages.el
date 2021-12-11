@@ -60,7 +60,9 @@
 (package! nyan-mode)
 (package! wakatime-mode)
 (package! indent-guide)
+;;; Completion
 (package! company-tabnine)
+(package! company-posframe)
 ;; (package! lsp-mode)
 (package! lsp-ui)
 (package! exec-path-from-shell)
@@ -73,8 +75,13 @@
 ;;;; CLojure
 (package! cider)
 
+;;;; Lua
+(package! lua-mode)
 
-;;;; Pyton
+
+;;;; Markdown
+(package! grip-mode)
+;;;; Python
 (package! pipenv)
 (package! python-mode)
 ;; (package! pyenv-mode)
@@ -92,7 +99,8 @@
 (package! evil-matchit)
 ;;;; Vue volar lsp
 (package! lsp-volar :recipe (:host github :repo "jadestrong/lsp-volar"))
-
+;;;; Documentation
+(package! zeal-at-point)
 
 ;;; Spelling
 ;; (package! spell-fu) ;; totally awfully behaviour
@@ -119,7 +127,7 @@
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 (package! blamer)
 (package! gist)
-;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "hotfix/narrowing"))
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "enhancement/company-integration"))
 
 (package! git-messenger)
 
@@ -146,6 +154,7 @@
 
 ;;; Tools
 (package! string-inflection) ;; PASCAL_CASE -> camelCase -> kebab-case
+(package! aggressive-indent)
 
 ;;;; Brackets
 (package! autopair :recipe (:host github :repo "joaotavora/autopair")) ;; Autorpair colors
@@ -161,6 +170,7 @@
 (unpin! org-roam)
 (package! org-roam)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
+(package! org-fancy-priorities)
 ;;;; Org babel
 (package! ob-restclient)
 (package! ob-async)
@@ -176,8 +186,9 @@
 
 ;;; Not a programming
 ;;; Unused
-;; (package! code-review :recipe (:host github :repo "wandersoncferreira/code-review"))
+(package! code-review)
 
+;; (package! vi-tilde-fringe :disable t)
 ;; (package! multi-vterm)
 ;; (package! pippel)
 ;; (package! org-yt :recipe (:host github :repo "TobiasZawada/org-yt")) Youtrack. Awfully.

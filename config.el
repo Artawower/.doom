@@ -252,7 +252,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; Improve counsel search (async)
 (use-package format-all
   :defer 1.5
-  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
+  ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
+  :hook ((json-mode go-mode) . format-all-mode)
   :config
   (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
   (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
@@ -366,6 +367,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; treemacs
 (use-package treemacs
   :defer 10
+  :bind (:map treemacs-mode-map
+         ("@" . evil-execute-macro))
   :custom-face
   (font-lock-doc-face ((t (:inherit nil))))
   (doom-themes-treemacs-file-face ((t (:inherit font-lock-doc-face :slant italic))))
@@ -412,21 +415,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (setq bookmark-save-flag 1)
   (setq bookmark-default-file "~/.doom.d/bookmarks"))
-
-
-;;; Google translate
-(use-package google-translate
-  :defer 30
-  :bind
-  (:map google-translate-minibuffer-keymap
-   ("C-k" . google-translate-next-translation-direction)
-   ("C-l" . google-translate-next-translation-direction))
-  :config
-  (require 'google-translate-smooth-ui)
-  (setq google-translate-backend-method 'curl)
-  (setq google-translate-translation-directions-alist
-        '(("en" . "ru") ("ru" . "en") ))
-  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 
 ;;; Terminal
@@ -489,7 +477,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
         '((light . pinky-winky)
-          (dark . pinky-winky-dark)))
+          (dark . deep-atom)))
   ;; (setq heaven-and-hell-themes
   ;;       '((light . zaiste)
   ;;         (dark . deep-atom)))
@@ -562,24 +550,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;; Programming
 ;; Common configurations for all programming languages
-;;;; Flycheck
-;; (use-package flycheck
-;;   :defer 0.1
-;;   :bind (:map evil-normal-state-map
-;;          ("SPC f n" . flycheck-next-error)))
 ;;;; Lsp
-;;;;
-;; (defun my-setup-flycheck ()
-;;   (if (eq major-mode 'go-mode)
-;;       ;; (flycheck-add-next-checker 'lsp '('golangci-lint 'go-errcheck 'go-gofmt 'go-goim) 'append)
-;;       (flycheck-add-next-checker 'lsp 'golangci-lint 'append)))
 
 (use-package lsp
   :defer 3
-  ;; TIDE check, less laggi?
-  ;; :hook (((go-mode scss-mode css-mode web-mode ng2-html-mode ng2-ts-mode python-mode typescript-tsx-mode) . lsp-deferred))
-  :hook (((go-mode
+  :hook (((clojure-mode
            scss-mode
+           go-mode
            css-mode
            js-mode
            typescript-mode
@@ -588,8 +565,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
            ng2-html-mode
            ng2-ts-mode
            python-mode
-           typescript-tsx-mode
-           clojure-mode) . lsp-deferred))
+           typescript-tsx-mode) . lsp-deferred))
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error)
          ("g i" . lsp-goto-implementation))
@@ -611,8 +587,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (lsp-diagnostics-flycheck-enable)
   ;; Golang
   (defun lsp-go-install-save-hooks ()
-    ;; (flycheck-add-next-checker 'lsp '(t . golangci-lint) 'append)
-
     (flycheck-add-next-checker 'lsp '(warning . go-gofmt) 'append)
     (flycheck-add-next-checker 'lsp '(warning . go-golint))
     (flycheck-add-next-checker 'lsp '(warning . go-errcheck))
@@ -626,11 +600,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                       (setq company-backends '(company-tabnine company-dabbrev))))
 
 
-  ;; Override company backends for lsp
-  ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
-  ;; (setq +lsp-company-backends '(company-tabnine :separate company-yasnippet))
-  ;; (setq +lsp-company-backends '(company-tabnine :separate company-capf))
-  (setq +lsp-company-backends '(company-tabnine :separate))
+  (setq +lsp-company-backends '(company-tabnine company-capf))
+  (setq company-backends '((company-tabnine :separate company-capf)))
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
@@ -666,7 +637,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Company
 (defun my-setup-tabnine ()
   (interactive)
-  (setq-local company-backends '(company-tabnine :separate company-capf)))
+  ;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
+  (setq-local company-backends '((company-tabnine :separate company-capf))))
 
 ;;;; Only tabnine
 (defun my-setup-tabnine-2 ()
@@ -679,29 +651,36 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq-local +lsp-company-backends '((company-capf)))
   (setq-local company-backends '((company-capf))))
 
+
 (use-package company
   :defer t
-  :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)))
-;; :map company-active-map ("<tab>" . company-complete-selection)
-;; ("<return>" . nil)
-;; ("RET" . nil)))
+  :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)
+         :map company-active-map
+         ("<escape>" . (lambda () (interactive)
+                         (company-cancel)
+                         (evil-normal-state))))
+  :config
+  (setq company-idle-delay 0.2)
+  (setq company-show-numbers nil)
+  (setq company-quick-access-modifier 'super)
+  (setq company-show-quick-access t)
+  (setq company-minimum-prefix-length 1)
+  (setq company-dabbrev-char-regexp "[A-z:-]"))
 
-;; (my-setup-tabnine)
+(use-package company-posframe
+  :after company
+  :config
+  (company-posframe-mode 1))
+
 ;; Autocomplete with AI
 (use-package company-tabnine
   :after (company lsp)
   :bind (("C-x C-i" . company-tabnine))
   :when (featurep! :completion company)
   :config
-  (setq company-idle-delay 0.1)
-  (setq company-show-numbers nil)
-  (setq company-quick-access-modifier 'super)
-  (setq company-show-quick-access t)
-  (setq company-minimum-prefix-length 1)
   (setq company-tabnine-always-trigger nil)
-  (setq company-tabnine-show-annotation t)
   ;; (setq company-tabnine-auto-balance nil)
-  (setq company-dabbrev-char-regexp "[A-z:-]"))
+  (setq company-tabnine-show-annotation t))
 
 
 ;;; Languages
@@ -792,7 +771,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ;; (setq lsp-eldoc-hook nil)
   ;; (setq lsp-enable-symbol-highlighting nil)
   ;; (setq lsp-signature-auto-activate nil)
-
   ;; comment to disable rustfmt on save
   (setq rustic-format-on-save t
         rustic-format-display-method 'ignore)
@@ -899,6 +877,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 5
   :hook (json-mode . format-all-mode))
 
+;;;; Lua
+(use-package lua-mode
+  :defer t)
+
 ;;;; Debug
 (use-package dap-mode
   :defer 3
@@ -908,16 +890,22 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("SPC d o" . dap-step-out)
          ("SPC d c" . dap-continue)
          ("SPC d Q" . dap-disconnect)
-         ("SPC d d" . dap-debug)
+         ("SPC d q" . dap-disconnect)
+         ("SPC d d" . (lambda () (interactive)
+                        (call-interactively #'dap-debug)
+                        (set-window-buffer nil (current-buffer))))
          ("SPC d r" . dap-debug-recent)
          ("SPC d l" . dap-ui-locals)
          ("SPC d b" . dap-ui-breakpoints)
          ("SPC d s" . dap-ui-sessions)
-         ("SPC d l" . dap-debug-last)
-         ("SPC d p" . dap-breakpoint-toggle)
+         ("SPC d e" . dap-debug-last)
+         ("SPC d p" . (lambda () (interactive)
+                        (set-window-buffer nil (current-buffer))
+                        (dap-breakpoint-toggle)))
          ("SPC d e" . dap-debug-edit-template))
   :config
   (dap-mode 1)
+  (setq dap-auto-configure-features '(sessions locals))
   (require 'dap-go))
 
 ;;;; Docker compose
@@ -926,7 +914,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;;; Docker
 (use-package dockerfile-mode
-  :defer t)
+  :defer t
+  :config
+  (add-hook 'compilation-filter-hook #'my-remove-cr -90))
 
 ;;;; Jenkins
 (use-package jenkinsfile-mode
@@ -944,14 +934,14 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Markdown
 (use-package grip-mode
   :after markdown-mode
-  :hook (markdown-mode . grip-mode)
+  ;; :hook (markdown-mode . grip-mode)
   :custom
   (browse-url-browser-function 'browse-url-generic)
   (grip-url-browser #'browse-url-firefox-program)
   :config
   (let ((credential (auth-source-user-and-password "api.github.com")))
-  (setq grip-github-user (car credential)
-        grip-github-password (cadr credential))))
+    (setq grip-github-user (car credential)
+          grip-github-password (cadr credential))))
 
 ;;; Help tools
 ;;;; PASCAL_CASE -> camelCase -> snake_case
@@ -959,13 +949,41 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer t
   :bind ("C-s-c" . string-inflection-all-cycle))
 
+;; TODO: check usage
+(use-package zeal-at-point
+  :defer t
+  :bind (:map evil-normal-state-map ("SPC d z" . zeal-at-point)))
+
+;;;; Indention
+
+;;; Google translate
+(use-package google-translate
+  :defer 30
+  :bind
+  (:map google-translate-minibuffer-keymap
+   ("C-k" . google-translate-next-translation-direction)
+   ("C-n" . google-translate-next-translation-direction)
+   ("C-l" . google-translate-next-translation-direction))
+  :config
+  (require 'google-translate-smooth-ui)
+  (setq google-translate-backend-method 'curl)
+  (setq google-translate-pop-up-buffer-set-focus t)
+  (setq google-translate-translation-directions-alist
+        '(("en" . "ru") ("ru" . "en") ))
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+
 ;;; Git
 (use-package magit
   :defer t
   :config
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
-  (define-key transient-sticky-map "q" 'transient-quit-seq))
+  (define-key transient-sticky-map "q" 'transient-quit-seq)
+  (advice-add
+   'ansi-color-apply-on-region
+   :before
+   #'my-remove-cr)
+  (setq magit-process-finish-apply-ansi-colors t))
 
 (use-package gist                       ;
   :defer t
@@ -988,6 +1006,11 @@ BEGIN END specifies region, otherwise works on entire buffer."
                               "gpalex" forge-gitlab-repository)
         forge-alist))
 
+(use-package code-review
+  :defer t
+  :config
+  (setq code-review-new-buffer-window-strategy #'switch-to-buffer))
+
 (use-package git-gutter
   :defer 10
   :init
@@ -997,14 +1020,15 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;; Blamer
 (use-package blamer
-  :defer 15
+  :defer 5
   :custom
-  (blamer-idle-time 0.35)
+  (blamer-idle-time 0.8)
   ;; (blamer-min-offset 50)
   (blamer-max-commit-message-length 65)
-  (blamer-commit-formatter "• %s")
+  ;; (blamer-commit-formatter "• %s")
+  (blamer-commit-formatter nil)
   ;; (blamer-entire-formatter "   %s")
-  (blamer-entire-formatter "  > %s")
+  (blamer-entire-formatter "  • %s")
   ;; (blamer-offset-per-symbol 17)
   ;; (blamer-view 'overlay-right)
   (blamer-view 'overlay)
@@ -1017,6 +1041,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
                    :height 0.9
                    :background nil)))
   :config
+  (tooltip-mode)
+  (setq blamer-commit-formatter nil)
+  (setq blamer-tooltip-function 'blamer-tooltip-commit-message)
   (defun blamer-callback-show-commit-diff (commit-info)
     (interactive)
     (message "Blamer my custom callback")
@@ -1098,6 +1125,14 @@ Version 2015-12-08"
 
 (global-set-key (kbd "s-e") 'emmet-expand-line)
 (global-set-key (kbd "C-s") 'save-buffer)
+(define-key evil-normal-state-map (kbd "SPC w w") 'ace-window)
+
+;;; Navigation
+;;;; Evil
+(use-package avy
+  :defer t
+  :custom
+  (avy-single-candidate-jump t))
 
 (use-package evil-leader
   :after evil
@@ -1111,7 +1146,11 @@ Version 2015-12-08"
          ("SPC d T" . org-time-stamp)
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
+         ("SPC t t" . ivy-magit-todos)
+         ("SPC w e" . ace-window)
+         ("SPC w f" . ace-window)
          ("s-2" . xah-paste-from-register-1)
+         ("SPC y k" . yank-from-kill-ring)
          :map evil-insert-state-map
          ("s-2" . xah-paste-from-register-1)
          :map evil-visual-state-map
@@ -1126,7 +1165,7 @@ Version 2015-12-08"
   (setq-default evil-kill-on-visual-paste nil)
   (evil-leader/set-key
     "f" 'evil-find-char
-    "b" 'evilem-motion-previous-line
+    "b" 'my-switch-to-xwidget-buffer
     "x" 'my-ecmascript-formatter
     "k" 'save-buffer-without-dtw
     "w" 'avy-goto-word-0
@@ -1148,8 +1187,12 @@ Version 2015-12-08"
     "c" 'dired-create-empty-file
     "p" '+format/buffer
     "s" 'publish-org-blog
-    "g" 'dogears-go
-
+    "g" 'ace-window
+    ;; Evil
+    "=" 'evil-record-macro
+    "-" 'evil-execute-macro
+    "0" 'my-toggle-default-browser
+    ;; "=" 'kmacro-start-macro-or-insert-counter
     ;; Lsp
     "h" 'lsp-ui-doc-show
     "e" 'lsp-treemacs-errors-list
@@ -1161,15 +1204,18 @@ Version 2015-12-08"
     "3" 'my-setup-tabnine-3
 
     "m" 'toggle-maximize-buffer
-    "y" 'yas-expand
-    ))
+    "y" 'yas-expand))
 
-;;; Navigation
+;; (defun bb/evil-delete (orig-fn beg end &optional type _ &rest args)
+;;     (apply orig-fn beg end type ?_ args))
+;; (advice-add 'evil-delete :around 'bb/evil-delete);;; Navigation
+
 (use-package evil-matchit
   :defer 15)
 
 (evilmi-load-plugin-rules '(ng2-html-mode) '(html))
 (global-evil-matchit-mode 1)
+
 
 ;;; Org mode
 (use-package org
