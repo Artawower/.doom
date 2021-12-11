@@ -4,5 +4,13 @@
 # --
 
 #+BEGIN_SRC go
-$1
+package main
+
+import (
+    "fmt"
+)
+
+func main() {
+   $1
+}
 #+END_SRC
