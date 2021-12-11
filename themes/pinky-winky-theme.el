@@ -144,6 +144,7 @@ Can be an integer to determine the exact padding."
 ;;;; ivy
    (ivy-current-match :background (doom-lighten red 0.35) :distant-foreground base0 :weight 'normal :foreground bg)
    (ivy-minibuffer-match-face-2 :background violet :foreground cyan)
+   (ivy-posframe :background bg)
 ;;;; LaTeX-mode
    (font-latex-math-face :foreground green)
 ;;;; markdown-mode
@@ -190,6 +191,11 @@ Can be an integer to determine the exact padding."
 (evil-ex-lazy-highlight :foreground bg :background (doom-lighten green 0.3))
 ;;;; hl-line mod e
 (hl-line :background (doom-lighten violet 0.85))
+;;;; markdown mode
+;; (markdown-markup-face :background (doom-lighten dark-red 0.98))
+;; (markdown-pre-face :background (doom-lighten dark-red 0.98))
+(markdown-code-face :distant-background (doom-lighten dark-red 0.98))
+
 ;;;; solaire-mode
    (solaire-mode-line-face
     :inherit 'mode-line
