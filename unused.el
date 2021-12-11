@@ -433,6 +433,49 @@
 ;; (use-package benchmark-init
 ;;   :config
 
-  ;; To disable collection of benchmark data after init is done.
-  ;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
-  ;; )
+;; To disable collection of benchmark data after init is done.
+;; (add-hook 'after-init-hook 'benchmark-init/deactivate)
+;; )
+
+
+;;; (use-package smartparens
+;;   :defer 5
+;;   :config
+
+;;   (defun indent-between-pair (&rest _ignored)
+;;     (newline)
+;;     (indent-according-to-mode)
+;;     (forward-line -1)
+;;     (indent-according-to-mode))
+
+;;   (sp-local-pair 'prog-mode "{" nil :post-handlers '((indent-between-pair "RET")))
+;;   (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
+;;   (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET"))))
+
+
+
+
+;; (defun my-after-electric-pair-inserted ()
+;;   "Call afer electric paid indention inserted for auto align with current mode."
+;;   (message "Amm was inserted"))
+
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-post-self-insert-function)
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-open-newline-between-pairs-psif)
+;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-will-use-region)
+
+;;; COmpany
+(add-hook! (go-mode scss-mode css-mode js-mode typescript-mode vue-mode web-mode ng2-html-mode ng2-ts-mode emacs-lisp-mode)
+           #'reset-lsp-backends)
+
+(defun reset-lsp-backends-straightaway ()
+  (my-setup-tabnine))
+
+(defun reset-lsp-backends (&optional arg)
+  (run-at-time "2 sec" nil #'reset-lsp-backends-straightaway))
+
+(advice-add 'lsp :after #'reset-lsp-backends)
+
+;;; Indention
+(use-package aggressive-indent
+  :defer t
+  :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))

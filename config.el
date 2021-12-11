@@ -267,40 +267,17 @@ INFO can be found in docstring of `posframe-show'."
   :defer 5
   :config
   (autopair-global-mode))
-;; (use-package smartparens
-;;   :defer 5
-;;   :config
-
-;;   (defun indent-between-pair (&rest _ignored)
-;;     (newline)
-;;     (indent-according-to-mode)
-;;     (forward-line -1)
-;;     (indent-according-to-mode))
-
-;;   (sp-local-pair 'prog-mode "{" nil :post-handlers '((indent-between-pair "RET")))
-;;   (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
-;;   (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET"))))
-
-
-
-
-;; (defun my-after-electric-pair-inserted ()
-;;   "Call afer electric paid indention inserted for auto align with current mode."
-;;   (message "Amm was inserted"))
-
-;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-post-self-insert-function)
-;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-open-newline-between-pairs-psif)
-;; (advice-add 'my-after-electric-pair-inserted :after #'electric-pair-will-use-region)
 
 
 ;;; Undo
 (use-package undo-tree
-  :defer 0.3
+  :defer 2
   :config
   (setq undo-tree-auto-save-history t)
   (setq undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
   ;; (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode))
+  ;; (global-undo-tree-mode)
+  (undo-tree-mode))
 
 ;;; Spell check
 (use-package flyspell
