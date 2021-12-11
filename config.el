@@ -68,10 +68,34 @@
         browse-url-browser-function 'browse-url-generic))
 
 ;;; My custom functions
+;;;; Switch default browser
+(defun my-switch-to-xwidget-buffer (&optional a b)
+  "Switch to xwidget buffer."
+  (interactive)
+  (switch-to-first-matching-buffer "xwidget webkit"))
+
+(defun my-toggle-default-browser ()
+  "Toggle default browser for preview"
+  (interactive)
+  (if (eq browse-url-browser-function #'browse-url-default-browser)
+      (progn (setq browse-url-browser-function #'xwidget-webkit-browse-url)
+             (advice-add 'browse-url :after #'my-switch-to-xwidget-buffer))
+    (progn
+      (setq browse-url-browser-function #'browse-url-default-browser)
+      (advice-remove 'browse-url #'my-switch-to-xwidget-buffer))))
+
 ;;;; Switch to first finded buffer
 (defun switch-to-first-matching-buffer (regex)
   (switch-to-buffer (car (remove-if-not (apply-partially #'string-match-p regex)
                                         (mapcar #'buffer-name (buffer-list))))));;;
+(defun my-remove-cr (&optional begin end)
+  "Remove line prefixes ending with carriage-return.
+
+BEGIN END specifies region, otherwise works on entire buffer."
+  (save-excursion
+    (goto-char (or begin (point-min)))
+    (while (re-search-forward "^.*\033\\[2K\033\\[1G" end t)
+      (replace-match ""))))
 
 ;;;; Maximize current buffer
 (defun toggle-maximize-buffer () "Maximize buffer"
