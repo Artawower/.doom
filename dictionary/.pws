@@ -1,11 +1,15 @@
-personal_ws-1.1 en 35 
+personal_ws-1.1 en 42 
 AxiosInstance
 AxiosRequestConfig
 DalGetReport
 DalService
+ICellRendererAngularComp
+ICellRendererParams
 Input
+OnDestroy
 UseFormGetValues
 Wakatime
+agInit
 alists
 apiServices
 dirPath
@@ -14,6 +18,7 @@ getLanguageById
 gocron
 golang
 highRiskPercantage
+isMinimalBudget
 isProduction
 languageByCode
 languageById
@@ -22,6 +27,7 @@ loadReferencesIfNotExist
 loc
 maxNominalCost
 maxPercentProfit
+maxYearsOfInfinityBonds
 middleRiskPercantage
 minNominalCost
 minPercentProfit
@@ -32,5 +38,6 @@ onBlur
 onChange
 preloadData
 projectId
+renderer
 strategyFormSchema
 swtest
