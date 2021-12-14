@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: spoiler
+# key: +sp
+# --
+
+#+START_SPOILER $1 >
+`(if (region-active-p)
+     yas-selected-text
+    "$2")`
+#+CLOSE_SPOILER

@@ -1,0 +1,8 @@
+# key: sp
+# name: spoiler2
+# --
+<details>
+  <summary>$1</summary>
+
+${2:`(if (region-active-p) (yas-selected-text) "$2")`}
+</details>
