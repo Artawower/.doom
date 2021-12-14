@@ -68,6 +68,15 @@
         browse-url-browser-function 'browse-url-generic))
 
 ;;; My custom functions
+;;;; Add additional space before org-insert link function
+
+(defun my-add-additional-space-when-not-exist (_)
+  "Add additional sapce if previous char is not space!"
+  (unless (eq (char-before) ? )
+    (insert " ")))
+
+(advice-add 'org-insert-link :before 'my-add-additional-space-when-not-exist)
+
 ;;;; Switch default browser
 (defun my-switch-to-xwidget-buffer (&optional a b)
   "Switch to xwidget buffer."
