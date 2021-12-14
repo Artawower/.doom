@@ -102,6 +102,10 @@
 ;;;; Documentation
 (package! zeal-at-point)
 
+;;; Markup
+(package! pug-mode)
+(package! auto-rename-tag)
+
 ;;; Spelling
 ;; (package! spell-fu) ;; totally awfully behaviour
 
@@ -115,11 +119,10 @@
 
 
 (package! emmet-mode)
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
+(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/log-from-clipboard"))
 (package! dap-mode)
 (package! undo-tree)
 (package! reverse-im)
-(package! pug-mode)
 (package! prettier)
 (package! package-lint)
 (package! package-build)
@@ -181,13 +184,16 @@
 ;;; Colloboration
 (package! floobits)
 ;;; Temporary
+
+(package! dumb-jump)
 (package! ranger)
 (package! benchmark-init)
 
 ;;; Not a programming
 ;;; Unused
-(package! code-review)
+;; (package! code-review)
 
+;; (package! dirvish) -- so luggy
 ;; (package! vi-tilde-fringe :disable t)
 ;; (package! multi-vterm)
 ;; (package! pippel)

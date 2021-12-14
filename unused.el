@@ -479,3 +479,15 @@
 (use-package aggressive-indent
   :defer t
   :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))
+
+(use-package dirvish
+  :defer t
+  :config
+  (setq dired-kill-when-opening-new-dired-buffer t) ;; added in emacs 28
+  (setq dired-clean-confirm-killing-deleted-buffers nil)
+  (setq large-file-warning-threshold 50000000)
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))

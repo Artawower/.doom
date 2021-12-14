@@ -210,7 +210,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
                     (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-file-modes-face))
                     (all-the-icons-ivy-rich-project-file-id (:width 12 :face all-the-icons-ivy-rich-file-owner-face))
                     (all-the-icons-ivy-rich-project-file-modification-time (:face all-the-icons-ivy-rich-time-face)))))
-    (set-face-attribute 'all-the-icons-ivy-rich-doc-face nil :font "ChalkBoard SE" :italic t :height 136)
+    (set-face-attribute 'all-the-icons-ivy-rich-doc-face nil :font "ChalkBoard SE 13" :italic t :height 136)
     (ivy-rich-set-columns 'projectile-find-file col-def)
     (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
     (ivy-rich-set-columns 'projectile--find-file col-def)))
@@ -232,9 +232,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq ivy-posframe-parameters '((internal-border-width . 20) (left-fringe . 18) (right-fringe . 18))
         ivy-posframe-height 14
         ;; ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
-        ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
-
-        ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 12")
+        ;; ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
+        ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
   ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
   (defun ivy-posframe-get-size ()
     "Func for detect ivy posframe size after resize dynamically"
@@ -291,9 +290,11 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 
 ;;; Flycheck
-;; (use-package flycheck
-;;   :defer 0.6
-;;   :config)
+(use-package flycheck
+  :defer 2
+  :bind (:map evil-normal-state-map
+         ("SPC f ]" . flycheck-next-error)
+         ("SPC f [" . flycheck-previous-error)))
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 (use-package autopair
@@ -407,6 +408,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package all-the-icons-dired
   :defer 15
   :hook (dired-mode . all-the-icons-dired-mode))
+
 
 ;;; Bookmarks
 ;;;; quick bm
@@ -541,7 +543,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("C-s-i" . turbo-log-print-immediately)
          ("C-s-h" . turbo-log-comment-all-logs)
          ("C-s-s" . turbo-log-uncomment-all-logs)
-         ("C-s-x" . turbo-log-delete-all-logs))
+         ("C-s-x" . turbo-log-delete-all-logs)
+         ("C-s-[" . turbo-log-paste-as-logger )
+         ("C-s-]" . turbo-log-paste-as-logger-immediately))
   :config
   (add-to-list 'turbo-log--modes '(js2-mode . turbo-log--ecmascript-print))
 
@@ -940,6 +944,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package nginx-mode
   :defer 10)
 
+;;; Markup
 ;;;; Markdown
 (use-package grip-mode
   :after markdown-mode
@@ -951,6 +956,11 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (let ((credential (auth-source-user-and-password "api.github.com")))
     (setq grip-github-user (car credential)
           grip-github-password (cadr credential))))
+
+(use-package auto-rename-tag
+  :defer t
+  :config
+  (auto-rename-tag-mode 1))
 
 ;;; Help tools
 ;;;; PASCAL_CASE -> camelCase -> snake_case
@@ -1553,6 +1563,8 @@ Version 2015-12-08"
     (define-key elfeed-search-mode-map "=" elfeed-score-map)))
 ;;;
 ;;; Temporary section
+(use-package dumb-jump
+  :defer t)
 
 
 ;; (use-package shikimori
