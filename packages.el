@@ -142,8 +142,6 @@
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
 (package! atom-one-dark-theme)
 (package! origami)
-;; (package! affe)
-;; (package! markdown-preview-mode)
 (package! ivy
   :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
   :recipe (:host github :repo "abo-abo/swiper"))
@@ -185,12 +183,13 @@
 (package! floobits)
 ;;; Temporary
 
-(package! dumb-jump)
 (package! ranger)
 (package! benchmark-init)
 
 ;;; Not a programming
 ;;; Unused
+
+;; (package! dumb-jump) -- really dumb
 ;; (package! code-review)
 
 ;; (package! dirvish) -- so luggy

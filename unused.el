@@ -480,6 +480,7 @@
   :defer t
   :hook ((emacs-lisp-mode css-mode) . aggressive-indent-mode))
 
+;;; Files
 (use-package dirvish
   :defer t
   :config
@@ -491,3 +492,7 @@
   (setq delete-by-moving-to-trash t)
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))
+
+;;; Navigation
+(use-package dumb-jump
+  :defer t)

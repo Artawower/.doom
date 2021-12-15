@@ -1545,14 +1545,7 @@ Version 2015-12-08"
   (setq-default elfeed-search-filter "@12-hours-ago +unread")
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100)
-
-  ;; (setq browse-url-generic-program #'xwidget-webkit-browse-url)
-  (setq browse-url-browser-function #'browse-url-default-browser)
-  ;; For built in browser
-  ;; (setq browse-url-browser-function #'xwidget-webkit-browse-url)
-  ;; (advice-add 'browse-url :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
-  ;; (advice-add 'browse-url-generic :after #'(lambda (a a2) (switch-to-first-matching-buffer "xwidget webkit")))
-  )
+  (setq browse-url-browser-function #'browse-url-default-browser))
 
 (use-package elfeed-score
   :after elfeed
@@ -1561,11 +1554,8 @@ Version 2015-12-08"
   (progn
     (elfeed-score-enable)
     (define-key elfeed-search-mode-map "=" elfeed-score-map)))
-;;;
-;;; Temporary section
-(use-package dumb-jump
-  :defer t)
 
+;;; Temporary section
 
 ;; (use-package shikimori
 ;;   :defer t
