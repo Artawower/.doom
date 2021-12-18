@@ -60,6 +60,8 @@
 ;;;; Additional colors
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
+
+(setq global-vi-tilde-fringe-mode nil)
 ;;;;; Browser configs
 ;; Mac os only
 (when (eq system-type 'darwin)
@@ -117,8 +119,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;; Transparent bg
 (progn
-  (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
-  (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
+  (set-frame-parameter (selected-frame) 'alpha '(95 . 90))
+  (add-to-list 'default-frame-alist '(alpha . (95 . 90))))
 
 ;;; Fonts
 
@@ -179,6 +181,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; Spaces insted of tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
+;;;; Benchmark
+(use-package explain-pause-mode
+  :defer t)
 
 ;;; Completion
 (use-package ivy
@@ -647,6 +652,14 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
 
+(use-package tree-edit
+  :defer t)
+
+(use-package evil-tree-edit
+  :after tree-edit)
+
+
+
 ;;;; Company
 (defun my-setup-tabnine ()
   (interactive)
@@ -921,6 +934,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq dap-auto-configure-features '(sessions locals))
   (require 'dap-go))
 
+;;; Infrastructure
 ;;;; Docker compose
 (use-package docker-compose-mode
   :defer t)
@@ -940,6 +954,19 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package company-nginx
   :after nginx-mode
   :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
+
+;;;; Kuber
+(use-package kubernetes
+  :defer 6
+  :commands (kubernetes-overview)
+  :bind (:map evil-normal-state-map
+         ("SPC o K" . kubernetes-overview))
+  :config
+  (setq kubernetes-poll-frequency 3600
+        kubernetes-redraw-frequency 3600))
+
+(use-package kubernetes-evil
+  :after kubernetes)
 
 (use-package nginx-mode
   :defer 10)
@@ -1557,6 +1584,8 @@ Version 2015-12-08"
 
 ;;; Temporary section
 
+(use-package secret-mode
+  :defer t)
 ;; (use-package shikimori
 ;;   :defer t
 ;;   :custom

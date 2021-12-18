@@ -66,10 +66,14 @@
 ;; (package! lsp-mode)
 (package! lsp-ui)
 (package! exec-path-from-shell)
-(package! tree-sitter)
-(package! tree-sitter-langs)
 (package! typescript-mode)
 (package! ng2-mode)
+
+;;; Treesitter
+(package! tree-sitter)
+(package! tree-sitter-langs)
+(package! tree-edit)
+(package! evil-tree-edit)
 
 ;;; Languages
 ;;;; CLojure
@@ -102,6 +106,9 @@
 ;;;; Documentation
 (package! zeal-at-point)
 
+;;; Performance bench
+(package! explain-pause-mode :recipe (:host github :repo "lastquestion/explain-pause-mode"))
+
 ;;; Markup
 (package! pug-mode)
 (package! auto-rename-tag)
@@ -115,6 +122,8 @@
 (package! jenkinsfile-mode)
 (package! company-nginx)
 (package! nginx-mode)
+(package! kubernetes)
+(package! kubernetes-evil)
 
 
 
@@ -179,12 +188,12 @@
 (package! elfeed-score)
 ;;; Agenda
 
-;;; Colloboration
+;;; Collaboration
 (package! floobits)
 ;;; Temporary
 
+(package! secret-mode :recipe (:host github :repo "bkaestner/secret-mode.el"))
 (package! ranger)
-(package! benchmark-init)
 
 ;;; Not a programming
 ;;; Unused
