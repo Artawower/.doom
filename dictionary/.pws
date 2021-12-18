@@ -1,4 +1,4 @@
-personal_ws-1.1 en 46 
+personal_ws-1.1 en 48 
 AxiosInstance
 AxiosRequestConfig
 DalGetReport
@@ -20,6 +20,7 @@ getLanguageById
 gocron
 golang
 highRiskPercantage
+identifier
 isMinimalBudget
 isProduction
 kubernetes
@@ -45,3 +46,4 @@ renderer
 strategyFormSchema
 swtest
 truthy
+verifika
