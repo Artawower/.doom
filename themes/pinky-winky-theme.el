@@ -169,6 +169,8 @@ Can be an integer to determine the exact padding."
    (show-paren-match-expression :foreground (doom-darken dark-red 0.1) :background nil)
 ;;;; Region
    (region :background (doom-lighten violet 0.85))
+;;;; Cursor
+(cursor :background blue)
 ;;; Doom
 ;;;; Workspace
    (+workspace-tab-selected-face :foreground (doom-lighten grey 0.8) :background blue :weight 'bold)
