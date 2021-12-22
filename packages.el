@@ -65,8 +65,12 @@
 (package! company-posframe)
 ;; (package! lsp-mode)
 (package! lsp-ui)
-(package! exec-path-from-shell)
+;; (package! exec-path-from-shell)
+
+
+;;; JS/TS
 (package! typescript-mode)
+(package! npm)
 (package! ng2-mode)
 
 ;;; Treesitter
@@ -114,7 +118,6 @@
 (package! auto-rename-tag)
 
 ;;; Spelling
-;; (package! spell-fu) ;; totally awfully behaviour
 
 ;;; Infrastucture
 (package! docker-compose-mode)
@@ -143,13 +146,16 @@
 
 (package! git-messenger)
 
+;;; Themes
+(package! atom-one-dark-theme)
+;; (package! ewal)
+;; (package! ewal-doom-themes)
 
 ;;; ~UNCATEGORIZED YET
 (package! hydra)
 ;; (package! company-box)
 ;; (package! prettier-js)
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
-(package! atom-one-dark-theme)
 (package! origami)
 (package! ivy
   :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
@@ -228,3 +234,5 @@
 ;; (package! modus-themes)
 
 ;; (package! counsel-dash)
+
+;; (package! live-py-mode)

@@ -424,10 +424,13 @@
 ;;   :config
 ;;   (setq shikimori-default-browser #'browse-url-firefox))
 
+;;; Python
 ;;;;; Python check depdendencies
 (use-package pippel
   :defer t)
 
+(use-package live-py-mode
+  :defer t)
 ;;; Debug
 
 ;; (use-package benchmark-init
@@ -495,4 +498,18 @@
 
 ;;; Navigation
 (use-package dumb-jump
+  :defer t)
+
+;;; Themes
+;; Not for me
+
+;;;; Change template for all componnets :)
+(use-package ewal
+  :defer t
+  :config
+  (setq ewal-use-built-in-always-p nil
+        ewal-use-built-in-on-failure-p t
+        ewal-built-in-palette "sexy-material"))
+
+(use-package ewal-doom-themes
   :defer t)

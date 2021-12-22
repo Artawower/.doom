@@ -363,6 +363,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (add-hook 'text-mode-hook 'flyspell-mode!)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
+
 ;;; Folding
 ;;;; Html
 (use-package origami
@@ -494,10 +495,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq heaven-and-hell-themes
         '((light . pinky-winky)
           (dark . deep-atom)))
-  ;; (setq heaven-and-hell-themes
-  ;;       '((light . zaiste)
-  ;;         (dark . deep-atom)))
-  ;; (dark . doom-moonlight)))
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
   :bind (("<f5>" . heaven-and-hell-toggle-theme)))
@@ -674,8 +671,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 (defun my-setup-tabnine-3 ()
   (interactive)
-  (setq-local +lsp-company-backends '((company-capf)))
-  (setq-local company-backends '((company-capf))))
+  (setq-local +lsp-company-backends '((company-capf company-dabbrev)))
+  (setq-local company-backends '((company-capf company-dabbrev))))
 
 
 (use-package company
@@ -769,6 +766,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package js2-mode
   :defer t
   :hook (js2-mode . js2-highlight-unused-variables-mode))
+
+(use-package npm
+  :defer t)
 
 ;;;; Golang
 (use-package go-playground
@@ -1192,6 +1192,7 @@ Version 2015-12-08"
          ("SPC d T" . org-time-stamp)
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
+         ("9" . ace-window)
          ("SPC t t" . ivy-magit-todos)
          ("SPC w e" . ace-window)
          ("SPC w f" . ace-window)
@@ -1264,12 +1265,16 @@ Version 2015-12-08"
 
 
 ;;; Org mode
+(use-package prg-crypt
+  :defer t)
+
 (use-package org
   :mode (("\\.org$" . org-mode))
   :defer t
   ;; :demand t
-  ;; :bind
-  ;; (:map org-mode-map ("C-o f" . format-org-mode-block))
+  :bind (:map evil-normal-state-map
+         ("SPC h ]" . org-next-visible-heading)
+         ("SPC h [" . org-previous-visible-heading))
   :config
   (progn
     (define-key org-mode-map "\C-x a f" "\C-x h \C-M-\\ \C-c")
