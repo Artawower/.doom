@@ -625,6 +625,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package lsp-ui
   :after lsp-mode
   :hook (lsp-mode . lsp-ui-mode)
+  :bind (:map evil-normal-state-map
+         ("SPC l r" . lsp-find-references))
   :config
   (setq lsp-ui-sideline-diagnostic-max-line-length 200
         lsp-ui-sideline-diagnostic-max-lines 5
@@ -749,6 +751,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq typescript-indent-level 2)
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
 
+;;;;; Angular
 (use-package ng2-mode
   :after typescript-mode
   :hook (ng2-html-mode . web-mode)
@@ -761,6 +764,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
           "--tsProbeLocations"
           "/usr/local/lib/node_modules"
           "--stdio")))
+
 
 ;;;; Javascript
 (use-package js2-mode
@@ -1192,7 +1196,6 @@ Version 2015-12-08"
          ("SPC d T" . org-time-stamp)
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
-         ("9" . ace-window)
          ("SPC t t" . ivy-magit-todos)
          ("SPC w e" . ace-window)
          ("SPC w f" . ace-window)
@@ -1221,6 +1224,7 @@ Version 2015-12-08"
     "[" 'flycheck-previous-error
 
     "d" 'dap-debug
+    "\\" 'ace-window
 
     "o" 'org-mode
     "q" 'kill-current-buffer
