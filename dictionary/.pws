@@ -1,5 +1,6 @@
-personal_ws-1.1 en 77 
+personal_ws-1.1 en 80 
 AgGridColumn
+ApiHttpError
 AxiosInstance
 AxiosRequestConfig
 ChangeDetectorRef
@@ -35,6 +36,7 @@ getLanguageById
 gocron
 golang
 highRiskPercantage
+html
 identifier
 imagePullPolicy
 initGridContext
@@ -64,6 +66,7 @@ onTargetSegmentUpdated
 preloadData
 projectId
 renderer
+rxjs
 showInvisibles
 src
 strategyFormSchema
