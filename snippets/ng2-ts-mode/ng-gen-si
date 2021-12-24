@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ng generate skip import
+# key: ng-gen-si
+# group: angular cli
+# type: command
+# --
+(ng-generate-for-buffer t)

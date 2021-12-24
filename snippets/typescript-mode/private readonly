@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: private readonly
+# key: pr
+# --
+
+private readonly $1 = $2

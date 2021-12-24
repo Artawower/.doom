@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ng generate
+# key: ng-gen
+# group: angular cli
+# type: command
+# --
+(ng-generate-for-buffer)

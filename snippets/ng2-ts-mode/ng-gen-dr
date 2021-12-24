@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ng generate dry run
+# key: ng-gen-dr
+# group: angular cli
+# type: command
+# --
+(ng-generate-for-buffer nil t)

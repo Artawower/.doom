@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: nd
+# key: nd
+# --
+
+ngOnDestroy() {
+  this.clearSubscriptions();
+}
+
+private clearSubscriptions(): void {
+  this.destroyed$.next();
+}

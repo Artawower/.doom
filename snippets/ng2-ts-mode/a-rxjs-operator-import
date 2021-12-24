@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: rxjs operator import
+# key: a-rxjs-operator-import
+# group: rxjs
+# --
+import { ${1:map} } from 'rxjs/operators';
+$0
