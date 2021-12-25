@@ -457,6 +457,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
                           (let ((kill-buffer-query-functions nil))
                             (kill-this-buffer)
                             (+vterm/toggle args)))))
+         ("SPC o h" . (lambda () (interactive)
+                        (+vterm/toggle t)))
          ("SPC t h" . vterm-toggle-hide))
   :config
   (setq vterm-toggle-scope 'project))
