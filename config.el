@@ -313,10 +313,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 2
   :config
   (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
-  ;; (evil-set-undo-system 'undo-tree)
-  ;; (global-undo-tree-mode)
-  (undo-tree-mode))
+  (setq undo-tree-history-directory-alist '(("." . "~/tmp/undo"))))
 
 ;;; Spell check
 (use-package flyspell
@@ -551,7 +548,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("C-s-[" . turbo-log-paste-as-logger )
          ("C-s-]" . turbo-log-paste-as-logger-immediately))
   :config
-  (add-to-list 'turbo-log--modes '(js2-mode . turbo-log--ecmascript-print))
+  ;; (add-to-list 'turbo-log--modes '(js2-mode . turbo-log--ecmascript-print))
 
   (setq turbo-log--prefix "🚀")
   (setq turbo-log--ecmascript-loggers '("console.log" "console.debug" "console.warn"))
@@ -1575,7 +1572,8 @@ Version 2015-12-08"
 ;;; COlloboration
 (use-package floobits
   :defer t)
-;;; RSS
+;;; Reading
+;;;; RSS
 (use-package elfeed
   :defer 30
   :config
@@ -1593,6 +1591,9 @@ Version 2015-12-08"
     (elfeed-score-enable)
     (define-key elfeed-search-mode-map "=" elfeed-score-map)))
 
+;;;; Pocket
+(use-package pocket-reader
+  :defer t)
 ;;; Temporary section
 
 (use-package secret-mode

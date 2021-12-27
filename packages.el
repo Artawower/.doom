@@ -131,7 +131,8 @@
 
 
 (package! emmet-mode)
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/log-from-clipboard"))
+;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/log-from-clipboard"))
+(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/v2.0"))
 (package! dap-mode)
 (package! undo-tree)
 (package! reverse-im)
@@ -190,8 +191,11 @@
 ;;;; Org babel
 (package! ob-restclient)
 (package! ob-async)
-;;; Rss
+;;; Reading
+;;;; Rss
 (package! elfeed-score)
+;;;; Pocket
+(package! pocket-reader)
 ;;; Agenda
 
 ;;; Collaboration
