@@ -1041,7 +1041,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("k" . previous-line)
          ("c" . gist-fork)
          ("x" . gist-kill-current)
-         ("f" . avy-goto-char)
+         ("f" . avy-goto-word-1)
          ("v" . evil-visual-char)
          :map evil-normal-state-map
          ("SPC g l g" . gist-list)))
@@ -1186,7 +1186,7 @@ Version 2015-12-08"
 (use-package evil-leader
   :after evil
   :bind (:map evil-normal-state-map
-         ("f" . avy-goto-char)
+         ("f" . avy-goto-word-1)
          ("SPC n r f" . org-roam-node-find)
          ("SPC t a" . treemacs-add-project-to-workspace)
          ("SPC g t" . git-timemachine)
@@ -1218,7 +1218,6 @@ Version 2015-12-08"
     "x" 'my-ecmascript-formatter
     "k" 'save-buffer-without-dtw
     "w" 'avy-goto-word-0
-    "f" 'avy-goto-word-1
     "]" 'flycheck-next-error
     "[" 'flycheck-previous-error
 
