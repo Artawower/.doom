@@ -1334,6 +1334,14 @@ Version 2015-12-08"
       ""
       "Javascript code to print value of body.")))
 
+(use-package svg-tag-mode
+  :defer 7
+  :hook (org-mode . svg-tag-mode)
+  :config
+  (setq svg-tag-tags
+        '(("\\(:[A-Z]+:\\)" . ((lambda (tag)
+                                 (svg-tag-make tag :beg 1 :end -1)))))))
+
 ;; (defun my-org-mode-hook ()
 ;;   "Custom `org-mode' behaviours."
 ;;   (add-hook  #'(lambda ()

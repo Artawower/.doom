@@ -204,6 +204,7 @@
 
 (package! secret-mode :recipe (:host github :repo "bkaestner/secret-mode.el"))
 (package! ranger)
+(package! svg-tag-mode)
 
 ;;; Not a programming
 ;;; Unused
