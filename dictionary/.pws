@@ -1,4 +1,4 @@
-personal_ws-1.1 en 80 
+personal_ws-1.1 en 82 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -10,6 +10,7 @@ ContextViewerEvent
 DalGetReport
 DalService
 Error
+FUNC
 GridApi
 ICellRendererAngularComp
 ICellRendererParams
@@ -60,6 +61,7 @@ minPercentProfit
 ngOnDestroy
 ngOnInit
 ngxsOnInit
+node
 onBlur
 onChange
 onTargetSegmentUpdated
