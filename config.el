@@ -547,13 +547,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("C-s-x" . turbo-log-delete-all-logs)
          ("C-s-[" . turbo-log-paste-as-logger )
          ("C-s-]" . turbo-log-paste-as-logger-immediately))
-  :config
-  ;; (add-to-list 'turbo-log--modes '(js2-mode . turbo-log--ecmascript-print))
-
-  (setq turbo-log--prefix "🚀")
-  (setq turbo-log--ecmascript-loggers '("console.log" "console.debug" "console.warn"))
-  (setq turbo-log--python-loggers '("print" "logger"))
-  (setq turbo-log--golang-loggers '("fmt.Printf" "log.Info().Msgf" "spew.Dump")))
+  :custom
+  (turbo-log-allow-insert-without-tree-sitter-p t))
 
 ;;; Quickly type converting
 (use-package quicktype
@@ -582,7 +577,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
            typescript-tsx-mode) . lsp-deferred))
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error)
-         ("g i" . lsp-goto-implementation))
+         ("g i" . lsp-goto-implementation)
+         ("SPC l a" . lsp-execute-code-action))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.3)
