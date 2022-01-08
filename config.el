@@ -610,12 +610,20 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                       (setq company-backends '(company-tabnine company-dabbrev))))
 
 
-  (setq +lsp-company-backends '(company-tabnine company-capf))
-  (setq company-backends '((company-tabnine :separate company-capf)))
+  ;; (setq +lsp-company-backends '(company-tabnine company-capf))
+  ;; (setq company-backends '((company-tabnine :separate company-capf)))
+  (setq +lsp-company-backends '(company-dabbrev company-capf))
+  (setq company-backends '((company-dabbrev company-capf)))
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
   (setq lsp-eldoc-hook nil))
+
+(use-package lsp-yaml
+  :defer t
+  :hook (yaml-mode . lsp-mode))
+  ;; :custom
+  ;; (lsp-yaml-schemas '(:kubernetes "https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json")))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -1177,7 +1185,8 @@ Version 2015-12-08"
 (use-package avy
   :defer t
   :custom
-  (avy-single-candidate-jump t))
+  (avy-single-candidate-jump t)
+  (avy-keys '(?q ?w ?e ?r ?t ?y ?u ?i ?o ?p ?a ?s ?d ?f ?g ?h ?j ?k ?l ?z ?x ?c ?v ?b ?n ?m)))
 
 (use-package evil-leader
   :after evil
@@ -1209,7 +1218,8 @@ Version 2015-12-08"
   :config
   (setq-default evil-kill-on-visual-paste nil)
   (evil-leader/set-key
-    "f" 'evil-find-char
+    ;; "f" 'evil-find-char
+    "f" 'avy-goto-char
     "b" 'my-switch-to-xwidget-buffer
     "x" 'my-ecmascript-formatter
     "k" 'save-buffer-without-dtw
