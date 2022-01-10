@@ -975,6 +975,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package kubernetes-evil
   :after kubernetes)
 
+(use-package k8s-mode
+  :defer t)
+
 (use-package nginx-mode
   :defer 10)
 

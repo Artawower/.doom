@@ -1,4 +1,4 @@
-personal_ws-1.1 en 82 
+personal_ws-1.1 en 102 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -22,21 +22,31 @@ OnChanges
 OnDestroy
 OnInit
 PREV
+PersistentVolume
+ReadWriteOnce
 RenderItemBuilder
+SuppressKeyboardEventParams
 UseFormGetValues
 Wakatime
+accessModes
 agInit
 alists
 apiServices
 apiVersion
 cellValueChanged
+containerPort
+contextViewerCalled
 dirPath
 ecmascript
 env
+fcType
+gcePersistentDisk
 getLanguageById
 gocron
 golang
 highRiskPercantage
+hostPath
+hostPort
 html
 identifier
 imagePullPolicy
@@ -58,6 +68,10 @@ maxYearsOfInfinityBonds
 middleRiskPercantage
 minNominalCost
 minPercentProfit
+mnt
+mongo
+mountPath
+namespace
 ngOnDestroy
 ngOnInit
 ngxsOnInit
@@ -65,12 +79,16 @@ node
 onBlur
 onChange
 onTargetSegmentUpdated
+pdName
 preloadData
 projectId
+provisioner
+pv
 renderer
 rxjs
 showInvisibles
 src
+storageClassName
 strategyFormSchema
 suppressKeyboardEvent
 suppressManualEditing
@@ -78,6 +96,8 @@ swtest
 targetPort
 truthy
 verifika
+volumeMounts
+volumeName
 watch
 watchLoadingError
 watchOfflineStatus

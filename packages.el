@@ -127,12 +127,13 @@
 (package! nginx-mode)
 (package! kubernetes)
 (package! kubernetes-evil)
+(package! k8s-mode)
 
 
 
 (package! emmet-mode)
-;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/log-from-clipboard"))
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/v2.0"))
+(package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
+;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/v2.0"))
 (package! dap-mode)
 (package! undo-tree)
 (package! reverse-im)
