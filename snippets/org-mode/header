@@ -10,5 +10,6 @@
 #+TITLE: $2
 #+DESCRIPTION: $3
 #+FILETAGS: $4
+#+STARTUP: show2levels
 #+ID:$1
 #+ACTIVE:
