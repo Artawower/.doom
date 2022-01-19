@@ -123,7 +123,7 @@
 (package! docker-compose-mode)
 (package! dockerfile-mode)
 (package! jenkinsfile-mode)
-(package! company-nginx)
+;; (package! company-nginx)
 (package! nginx-mode)
 (package! kubernetes)
 (package! kubernetes-evil)
@@ -132,8 +132,8 @@
 
 
 (package! emmet-mode)
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
-;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "feature/v2.0"))
+;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
+(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "enchancement/jump-inserting"))
 (package! dap-mode)
 (package! undo-tree)
 (package! reverse-im)
@@ -205,6 +205,7 @@
 
 (package! secret-mode :recipe (:host github :repo "bkaestner/secret-mode.el"))
 (package! ranger)
+(package! filetree)
 (package! svg-tag-mode)
 
 ;;; Not a programming

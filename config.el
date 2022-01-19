@@ -119,8 +119,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;; Transparent bg
 (progn
-  (set-frame-parameter (selected-frame) 'alpha '(95 . 90))
-  (add-to-list 'default-frame-alist '(alpha . (95 . 90))))
+  (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
+  (add-to-list 'default-frame-alist '(alpha . (100 . 100))))
+
+;; (progn
+;;   (set-frame-parameter (selected-frame) 'alpha '(97 . 95))
+;;   (add-to-list 'default-frame-alist '(alpha . (97 . 95))))
 
 ;;; Fonts
 
@@ -394,6 +398,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 
+;;; Files
+
 (use-package ranger
   :defer t
   :bind (:map evil-normal-state-map
@@ -406,6 +412,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq ranger-dont-show-binary t)
   (setq ranger-max-preview-size 10)
   (setq ranger-preview-delay 0.040))
+
+;; (use-package filetree
+;;   :defer t)
 
 ;;;; Dired
 (use-package all-the-icons-dired
@@ -493,7 +502,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq heaven-and-hell-theme-type 'dark) ;; Omit to use light by default
   (setq heaven-and-hell-themes
         '((light . pinky-winky)
-          (dark . deep-atom)))
+          (dark . tokio-night)))
   (setq heaven-and-hell-load-theme-no-confirm t)
   :hook (after-init . heaven-and-hell-init-hook)
   :bind (("<f5>" . heaven-and-hell-toggle-theme)))
@@ -548,7 +557,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("C-s-[" . turbo-log-paste-as-logger )
          ("C-s-]" . turbo-log-paste-as-logger-immediately))
   :custom
-  (turbo-log-allow-insert-without-tree-sitter-p t))
+  (turbo-log-allow-insert-without-tree-sitter-p t)
+  :config
+  (turbo-log-configure
+   :modes (typescript-mode js2-mode web-mode ng2-ts-mode js-mode)
+   :strategy merge
+   :post-insert-hooks (prettier-prettify lsp)
+   :msg-format-template "'🦄: %s'"))
 
 ;;; Quickly type converting
 (use-package quicktype
@@ -622,8 +637,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package lsp-yaml
   :defer t
   :hook (yaml-mode . lsp-mode))
-  ;; :custom
-  ;; (lsp-yaml-schemas '(:kubernetes "https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json")))
+;; :custom
+;; (lsp-yaml-schemas '(:kubernetes "https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json")))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -650,6 +665,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
+  (push '(scss-mode . typescript) tree-sitter-major-mode-language-alist)
   (tree-sitter-require 'tsx)
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
@@ -958,9 +974,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config)
 
 ;;;; Nginx
-(use-package company-nginx
-  :after nginx-mode
-  :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
+;; (use-package company-nginx
+;;   :after nginx-mode
+;;   :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
 
 ;;;; Kuber
 (use-package kubernetes
