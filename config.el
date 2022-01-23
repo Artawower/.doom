@@ -118,13 +118,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
            (delete-other-windows))))
 
 ;;; Transparent bg
-(progn
-  (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
-  (add-to-list 'default-frame-alist '(alpha . (100 . 100))))
-
 ;; (progn
-;;   (set-frame-parameter (selected-frame) 'alpha '(97 . 95))
-;;   (add-to-list 'default-frame-alist '(alpha . (97 . 95))))
+;;   (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
+;;   (add-to-list 'default-frame-alist '(alpha . (100 . 100))))
+
+(progn
+  (set-frame-parameter (selected-frame) 'alpha '(93 . 90))
+  (add-to-list 'default-frame-alist '(alpha . (93 . 90))))
 
 ;;; Fonts
 
@@ -192,7 +192,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Completion
 (use-package ivy
   :defer t
-  :bind (:map ivy-mode-map ("C-<return>" . ivy-immediate-done)))
+  :bind (:map ivy-mode-map
+         ("C-<return>" . ivy-immediate-done)
+         ("C-d" . (lambda ()
+                    (interactive)
+                    (ivy-kill-whole-line)
+                    (ivy--cd "~/")))
+         ("C-r" . (lambda ()
+                    (interactive)
+                    (ivy-kill-whole-line)
+                    (ivy--cd "/")))))
 
 (use-package ivy-rich
   :hook (ivy-mode . ivy-rich-mode)
@@ -242,7 +251,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
         ivy-posframe-height 14
         ;; ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
         ;; ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
-        ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
+                                        ; ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
+        ivy-posframe-font "JetBrainsMono Nerd Font Mono Bold 13")
   ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
   (defun ivy-posframe-get-size ()
     "Func for detect ivy posframe size after resize dynamically"
@@ -1326,24 +1336,22 @@ Version 2015-12-08"
       (interactive)
       (require 'ox-gfm)
       (setq org-export-with-sub-superscripts '{})
-      (defun org-gfm-format-toc (headline)
-        "")
+      (defun org-gfm-format-toc (headline) "")
       (org-gfm-export-to-markdown)
-      (message (concat
-                "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js"
-                (buffer-file-name)))
-      (shell-command
-       (concat
-        "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js "
-        (buffer-file-name))
-       ))
+      (let ((file-path (replace-regexp-in-string " " "\\\\\  " (buffer-file-name))))
+
+        (message (concat
+                  "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js"
+                  file-path))
+        (shell-command
+         (concat
+          "node /Users/darkawower/projects/pet/it-blog/emacs-blog/index.js "
+          file-path))))
 
     (setenv "NODE_PATH"
             (concat
              (getenv "HOME") "/org-node/node_modules"  ":"
-             (getenv "NODE_PATH")
-             )
-            )
+             (getenv "NODE_PATH")))
 
     (org-babel-do-load-languages
      'org-babel-load-languages
@@ -1428,11 +1436,6 @@ Version 2015-12-08"
   (setq org-icalendar-timezone "Equrope/Moscow")
   (setq plstore-cache-passphrase-for-symmetric-encryption t)
   (setq org-caldav-url 'google)
-  ;; For nextcloud
-  ;; (setq org-caldav-url "https://mark.nl.tab.digital/remote.php/dav/calendars/artawower@mail.ru")
-  ;; (setq org-caldav-calendars
-  ;;       '((:calendar-id "work" :files ("~/Yandex.Disk.localized/org/almanah.org")
-  ;;          :inbox "~/Yandex.Disk.localized/org/fromwork.org"))))
 
   (setq org-caldav-calendars
         ;; Work
