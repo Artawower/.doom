@@ -784,10 +784,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq company-minimum-prefix-length 1)
   (setq company-dabbrev-char-regexp "[A-z:-]"))
 
-;; (use-package company-posframe
-;;   :after company
-;;   :config
-;;   (company-posframe-mode 1))
 
 ;; Autocomplete with AI
 (use-package company-tabnine
@@ -1703,12 +1699,6 @@ Version 2015-12-08"
 
 (use-package secret-mode
   :defer t)
-;; (use-package shikimori
-;;   :defer t
-;;   :custom
-;;   (shikimori-default-browser 'browse-url-default-browser)
-;;   :config
-;;   (setq shikimori-default-browser #'browse-url-firefox))
 
 ;;; Temporary unused
 
