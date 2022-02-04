@@ -60,6 +60,8 @@
 (package! nyan-mode)
 (package! wakatime-mode)
 (package! indent-guide)
+;;; Visual
+(package! centaur-tabs)
 ;;; Completion
 (package! company-tabnine)
 (package! company-posframe)
@@ -132,8 +134,8 @@
 
 
 (package! emmet-mode)
-;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
-(package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "enchancement/jump-inserting"))
+(package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
+;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "enchancement/jump-inserting"))
 (package! dap-mode)
 (package! undo-tree)
 (package! reverse-im)

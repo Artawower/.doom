@@ -1,0 +1,6 @@
+# key: jt
+# name: jest new it ssction
+# --
+  it('should $1', () => {
+    $2
+  });

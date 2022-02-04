@@ -1,9 +1,11 @@
-personal_ws-1.1 en 102 
+personal_ws-1.1 en 107 
 AgGridColumn
 ApiHttpError
 AxiosInstance
 AxiosRequestConfig
 ChangeDetectorRef
+ClusterRole
+ClusterRoleBinding
 ContextViewerComponent
 ContextViewerComponentParams
 ContextViewerEvent
@@ -14,6 +16,7 @@ FUNC
 GridApi
 ICellRendererAngularComp
 ICellRendererParams
+IHeaderAngularComp
 Input
 JSON
 Loading
@@ -25,6 +28,7 @@ PREV
 PersistentVolume
 ReadWriteOnce
 RenderItemBuilder
+ServiceAccount
 SuppressKeyboardEventParams
 UseFormGetValues
 Wakatime
@@ -36,6 +40,7 @@ apiVersion
 cellValueChanged
 containerPort
 contextViewerCalled
+dashboard
 dirPath
 ecmascript
 env

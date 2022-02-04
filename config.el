@@ -70,14 +70,33 @@
         browse-url-browser-function 'browse-url-generic))
 
 ;;; My custom functions
-;;;; Add additional space before org-insert link function
+;;;; Insert TODO for current git branch
+(defun my-insert-todo-by-current-git-branch ()
+  "Insert todo for current git branch."
+  (interactive)
+  (let* ((branch-name (magit-get-current-branch))
+         (vw (string-match "\\(?1:[A-Za-z0-9]+\/\\)\\(?2:VW-[0-9]+\\)" branch-name))
+         (task-number (match-string 2 branch-name))
+         (todo-msg (or task-number branch-name)))
+    (insert (format "TODO: %s " todo-msg))
+    (comment-line 1)
+    (previous-line)
+    (end-of-line)
+    (evil-insert 1)))
 
+;;;; Add additional space before org-insert link function
 (defun my-add-additional-space-when-not-exist (_)
   "Add additional sapce if previous char is not space!"
   (unless (eq (char-before) ? )
     (insert " ")))
 
 (advice-add 'org-insert-link :before 'my-add-additional-space-when-not-exist)
+
+(defun my-open-kitty-right-here ()
+  "Open or switch kitty to root directory of current project."
+  (interactive)
+  (let* ((cmd (concat "open -a kitty.app --args \"cd\" " default-directory)))
+    (shell-command cmd)))
 
 ;;;; Switch default browser
 (defun my-switch-to-xwidget-buffer (&optional a b)
@@ -123,8 +142,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;   (add-to-list 'default-frame-alist '(alpha . (100 . 100))))
 
 (progn
-  (set-frame-parameter (selected-frame) 'alpha '(93 . 90))
-  (add-to-list 'default-frame-alist '(alpha . (93 . 90))))
+  (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+  (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
 
 ;;; Fonts
 
@@ -188,6 +207,46 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Benchmark
 (use-package explain-pause-mode
   :defer t)
+
+;;; Centaur tabs
+
+
+;; (defun centaur-tabs-hide-tab (x)
+;;   (not (string-match "vterm" (format "%s" (format "%s" x)))))
+
+;; (use-package centaur-tabs
+;;   :defer 5
+;;   :bind (:map evil-normal-state-map
+;;          ("M-]" . centaur-tabs-forward)
+;;          ("M-[" . centaur-tabs-backward))
+;;   :hook ((vterm-mode vterm-toggle--mode) . centaur-tabs-local-mode)
+;;   :config
+;;   (centaur-tabs-mode t)
+;;   (setq centaur-tabs-height 46
+;;         centaur-tabs-style "bar"
+;;         centaur-tabs-set-icons t
+;;         centaur-tabs-set-modified-marker t
+;;         centaur-tabs-show-navigation-buttons t
+;;         centaur-tabs-set-bar 'under
+;;         x-underline-at-descent-line t)
+
+;;   ;; (defun centaur-tabs-buffer-groups ()
+;;   ;;   (list
+;;   ;;    (cond
+;;   ;;     ((string-match "vterm" (format "%s" (buffer-name))) "Emacs")
+;;   ;;     (t (centaur-tabs-get-group-name (current-buffer))))))
+
+;;   (defun my-show-only-vterm ()
+;;     (when (bound-and-true-p centaur-tabs-mode)
+;;           (if (string-match "vterm" (format "%s" (buffer-name)))
+;;               (unless centaur-tabs-local-mode
+;;                 (centaur-tabs-local-mode))
+;;             (centaur-tabs-local-mode nil))))
+
+;;   ;; (add-hook! 'window-configuration-change-hook 'my-show-only-vterm)
+;;   (add-hook! 'buffer-list-update-hook 'my-show-only-vterm))
+
+
 
 ;;; Completion
 (use-package ivy
@@ -325,9 +384,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Undo
 (use-package undo-tree
   :defer 2
+  :custom
+  (undo-tree-auto-save-history t)
+  (undo-tree-enable-undo-in-region nil)
+  (undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
   :config
-  (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist '(("." . "~/tmp/undo"))))
+  (global-undo-tree-mode 1))
 
 ;;; Spell check
 (use-package flyspell
@@ -451,12 +513,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 
 ;;; Terminal
-(set-face-attribute 'fixed-pitch nil ':font "Fira Code 14")
-(add-hook 'vterm-mode-hook
-          (lambda ()
-            (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
-            (buffer-face-mode t)))
+;; (set-face-attribute 'fixed-pitch nil ':font "Fira Code 14")
+;; (add-hook 'vterm-mode-hook
+;;           (lambda ()
+;;             (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+;;             (buffer-face-mode t)))
 
+;; https://github.com/jixiuf/vterm-toggle/issues/30
 (use-package vterm-toggle
   :defer 10
   :bind (:map evil-normal-state-map
@@ -475,7 +538,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
                             (+vterm/toggle args)))))
          ("SPC o h" . (lambda () (interactive)
                         (+vterm/toggle t)))
-         ("SPC t h" . vterm-toggle-hide))
+         ("SPC t h" . vterm-toggle-hide)
+         ("SPC t k" . my-open-kitty-right-here))
   :config
   (setq vterm-toggle-scope 'project))
 
@@ -599,7 +663,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
            ng2-html-mode
            ng2-ts-mode
            python-mode
-           typescript-tsx-mode) . lsp-deferred))
+           typescript-tsx-mode) . lsp-deferred)
+         (lsp-mode . my-setup-tabnine))
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error)
          ("g i" . lsp-goto-implementation)
@@ -635,10 +700,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                       (setq company-backends '(company-tabnine company-dabbrev))))
 
 
-  ;; (setq +lsp-company-backends '(company-tabnine company-capf))
-  ;; (setq company-backends '((company-tabnine :separate company-capf)))
-  (setq +lsp-company-backends '(company-dabbrev company-capf))
-  (setq company-backends '((company-dabbrev company-capf)))
+  (setq +lsp-company-backends '(company-tabnine company-capf))
+  (setq company-backends '((company-tabnine :separate company-capf)))
+  ;; (setq +lsp-company-backends '(company-dabbrev company-capf))
+  ;; (setq company-backends '((company-dabbrev company-capf)))
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
@@ -667,7 +732,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package tree-sitter-langs
   :defer 6)
 
-
 (use-package tree-sitter
   :after tree-sitter-langs
   :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
@@ -679,7 +743,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (tree-sitter-require 'tsx)
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
-
 (use-package tree-edit
   :defer t)
 
@@ -687,12 +750,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :after tree-edit)
 
 
-
 ;;;; Company
 (defun my-setup-tabnine ()
   (interactive)
   ;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
-  (setq-local company-backends '((company-tabnine :separate company-capf))))
+  ;; (setq-local company-backends '((company-tabnine :separate company-capf))))
+  (setq-local company-backends '((company-tabnine company-capf))))
 
 ;;;; Only tabnine
 (defun my-setup-tabnine-2 ()
@@ -721,10 +784,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq company-minimum-prefix-length 1)
   (setq company-dabbrev-char-regexp "[A-z:-]"))
 
-(use-package company-posframe
-  :after company
-  :config
-  (company-posframe-mode 1))
+;; (use-package company-posframe
+;;   :after company
+;;   :config
+;;   (company-posframe-mode 1))
 
 ;; Autocomplete with AI
 (use-package company-tabnine
@@ -1124,7 +1187,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
                    :background nil)))
   :config
   (tooltip-mode)
-  (setq blamer-commit-formatter nil)
+  (setq blamer-commit-formatter "%s")
   (setq blamer-tooltip-function 'blamer-tooltip-commit-message)
   (defun blamer-callback-show-commit-diff (commit-info)
     (interactive)
@@ -1196,7 +1259,9 @@ Version 2015-12-08"
 ;; (global-set-key (kbd "s-2") 'xah-paste-from-register-1)
 ;;;; Global keybinding
 (global-set-key (kbd "C-S-k") 'shrink-window)
+(global-set-key (kbd "<C-S-up>") 'shrink-window)
 (global-set-key (kbd "C-S-j") 'enlarge-window)
+(global-set-key (kbd "<C-S-down>") 'enlarge-window)
 (global-set-key (kbd "C-S-l") 'enlarge-window-horizontally)
 (global-set-key (kbd "C-S-h") 'shrink-window-horizontally)
 (global-set-key (kbd "C-c l") 'smerge-keep-lower)
@@ -1213,6 +1278,9 @@ Version 2015-12-08"
 ;;;; Evil
 (use-package avy
   :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC k l" . avy-kill-whole-line)
+         ("SPC k r" . avy-kill-region))
   :custom
   (avy-single-candidate-jump t)
   (avy-keys '(?q ?w ?e ?r ?t ?y ?u ?i ?o ?p ?a ?s ?d ?f ?g ?h ?j ?k ?l ?z ?x ?c ?v ?b ?n ?m)))
@@ -1224,6 +1292,8 @@ Version 2015-12-08"
          ("SPC n r f" . org-roam-node-find)
          ("SPC t a" . treemacs-add-project-to-workspace)
          ("SPC g t" . git-timemachine)
+         ;; CUSTOM
+         ("SPC t i" . my-insert-todo-by-current-git-branch)
          ;; Org mode
          ("SPC d t" . org-time-stamp-inactive)
          ("SPC d T" . org-time-stamp)

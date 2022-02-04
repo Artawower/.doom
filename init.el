@@ -26,8 +26,8 @@
 
        :completion
        ;; TODO: Child frame is so luggy, check sometime
-       ;; (company +childframe)            ; the ultimate code completion backend
-       company ; the ultimate code completion backend
+       (company +childframe)            ; the ultimate code completion backend
+       ;; company ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        (ivy +icons)               ; a search engine for love and life
@@ -189,7 +189,7 @@
        :app
        (calendar +calfw +calfw-org)
        ;;emms
-       ;;everywhere        ; *leave* Emacs!? You must be joking
+       everywhere        ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize
        (rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
