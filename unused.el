@@ -528,3 +528,119 @@
   (setq delete-by-moving-to-trash t)
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))
+
+
+;; Documentation
+;; TODO: check usage
+(use-package zeal-at-point
+  :defer t
+  :bind (:map evil-normal-state-map ("SPC d z" . zeal-at-point)))
+
+;;; Indent guide
+;; NOTE: can i live without it?
+(use-package indent-guide               ;
+  :defer 1.2
+  :hook ((web-mode
+          html-mode
+          scss-mode
+          css-mode
+          go-mode
+          typescript-mode
+          js-mode
+          ng2-ts-mode
+          python-mode) . indent-guide-mode)
+  :custom-face
+  (indent-guide-face ((t (:foreground ,+m-color-main :font "Fira Code" :height 0.9))))
+  :config
+  (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
+  (setq indent-guide-char "|")
+  ;; (setq indent-guide-char ":")
+  (setq indent-guide-delay 0.2))
+
+;;; Spell check via wukuo
+(use-package wucuo
+  :after ispell
+  :init
+  (add-hook 'prog-mode-hook #'wucuo-start)
+  (add-hook 'text-mode-hook #'wucuo-start)
+  :config
+  (setq my-force-to-use-hunspell t)
+  (setq ispell-program-name "hunspell")
+  (ispell-check-version)
+  (setenv
+   "DICPATH"
+   "/Users/darkawower/Library/Spelling")
+  ;; reset the hunspell so it STOPS querying locale!
+  (setq ispell-local-dictionary "LocalDictionary") ; "myhunspell" is key to lookup in `ispell-local-dictionary-alist`
+  ;; two dictionaries "en_US" and "zh_CN" are used. Feel free to remove "zh_CN"
+  ;; Привет как дла
+  (setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
+
+  (setq ispell-local-dictionary-alist   ;
+        '(("LocalDictionary" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US" "Russian-English") nil utf-8)))
+  (setq wucuo-font-faces-to-check '(tree-sitter-hl-face:comment
+                                    tree-sitter-hl-face:doc
+                                    tree-sitter-hl-face:string
+                                    tree-sitter-hl-face:function
+                                    tree-sitter-hl-face:variable
+                                    tree-sitter-hl-face:type
+                                    tree-sitter-hl-face:method
+                                    tree-sitter-hl-face:function.method
+                                    tree-sitter-hl-face:function.special
+                                    tree-sitter-hl-face:attribute
+                                    font-lock-comment-face
+                                    font-lock-doc-face
+                                    font-lock-string-face
+                                    lsp-face-highlight-textual
+                                    default))
+  (setq ispell-hunspell-dict-paths-alist '(("Russian-English" "/Users/darkawower/Library/Spelling/Russian-English.aff")
+                                           ("ru_RU" "/Users/darkawower/Library/Spelling/ru_RU.aff")
+                                           ("en_US" "/Users/darkawower/Library/Spelling/en_US.aff")))
+  (when (boundp 'ispell-hunspell-dictionary-alist)
+    (setq ispell-hunspell-dictionary-alist ispell-local-dictionary-alist))
+  (advice-add 'ispell-pdict-save :after (lambda (_arg) (wucuo-spell-check-visible-region))))
+
+;;; Spell check
+;; (use-package flyspell
+;;   :defer 7
+;;   :config
+;;   ;; (setq ispell-program-name "aspell")
+;;   ;; You could add extra option "--camel-case" for since Aspell 0.60.8
+;;   ;; @see https://github.com/redguardtoo/emacs.d/issues/796
+;;   ;; (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
+;;   (setq-default flyspell-prog-text-faces
+;;                 '(tree-sitter-hl-face:comment
+;;                   tree-sitter-hl-face:doc
+;;                   tree-sitter-hl-face:string
+;;                   tree-sitter-hl-face:function
+;;                   tree-sitter-hl-face:variable
+;;                   tree-sitter-hl-face:type
+;;                   tree-sitter-hl-face:method
+;;                   tree-sitter-hl-face:function.method
+;;                   tree-sitter-hl-face:function.special
+;;                   tree-sitter-hl-face:attribute
+;;                   font-lock-comment-face
+;;                   font-lock-doc-face
+;;                   font-lock-string-face
+;;                   lsp-face-highlight-textual
+;;                   default))
+
+;;   (setq spell-fu-directory "~/.doom.d/dictionary") ;; Please create this directory manually.
+;;   (setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
+;;   (after! ispell
+;;     (setq ispell-program-name "aspell"
+;;           ;; Notice the lack of "--run-together"
+;;           ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
+;;     (ispell-kill-ispell t))
+
+;;   (defun flyspell-buffer-after-pdict-save (&rest _)
+;;     (flyspell-buffer))
+
+;;   (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save))
+;; (use-package spell-fu
+;;   :defer 0.1
+;;   :config
+;;   (global-spell-fu-mode))
+
+;; (add-hook 'text-mode-hook 'flyspell-mode!)
+;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)

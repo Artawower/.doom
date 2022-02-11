@@ -270,15 +270,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package counsel-projectile
   :defer 0.5)
 
-(use-package all-the-icons-ivy-rich
-  :defer 0.5)
-
-(use-package all-the-icons-ivy-rich
-  :after (all-the-icons ivy-rich counsel-projectile all-the-icons-ivy-rich)
-  :config
-  (all-the-icons-ivy-rich-mode 1)
-  (ivy-rich-mode 1)
-
+;; (use-package all-the-icons-ivy-rich
+;;   :defer 0.5)
+(defun @ivy-rich-prettify-file-search ()
   (let* ((col-def '((all-the-icons-ivy-rich-file-icon)
                     (file-name-nondirectory (:width 0.2 :face (:foreground "#61AFEF" :slant 'italic)))
                     ((lambda (str) (string-join (butlast (split-string (counsel-projectile-find-file-transformer str) "/")) "/")) (:width 0.4))
@@ -292,6 +286,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
     (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
     (ivy-rich-set-columns 'projectile--find-file col-def)))
 
+(use-package all-the-icons-ivy-rich
+  :after (all-the-icons ivy-rich counsel-projectile)
+  :config
+  (run-at-time "3 sec" nil #'@ivy-rich-prettify-file-search)
+  (all-the-icons-ivy-rich-mode 1))
+
+
 (defun posframe-poshandler-frame-top-center-with-offset (info)
   "Posframe position at top + 40px offset."
   (cons (/ (- (plist-get info :parent-frame-width)
@@ -301,6 +302,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 (use-package ivy-posframe
   :after ivy
+  :disabled t
   :custom-face
   (ivy-posframe-border ((t (:background ,+m-color-main))))
   :init
@@ -391,50 +393,77 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (global-undo-tree-mode 1))
 
-;;; Spell check
-(use-package flyspell
-  :defer 7
+;;; Spellcheck via spell-fu
+(use-package spell-fu
+  :bind (:map evil-normal-state-map
+         ("z g" . spell-fu-word-add))
   :config
-  ;; (setq ispell-program-name "aspell")
-  ;; You could add extra option "--camel-case" for since Aspell 0.60.8
-  ;; @see https://github.com/redguardtoo/emacs.d/issues/796
-  ;; (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=16"))
-  (setq-default flyspell-prog-text-faces
-                '(tree-sitter-hl-face:comment
-                  tree-sitter-hl-face:doc
-                  tree-sitter-hl-face:string
-                  tree-sitter-hl-face:function
-                  tree-sitter-hl-face:variable
-                  tree-sitter-hl-face:type
-                  tree-sitter-hl-face:method
-                  tree-sitter-hl-face:function.method
-                  tree-sitter-hl-face:function.special
-                  tree-sitter-hl-face:attribute
-                  font-lock-comment-face
-                  font-lock-doc-face
-                  font-lock-string-face
-                  lsp-face-highlight-textual
-                  default))
+  (setq ispell-program-name "aspell")
+  (setq spell-fu-directory "~/.doom.d/dictionary")
+  (setq ispell-program-name "aspell"
+        ;;           ;; Notice the lack of "--run-together"
+        ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
+  (add-hook 'spell-fu-mode-hook
+            (lambda ()
+              (spell-fu-dictionary-add (spell-fu-get-ispell-dictionary "en"))
+              (spell-fu-dictionary-add (spell-fu-get-ispell-dictionary "ru"))
+              (spell-fu-dictionary-add
+               (spell-fu-get-personal-dictionary "en-personal" "/Users/darkawower/.doom.d/dictionary/.pws"))
+              (spell-fu-dictionary-add
+               (spell-fu-get-personal-dictionary "ru-personal" "/Users/darkawower/.doom.d/dictionary/ru.pws"))))
 
-  (setq spell-fu-directory "~/.doom.d/dictionary") ;; Please create this directory manually.
-  (setq ispell-personal-dictionary "~/.doom.d/dictionary/.pws")
-  (after! ispell
-    (setq ispell-program-name "aspell"
-          ;; Notice the lack of "--run-together"
-          ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
-    (ispell-kill-ispell t))
 
-  (defun flyspell-buffer-after-pdict-save (&rest _)
-    (flyspell-buffer))
+  ;; Camel case support
+  (setq-default spell-fu-word-regexp
+                (rx
+                 (or
 
-  (advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save))
-;; (use-package spell-fu
-;;   :defer 0.1
-;;   :config
-;;   (global-spell-fu-mode))
+                  ;; lowercase
+                  (seq
+                   (one-or-more lower)
+                   (opt
+	            (any "'’")
+	            (one-or-more lower)
+	            word-end))
 
-(add-hook 'text-mode-hook 'flyspell-mode!)
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+                  ;; capitalized
+                  (seq
+                   upper
+                   (zero-or-more lower)
+                   (opt
+	            (any "'’")
+	            (one-or-more lower)
+	            word-end))
+
+                  ;; uppercase
+                  (seq
+                   (one-or-more upper)
+                   (opt
+	            (any "'’")
+	            (one-or-more upper)
+	            word-end)))))
+
+  (defun cs/spell-fu-check-range (pos-beg pos-end)
+    (let (case-fold-search)
+      (spell-fu-check-range-default pos-beg pos-end)))
+
+  (setq-default spell-fu-check-range #'cs/spell-fu-check-range)
+  (global-spell-fu-mode)
+  (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
+                                 tree-sitter-hl-face:doc
+                                 tree-sitter-hl-face:string
+                                 tree-sitter-hl-face:function
+                                 tree-sitter-hl-face:variable
+                                 tree-sitter-hl-face:type
+                                 tree-sitter-hl-face:method
+                                 tree-sitter-hl-face:function.method
+                                 tree-sitter-hl-face:function.special
+                                 tree-sitter-hl-face:attribute
+                                 font-lock-comment-face
+                                 font-lock-doc-face
+                                 font-lock-string-face
+                                 lsp-face-highlight-textual
+                                 default)))
 
 
 ;;; Folding
@@ -485,14 +514,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq ranger-max-preview-size 10)
   (setq ranger-preview-delay 0.040))
 
-;; (use-package filetree
-;;   :defer t)
-
-;;;; Dired
-(use-package all-the-icons-dired
-  :defer 15
-  :hook (dired-mode . all-the-icons-dired-mode))
-
 
 ;;; Bookmarks
 ;;;; quick bm
@@ -541,28 +562,26 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("SPC t h" . vterm-toggle-hide)
          ("SPC t k" . my-open-kitty-right-here))
   :config
+  (setq vterm-kill-buffer-on-exit nil)
   (setq vterm-toggle-scope 'project))
 
 
 ;;; Colors
 (use-package rainbow-mode
-  :hook (((css-mode scss-mode org-mode typescript-mode js-mode emacs-list-mode). rainbow-mode))
-  :defer 15)
+  :hook (((css-mode scss-mode org-mode typescript-mode js-mode emacs-lisp-mode). rainbow-mode))
+  :defer 5)
 
-;; TODO
-;; (use-package hl-todo
-;;
-;;   :defer 0.1
-;;   :init
-;;   (global-hl-todo-mode 1)
-;;   :config
-;;   (setq hl-todo-keyword-faces
-;;         '(("TODO"   . "#E5C07B")
-;;           ("FIXME"  . "#E06C75")
-;;           ("DEBUG"  . "#C678DD")
-;;           ("GOTCHA" . "#FF4500")
-;;           ("NOTE"   . "#98C379")
-;;           ("STUB"   . "#61AFEF"))))
+(use-package hl-todo
+  :defer 2
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO"   . "#E5C07B")
+          ("FIXME"  . "#E06C75")
+          ("DEBUG"  . "#C678DD")
+          ("GOTCHA" . "#FF4500")
+          ("NOTE"   . "#98C379")
+          ("STUB"   . "#61AFEF")))
+  (global-hl-todo-mode 1))
 
 ;;; Themes
 ;;; Modus
@@ -599,26 +618,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (global-wakatime-mode))
 
-;;; Indent guide
-;; NOTE: can i live without it?
-;; (use-package indent-guide
-;;   :defer 1.2
-;;   :hook ((web-mode
-;;           html-mode
-;;           scss-mode
-;;           css-mode
-;;           go-mode
-;;           typescript-mode
-;;           js-mode
-;;           ng2-ts-mode
-;;           python-mode) . indent-guide-mode)
-;;   :custom-face
-;;   (indent-guide-face ((t (:foreground ,+m-color-main :font "Fira Code" :height 0.9))))
-;;   :config
-;;   (add-hook '+doom-dashboard-mode-hook #'(lambda () (setq indent-guide-mode nil)))
-;;   (setq indent-guide-char "|")
-;;   ;; (setq indent-guide-char ":")
-;;   (setq indent-guide-delay 0.2))
 
 ;;; Fast commenting
 (use-package turbo-log
@@ -678,6 +677,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (lsp-file-watch-threshold 4000)
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
+  (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
+  ;; (lsp-yaml-schemas '(:kubernetes "/.yaml" :kubernetes "/*.yml"))
   :config
 
   (set-face-attribute 'lsp-face-highlight-read nil :background "#61AFEF")
@@ -733,13 +734,29 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 6)
 
 (use-package tree-sitter
-  :after tree-sitter-langs
+  :after (tree-sitter-langs spell-fu)
   :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
   :config
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . typescript) tree-sitter-major-mode-language-alist)
+  (advice-add 'tree-sitter-hl-mode :before (lambda (&rest ignore)
+                                     (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
+                                                                    tree-sitter-hl-face:doc
+                                                                    tree-sitter-hl-face:string
+                                                                    tree-sitter-hl-face:function
+                                                                    tree-sitter-hl-face:variable
+                                                                    tree-sitter-hl-face:type
+                                                                    tree-sitter-hl-face:method
+                                                                    tree-sitter-hl-face:function.method
+                                                                    tree-sitter-hl-face:function.special
+                                                                    tree-sitter-hl-face:attribute
+                                                                    font-lock-comment-face
+                                                                    font-lock-doc-face
+                                                                    font-lock-string-face
+                                                                    lsp-face-highlight-textual
+                                                                    default))))
   (tree-sitter-require 'tsx)
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
@@ -1090,11 +1107,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer t
   :bind ("C-s-c" . string-inflection-all-cycle))
 
-;; TODO: check usage
-(use-package zeal-at-point
-  :defer t
-  :bind (:map evil-normal-state-map ("SPC d z" . zeal-at-point)))
-
 ;;;; Indention
 
 ;;; Google translate
@@ -1255,6 +1267,7 @@ Version 2015-12-08"
 ;; (global-set-key (kbd "s-2") 'xah-paste-from-register-1)
 ;;;; Global keybinding
 (global-set-key (kbd "C-S-k") 'shrink-window)
+(global-set-key (kbd "s-y") 'yas-expand)
 (global-set-key (kbd "<C-S-up>") 'shrink-window)
 (global-set-key (kbd "C-S-j") 'enlarge-window)
 (global-set-key (kbd "<C-S-down>") 'enlarge-window)
@@ -1296,9 +1309,10 @@ Version 2015-12-08"
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
          ("SPC t t" . ivy-magit-todos)
-         ("SPC w e" . ace-window)
+         ("SPC j" . ace-window)
          ("SPC w f" . ace-window)
          ("s-2" . xah-paste-from-register-1)
+         ("s-r" . (lambda () (interactive) (set-mark-command nil) (evil-avy-goto-char)))
          ("SPC y k" . yank-from-kill-ring)
          :map evil-insert-state-map
          ("s-2" . xah-paste-from-register-1)
@@ -1388,6 +1402,8 @@ Version 2015-12-08"
      '(org-level-3 ((t (:inherit outline-3 :height 1.25))))
      '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
      '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+
+    (setq org-hide-emphasis-markers t)
 
     (add-to-list 'org-tag-faces '("@.*" . (:foreground "red")))
 

@@ -5,7 +5,6 @@ async
 coords
 echarts
 elisp
-Error: The file "/usr/local/Cellar/aspell/0.60.8/lib/aspell-0.60/en_IN" can not be opened for reading.
 errorDialogDialog
 eshell
 fieldId

@@ -120,6 +120,8 @@
 (package! auto-rename-tag)
 
 ;;; Spelling
+;; (package! wucuo)
+(package! spell-fu :recipe (:host gitlab :repo "ideasman42/emacs-spell-fu"))
 
 ;;; Infrastucture
 (package! docker-compose-mode)

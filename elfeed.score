@@ -1,7 +1,9 @@
 ;;; Elfeed score file                                     -*- lisp -*-
 ;;; https://www.unwoundstack.com/doc/elfeed-score/curr
 (("title"
-  (:text "vim" :value 1000 :type S))
+  (:text "vim" :value 900 :type S))
+ ("title"
+  (:text "neovim" :value 900 :type S))
  ("feed"
   (:text "emacs-news – sacha chua" :value 1200 :type S :attr t :comment "Essential!"))
  ("tag"
