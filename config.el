@@ -201,7 +201,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 
 
-;; Spaces insted of tabs
+;; Spaces instead of tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 ;;;; Benchmark
@@ -209,8 +209,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer t)
 
 ;;; Centaur tabs
-
-
 ;; (defun centaur-tabs-hide-tab (x)
 ;;   (not (string-match "vterm" (format "%s" (format "%s" x)))))
 
@@ -394,15 +392,37 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (global-undo-tree-mode 1))
 
 ;;; Spellcheck via spell-fu
+;;;; Enable spell fu for tree sitter face
+(defun my-set-spellfu-faces ()
+  "Set faces for correct spell-fu working"
+  (interactive)
+  (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
+                                 tree-sitter-hl-face:doc
+                                 tree-sitter-hl-face:string
+                                 tree-sitter-hl-face:function
+                                 tree-sitter-hl-face:variable
+                                 tree-sitter-hl-face:type
+                                 tree-sitter-hl-face:method
+                                 tree-sitter-hl-face:function.method
+                                 tree-sitter-hl-face:function.special
+                                 tree-sitter-hl-face:attribute
+                                 font-lock-comment-face
+                                 font-lock-doc-face
+                                 font-lock-string-face
+                                 lsp-face-highlight-textual
+                                 default)))
+
 (use-package spell-fu
   :bind (:map evil-normal-state-map
          ("z g" . spell-fu-word-add))
+  :defer 1
   :config
   (setq ispell-program-name "aspell")
   (setq spell-fu-directory "~/.doom.d/dictionary")
   (setq ispell-program-name "aspell"
         ;;           ;; Notice the lack of "--run-together"
         ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
+
   (add-hook 'spell-fu-mode-hook
             (lambda ()
               (spell-fu-dictionary-add (spell-fu-get-ispell-dictionary "en"))
@@ -448,21 +468,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
   (setq-default spell-fu-check-range #'cs/spell-fu-check-range)
   (global-spell-fu-mode)
-  (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
-                                 tree-sitter-hl-face:doc
-                                 tree-sitter-hl-face:string
-                                 tree-sitter-hl-face:function
-                                 tree-sitter-hl-face:variable
-                                 tree-sitter-hl-face:type
-                                 tree-sitter-hl-face:method
-                                 tree-sitter-hl-face:function.method
-                                 tree-sitter-hl-face:function.special
-                                 tree-sitter-hl-face:attribute
-                                 font-lock-comment-face
-                                 font-lock-doc-face
-                                 font-lock-string-face
-                                 lsp-face-highlight-textual
-                                 default)))
+  (my-set-spellfu-faces))
 
 
 ;;; Folding
@@ -740,22 +746,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . typescript) tree-sitter-major-mode-language-alist)
-  (advice-add 'tree-sitter-hl-mode :before (lambda (&rest ignore)
-                                             (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
-                                                                            tree-sitter-hl-face:doc
-                                                                            tree-sitter-hl-face:string
-                                                                            tree-sitter-hl-face:function
-                                                                            tree-sitter-hl-face:variable
-                                                                            tree-sitter-hl-face:type
-                                                                            tree-sitter-hl-face:method
-                                                                            tree-sitter-hl-face:function.method
-                                                                            tree-sitter-hl-face:function.special
-                                                                            tree-sitter-hl-face:attribute
-                                                                            font-lock-comment-face
-                                                                            font-lock-doc-face
-                                                                            font-lock-string-face
-                                                                            lsp-face-highlight-textual
-                                                                            default))))
   (tree-sitter-require 'tsx)
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
@@ -881,12 +871,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Golang
 (use-package go-playground
   :defer t)
-
-;; (defun my-go-mode-hook ()
-;;   (flycheck-add-next-checker 'lsp 'golangci-lint 'go-errcheck 'go-gofmt 'go-goim 'append))
-;; (use-package go-mode
-;;   :defer 0.3
-;;   :hook (go-mode . my-go-mode-hook))
 
 ;;;; Rust
 (use-package rustic
@@ -1262,8 +1246,6 @@ Version 2015-12-08"
     (delete-region (region-beginning) (region-end)))
   (insert-register ?1 t))
 
-;; (global-set-key (kbd "s-1") 'xah-copy-to-register-1)
-;; (global-set-key (kbd "s-2") 'xah-paste-from-register-1)
 ;;;; Global keybinding
 (global-set-key (kbd "C-S-k") 'shrink-window)
 (global-set-key (kbd "s-y") 'yas-expand)
@@ -1291,7 +1273,7 @@ Version 2015-12-08"
          ("SPC k r" . avy-kill-region))
   :custom
   (avy-single-candidate-jump t)
-  (avy-keys '(?q ?w ?e ?r ?t ?y ?u ?i ?o ?p ?a ?s ?d ?f ?g ?h ?j ?k ?l ?z ?x ?c ?v ?b ?n ?m)))
+  (avy-keys '(?w ?e ?r ?t ?y ?u ?i ?o ?p ?a ?s ?d ?f ?g ?h ?j ?k ?l ?z ?x ?c ?v ?b ?n ?m)))
 
 (use-package evil-leader
   :after evil
@@ -1373,12 +1355,9 @@ Version 2015-12-08"
     "m" 'toggle-maximize-buffer
     "y" 'yas-expand))
 
-;; (defun bb/evil-delete (orig-fn beg end &optional type _ &rest args)
-;;     (apply orig-fn beg end type ?_ args))
-;; (advice-add 'evil-delete :around 'bb/evil-delete);;; Navigation
 
 (use-package evil-matchit
-  :defer 15)
+  :defer t)
 
 (evilmi-load-plugin-rules '(ng2-html-mode) '(html))
 (global-evil-matchit-mode 1)
@@ -1460,16 +1439,6 @@ Version 2015-12-08"
         '(("\\(:[A-Z]+:\\)" . ((lambda (tag)
                                  (svg-tag-make tag :beg 1 :end -1)))))))
 
-;; (defun my-org-mode-hook ()
-;;   "Custom `org-mode' behaviours."
-;;   (add-hook  #'(lambda ()
-;;                  (message "Amma inside org mode")
-;;                  (prettier-mode -1))
-;;              'org-in-src-block-p
-;;              nil :local))
-
-;; (add-hook 'org-mode-hook 'my-org-mode-hook)
-;; )
 
 ;;;; Org mode todos list
 (after! org
