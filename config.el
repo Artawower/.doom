@@ -422,26 +422,26 @@ BEGIN END specifies region, otherwise works on entire buffer."
                   (seq
                    (one-or-more lower)
                    (opt
-	            (any "'’")
-	            (one-or-more lower)
-	            word-end))
+                    (any "'’")
+                    (one-or-more lower)
+                    word-end))
 
                   ;; capitalized
                   (seq
                    upper
                    (zero-or-more lower)
                    (opt
-	            (any "'’")
-	            (one-or-more lower)
-	            word-end))
+                    (any "'’")
+                    (one-or-more lower)
+                    word-end))
 
                   ;; uppercase
                   (seq
                    (one-or-more upper)
                    (opt
-	            (any "'’")
-	            (one-or-more upper)
-	            word-end)))))
+                    (any "'’")
+                    (one-or-more upper)
+                    word-end)))))
 
   (defun cs/spell-fu-check-range (pos-beg pos-end)
     (let (case-fold-search)
@@ -742,21 +742,21 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . typescript) tree-sitter-major-mode-language-alist)
   (advice-add 'tree-sitter-hl-mode :before (lambda (&rest ignore)
-                                     (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
-                                                                    tree-sitter-hl-face:doc
-                                                                    tree-sitter-hl-face:string
-                                                                    tree-sitter-hl-face:function
-                                                                    tree-sitter-hl-face:variable
-                                                                    tree-sitter-hl-face:type
-                                                                    tree-sitter-hl-face:method
-                                                                    tree-sitter-hl-face:function.method
-                                                                    tree-sitter-hl-face:function.special
-                                                                    tree-sitter-hl-face:attribute
-                                                                    font-lock-comment-face
-                                                                    font-lock-doc-face
-                                                                    font-lock-string-face
-                                                                    lsp-face-highlight-textual
-                                                                    default))))
+                                             (setq spell-fu-faces-include '(tree-sitter-hl-face:comment
+                                                                            tree-sitter-hl-face:doc
+                                                                            tree-sitter-hl-face:string
+                                                                            tree-sitter-hl-face:function
+                                                                            tree-sitter-hl-face:variable
+                                                                            tree-sitter-hl-face:type
+                                                                            tree-sitter-hl-face:method
+                                                                            tree-sitter-hl-face:function.method
+                                                                            tree-sitter-hl-face:function.special
+                                                                            tree-sitter-hl-face:attribute
+                                                                            font-lock-comment-face
+                                                                            font-lock-doc-face
+                                                                            font-lock-string-face
+                                                                            lsp-face-highlight-textual
+                                                                            default))))
   (tree-sitter-require 'tsx)
   (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
 
@@ -1309,6 +1309,10 @@ Version 2015-12-08"
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
          ("SPC t t" . ivy-magit-todos)
+         ;; TODO: add check might be roam buffer already opened?
+         ("SPC r u" . (lambda () (interactive)
+                        (org-roam-ui-open)
+                        (run-at-time "0.3 sec" nil (lambda () (org-roam-ui-sync-theme) (my-switch-to-xwidget-buffer)))))
          ("SPC j" . ace-window)
          ("SPC w f" . ace-window)
          ("s-2" . xah-paste-from-register-1)
