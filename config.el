@@ -417,7 +417,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq-default spell-fu-word-regexp
                 (rx
                  (or
-
                   ;; lowercase
                   (seq
                    (one-or-more lower)
