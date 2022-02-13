@@ -410,11 +410,17 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                  font-lock-doc-face
                                  font-lock-string-face
                                  lsp-face-highlight-textual
-                                 default)))
+                                 default))
+  (setq spell-fu-faces-exclude (append spell-fu-faces-exclude
+                                       '(diredfl-file-name))))
+(defun disable-spell-fu ()
+  "Disable spell fu mode for certain modes."
+  (spell-fu-mode -1))
 
 (use-package spell-fu
   :bind (:map evil-normal-state-map
          ("z g" . spell-fu-word-add))
+  :hook ((vterm-mode elfeed-search-mode dired-mode) . disable-spell-fu)
   :defer 1
   :config
   (setq ispell-program-name "aspell")
