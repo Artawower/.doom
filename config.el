@@ -413,14 +413,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                  default))
   (setq spell-fu-faces-exclude (append spell-fu-faces-exclude
                                        '(diredfl-file-name))))
-(defun disable-spell-fu ()
-  "Disable spell fu mode for certain modes."
-  (spell-fu-mode -1))
-
 (use-package spell-fu
   :bind (:map evil-normal-state-map
          ("z g" . spell-fu-word-add))
-  :hook ((vterm-mode elfeed-search-mode dired-mode) . disable-spell-fu)
   :defer 1
   :config
   (setq ispell-program-name "aspell")
@@ -428,6 +423,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq ispell-program-name "aspell"
         ;;           ;; Notice the lack of "--run-together"
         ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
+  (setq spell-fu-ignore-modes '(org-mode dired-mode vterm-mode))
 
   (add-hook 'spell-fu-mode-hook
             (lambda ()
@@ -437,7 +433,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
                (spell-fu-get-personal-dictionary "en-personal" "/Users/darkawower/.doom.d/dictionary/.pws"))
               (spell-fu-dictionary-add
                (spell-fu-get-personal-dictionary "ru-personal" "/Users/darkawower/.doom.d/dictionary/ru.pws"))))
-
 
   ;; Camel case support
   (setq-default spell-fu-word-regexp
