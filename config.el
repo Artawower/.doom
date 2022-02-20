@@ -423,7 +423,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq ispell-program-name "aspell"
         ;;           ;; Notice the lack of "--run-together"
         ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together" "--run-together-limit=56"))
-  (setq spell-fu-ignore-modes '(org-mode dired-mode vterm-mode))
+  (setq spell-fu-ignore-modes '(org-mode dired-mode vterm-mode elfeed-search-mode))
 
   (add-hook 'spell-fu-mode-hook
             (lambda ()
@@ -743,6 +743,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :after (tree-sitter-langs spell-fu)
   :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
   :config
+  (advice-add 'tree-sitter-hl-mode :before 'my-set-spellfu-faces)
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
   (push '(scss-mode . css) tree-sitter-major-mode-language-alist)
