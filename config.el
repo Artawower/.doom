@@ -136,6 +136,21 @@ BEGIN END specifies region, otherwise works on entire buffer."
            (window-configuration-to-register '_)
            (delete-other-windows))))
 
+;;;; Change vterm directory to current buffer pwd
+(defun my-vterm-change-current-directory-to-active-buffer-pwd ()
+  "Just exec CD to pwd of active buffer."
+  (interactive)
+  (when-let* ((file-name (buffer-file-name))
+              (file-dir (file-name-directory file-name))
+              (file-dir (replace-regexp-in-string " " "\\\\\  " file-dir)))
+    (message "FILE: %s" file-dir)
+    (save-window-excursion
+      (switch-to-first-matching-buffer "vterm")
+      (vterm-send-C-c)
+      (vterm-send-string (concat "cd " file-dir))
+      (vterm-send-return)
+      )
+    (evil-window-down 1)))
 ;;; Transparent bg
 ;; (progn
 ;;   (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
@@ -637,6 +652,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("C-s-]" . turbo-log-paste-as-logger-immediately))
   :custom
   (turbo-log-allow-insert-without-tree-sitter-p t)
+  ;; (turbo-log-payload-format-template "")
+  (turbo-log-payload-format-template "\x1b[35m%s: ")
   :config
   (turbo-log-configure
    :modes (typescript-mode js2-mode web-mode ng2-ts-mode js-mode)
@@ -1159,6 +1176,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Blamer
 (use-package blamer
   :defer 5
+  :bind (("s-i" . blamer-show-commit-info))
   :custom
   (blamer-idle-time 0.8)
   ;; (blamer-min-offset 50)
@@ -1172,6 +1190,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (blamer-view 'overlay)
   ;; (blamer-uncommitted-changes-message "(งツ)
   (blamer-uncommitted-changes-message "uncommitted yet")
+  (blamer-min-offset 10)
   :custom-face
   (blamer-face ((t :inherit company-preview
                    :italic t
