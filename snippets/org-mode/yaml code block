@@ -3,7 +3,6 @@
 # key: +y
 # --
 
-
 #+BEGIN_SRC yaml
 $1
 #+END_SRC
