@@ -1,4 +1,4 @@
-personal_ws-1.1 en 179 
+personal_ws-1.1 en 190 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -44,26 +44,35 @@ apiServices
 apiVersion
 args
 aspell
+async
 autofix
+autofixable
 autoscaler
 bool
+calc
+cdr
 cellValueChanged
 codemirror
+comparator
 compodoc
 cond
 conf
 config
 containerPort
 contextViewerCalled
+contextmenu
 coords
 dashboard
 datetime
+defragmentate
+defs
 defun
 dev
 dirPath
 ecmascript
 entrypoint
 env
+eslint
 fcType
 flyspell
 gcePersistentDisk
@@ -133,7 +142,9 @@ selectable
 setq
 showInvisibles
 sourcemaps
+splitted
 src
+statused
 storageClassName
 strategyFormSchema
 stylelint
