@@ -1176,21 +1176,23 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Blamer
 (use-package blamer
   :defer 5
-  :bind (("s-i" . blamer-show-commit-info))
+  :bind (("s-i" . blamer-show-commit-info)
+         ("C-c i" . (lambda () (interactive) (blamer-show-commit-info 'visual))))
   :custom
   (blamer-idle-time 0.8)
-  ;; (blamer-min-offset 50)
+  (blamer-min-offset 20)
   (blamer-max-commit-message-length 65)
   ;; (blamer-commit-formatter "• %s")
-  (blamer-commit-formatter nil)
+  ;; (blamer-commit-formatter nil)
   ;; (blamer-entire-formatter "   %s")
-  (blamer-entire-formatter "  • %s")
+  ;; (blamer-entire-formatter "  • %s")
   ;; (blamer-offset-per-symbol 17)
   ;; (blamer-view 'overlay-right)
+  (blamer-commit-formatter "◉ %s")
   (blamer-view 'overlay)
   ;; (blamer-uncommitted-changes-message "(งツ)
   (blamer-uncommitted-changes-message "uncommitted yet")
-  (blamer-min-offset 10)
+  ;; (blamer-min-offset 10)
   :custom-face
   (blamer-face ((t :inherit company-preview
                    :italic t
@@ -1199,7 +1201,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
                    :background nil)))
   :config
   (tooltip-mode)
-  (setq blamer-commit-formatter "%s")
   (setq blamer-tooltip-function 'blamer-tooltip-commit-message)
   (defun blamer-callback-show-commit-diff (commit-info)
     (interactive)

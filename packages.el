@@ -145,7 +145,7 @@
 (package! package-lint)
 (package! package-build)
 ;;; GIT
-;; (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "enhancement/truncated-lines"))
 (package! blamer)
 (package! gist)
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "enhancement/company-integration"))
