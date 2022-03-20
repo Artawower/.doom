@@ -151,6 +151,25 @@ BEGIN END specifies region, otherwise works on entire buffer."
       (vterm-send-return)
       )
     (evil-window-down 1)))
+
+;;;; Browse current git file at remote machine
+(defun my-forge-browse-buffer-file ()
+  (interactive)
+  (browse-url
+   (let
+       ((rev (magit-rev-abbrev "HEAD"))
+        (repo (forge-get-repository 'stub))
+        (file (magit-file-relative-name buffer-file-name))
+        (highlight
+         (if
+             (use-region-p)
+             (let ((l1 (line-number-at-pos (region-beginning)))
+                   (l2 (line-number-at-pos (- (region-end) 1))))
+               (format "#L%d-L%d" l1 l2))
+           ""
+           )))
+     (forge--format repo "https://%h/%o/%n/blob/%r/%f%L"
+                    `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
 ;;; Transparent bg
 ;; (progn
 ;;   (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
@@ -381,6 +400,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;                            "--trailing-comma" "all"
 ;;                            "--bracket-spacing" "true")))
 
+
+;;; UI
 
 ;;; Flycheck
 (use-package flycheck
@@ -1319,10 +1340,14 @@ Version 2015-12-08"
          ("SPC j" . ace-window)
          ("SPC w f" . ace-window)
          ("s-2" . xah-paste-from-register-1)
+         ("s-p" . yank-from-kill-ring)
          ("s-r" . (lambda () (interactive) (set-mark-command nil) (evil-avy-goto-char)))
          ("SPC y k" . yank-from-kill-ring)
+         ;; Git
+         ("SPC g o f" . my-forge-browse-buffer-file)
          :map evil-insert-state-map
          ("s-2" . xah-paste-from-register-1)
+         ("s-p" . yank-from-kill-ring)
          :map evil-visual-state-map
          ("s-1" . xah-copy-to-register-1)
          ("s-2" . xah-paste-from-register-1)
