@@ -1,4 +1,4 @@
-personal_ws-1.1 en 190 
+personal_ws-1.1 en 204 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -43,6 +43,7 @@ ansible
 apiServices
 apiVersion
 args
+arrayify
 aspell
 async
 autofix
@@ -69,11 +70,14 @@ defs
 defun
 dev
 dirPath
+dirent
 ecmascript
 entrypoint
 env
 eslint
+favicon
 fcType
+filetags
 flyspell
 gcePersistentDisk
 getLanguageById
@@ -84,6 +88,7 @@ hideblocks
 highRiskPercantage
 hostPath
 hostPort
+hoverable
 href
 html
 identifier
@@ -98,6 +103,7 @@ isProduction
 js
 kubernetes
 lang
+langs
 languageByCode
 languageById
 languagesIdMap
@@ -108,6 +114,7 @@ maxNominalCost
 maxPercentProfit
 maxYearsOfInfinityBonds
 middleRiskPercantage
+middleware
 minNominalCost
 minPercentProfit
 mnt
@@ -118,6 +125,7 @@ namespace
 ngOnDestroy
 ngOnInit
 nginx
+ngxs
 ngxsOnInit
 node
 npm
@@ -125,6 +133,7 @@ nvm
 onBlur
 onChange
 onTargetSegmentUpdated
+orga
 pdName
 pos
 posframe
@@ -157,6 +166,8 @@ testcafe
 tooltip
 truthy
 tsconfig
+uniorg
+uniquify
 valuegetter
 verifika
 viewport
@@ -186,6 +197,9 @@ Getter
 getter
 wcheck
 webpack
+whitespace
+wordform
+wordforms
 wucuo
 yabai
 zettelkasten
