@@ -168,8 +168,17 @@ BEGIN END specifies region, otherwise works on entire buffer."
                (format "#L%d-L%d" l1 l2))
            ""
            )))
-     (forge--format repo "https://%h/%o/%n/blob/%r/%f%L"
+     (forge--format repo "https://%h/%o/%n/blob/master/%f%L"
                     `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
+;;;; My sass format
+(defun my-run-sass-auto-fix ()
+  "Run sass auto fix if cli tool exist"
+  (interactive)
+  (save-window-excursion
+    (let ((default-directory (file-name-directory buffer-file-name)))
+      (async-shell-command "sass-lint-auto-fix")
+      ;; (revert-buffer-no-confirm)
+      (message "SASS FORMATTED"))))
 ;;; Transparent bg
 ;; (progn
 ;;   (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
@@ -620,8 +629,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
         '(("TODO"   . "#E5C07B")
           ("FIXME"  . "#E06C75")
           ("DEBUG"  . "#C678DD")
+          ("REFACTOR"  . "#C678DD")
           ("GOTCHA" . "#FF4500")
           ("NOTE"   . "#98C379")
+          ("QUESTION"   . "#98C379")
           ("STUB"   . "#61AFEF")))
   (global-hl-todo-mode 1))
 
@@ -724,7 +735,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
   ;; (lsp-yaml-schemas '(:kubernetes "/.yaml" :kubernetes "/*.yml"))
   :config
-
+  (setq lsp-json-schemas `[(:fileMatch ["ng-openapi-gen.json"] :url "https://raw.githubusercontent.com/cyclosproject/ng-openapi-gen/master/ng-openapi-gen-schema.json")])
   (set-face-attribute 'lsp-face-highlight-read nil :background "#61AFEF")
   ;; Flycheck patch checkers
   (require 'flycheck)
@@ -1734,7 +1745,8 @@ Version 2015-12-08"
 
 (use-package secret-mode
   :defer t)
-
+;;; Regexp for compilation and qucik error finding
+(add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
 ;;; Temporary unused
 
 ;; (use-package code-review
