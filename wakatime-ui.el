@@ -61,7 +61,11 @@
   "Update modeline information by TEXT."
   ;; TODO: add face for modeline info, check correct modeline mode
   ;; (setq-default mode-line-misc-info (propertize text 'face '(:foreground "red" :bold t))))
-  (setq-default mode-line-misc-info (propertize text 'face 'wakatime-ui--modeline-face)))
+  ;; (setq global-mode-string (propertize text 'face '(:foreground "#f65866"))))
+  ;; (add-to-list 'mode-line-misc-info (propertize (concat text " ") 'face '(:foreground "#f65866"))))
+  (setq-default mode-line-misc-info (propertize (concat text " ") 'face '(:foreground "#f65866"))))
+  ;; (setq mode-line-misc-info (propertize text 'face '(:foreground "#f65866")))
+  ;; )
 
 (defun wakatime-ui--handle-process-output (process signal buffer-name)
   "Handle background PROCESS SIGNAL and BUFFER-NAME."

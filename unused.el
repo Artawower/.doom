@@ -644,3 +644,68 @@
 
 ;; (add-hook 'text-mode-hook 'flyspell-mode!)
 ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+;; Autocomplete with AI
+(use-package company-tabnine
+  :after (company lsp)
+  :bind (("C-x C-i" . company-tabnine))
+  :when (featurep! :completion company)
+  :config
+  (setq company-tabnine-always-trigger nil)
+  ;; (setq company-tabnine-auto-balance nil)
+  (setq company-tabnine-show-annotation t))
+;;; Tabnine compay
+(defun my-setup-tabnine ()
+  (interactive)
+  ;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
+  ;; (setq-local company-backends '((company-tabnine :separate company-capf))))
+  (setq-local company-backends '((company-tabnine company-capf))))
+
+;;;; Only tabnine
+(defun my-setup-tabnine-2 ()
+  (interactive)
+  (setq-local +lsp-company-backends '((company-tabnine company-dabbrev)))
+  (setq-local company-backends '(company-tabnine company-dabbrev)))
+
+(defun my-setup-tabnine-3 ()
+  (interactive)
+  (setq-local +lsp-company-backends '((company-capf company-dabbrev)))
+  (setq-local company-backends '((company-capf company-dabbrev))))
+
+
+(use-package company
+  :defer t
+  :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)
+         :map company-active-map
+         ("<escape>" . (lambda () (interactive)
+                         (company-cancel)
+                         (evil-normal-state))))
+;;; Org mode
+(use-package org-modern
+  :after org
+  :config
+  (setq
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+   org-ellipsis "…"
+
+   ;; Agenda styling
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "⭠ now ─────────────────────────────────────────────────")
+
+  ;; Enable org-modern-mode
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))

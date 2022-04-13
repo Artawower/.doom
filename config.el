@@ -309,7 +309,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config)
 
 (use-package counsel-projectile
-  :defer 0.5)
+  :defer 0.5
+  :config
+  (add-to-list 'projectile-globally-ignored-directories "node_modules"))
 
 ;; (use-package all-the-icons-ivy-rich
 ;;   :defer 0.5)
@@ -706,19 +708,18 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 (use-package lsp
   :defer 3
-  :hook (((clojure-mode
-           scss-mode
-           go-mode
-           css-mode
-           js-mode
-           typescript-mode
-           vue-mode
-           web-mode
-           ng2-html-mode
-           ng2-ts-mode
-           python-mode
-           typescript-tsx-mode) . lsp-deferred)
-         (lsp-mode . my-setup-tabnine))
+  :hook ((clojure-mode
+          scss-mode
+          go-mode
+          css-mode
+          js-mode
+          typescript-mode
+          vue-mode
+          web-mode
+          ng2-html-mode
+          ng2-ts-mode
+          python-mode
+          typescript-tsx-mode) . lsp-deferred)
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error)
          ("g i" . lsp-goto-implementation)
@@ -752,12 +753,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
   (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-  (add-hook 'emacs-lisp-mode-hook #'(lambda ()
-                                      (setq company-backends '(company-tabnine company-dabbrev))))
+  ;; (add-hook 'emacs-lisp-mode-hook #'(lambda ()
+  ;;                                     (setq company-backends '(company-tabnine company-dabbrev))))
 
 
-  (setq +lsp-company-backends '(company-tabnine company-capf))
-  (setq company-backends '((company-tabnine :separate company-capf)))
+  ;; (setq +lsp-company-backends '(company-tabnine company-capf))
+  ;; (setq company-backends '((company-tabnine :separate company-capf)))
+  ;;
   ;; (setq +lsp-company-backends '(company-dabbrev company-capf))
   ;; (setq company-backends '((company-dabbrev company-capf)))
 
@@ -808,24 +810,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 
 ;;;; Company
-(defun my-setup-tabnine ()
-  (interactive)
-  ;; (setq-local +lsp-company-backends '((company-tabnine :separate company-capf)))
-  ;; (setq-local company-backends '((company-tabnine :separate company-capf))))
-  (setq-local company-backends '((company-tabnine company-capf))))
-
-;;;; Only tabnine
-(defun my-setup-tabnine-2 ()
-  (interactive)
-  (setq-local +lsp-company-backends '((company-tabnine company-dabbrev)))
-  (setq-local company-backends '(company-tabnine company-dabbrev)))
-
-(defun my-setup-tabnine-3 ()
-  (interactive)
-  (setq-local +lsp-company-backends '((company-capf company-dabbrev)))
-  (setq-local company-backends '((company-capf company-dabbrev))))
-
-
 (use-package company
   :defer t
   :bind (:map evil-insert-state-map ("C-'" . company-yasnippet)
@@ -842,15 +826,42 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq company-dabbrev-char-regexp "[A-z:-]"))
 
 
-;; Autocomplete with AI
-(use-package company-tabnine
-  :after (company lsp)
-  :bind (("C-x C-i" . company-tabnine))
-  :when (featurep! :completion company)
+;;;; Copilot
+(use-package copilot
+  :defer 1
+  :bind
+  ("s-]" . copilot-next-completion)
+  ("s-[" . copilot-previous-completion)
+  ("s-l" . copilot-accept-completion)
+  ("s-j" . copilot-complete)
+  :custom
+  (copilot-idle-delay 0.3)
   :config
-  (setq company-tabnine-always-trigger nil)
-  ;; (setq company-tabnine-auto-balance nil)
-  (setq company-tabnine-show-annotation t))
+  (setq copilot--previous-point nil)
+  (setq copilot--previous-window-width nil)
+
+  (defun copilot--preserve-positions ()
+    (setq copilot--previous-point (point))
+    (setq copilot--previous-window-width (blamer--real-window-width)))
+
+  (defun copilot--positions-changed-p ()
+    (or (not (equal (point)  copilot--previous-point))
+        (not (equal (window-width) copilot--previous-window-width))))
+
+
+  (defun copilot--rerender ()
+    (when-let ((copilot--changed (copilot--positions-changed-p)))
+      (copilot-clear-overlay)
+      (copilot--preserve-positions)
+      (blamer--clear-overlay)
+      (when (evil-insert-state-p) (copilot-complete))))
+
+  (add-hook 'post-command-hook #'copilot--rerender)
+  (add-hook 'evil-insert-state-exit-hook 'copilot-clear-overlay)
+  (add-hook 'evil-insert-state-entry-hook (lambda ()
+                                            (setq blamer--block-render-p t)
+                                            (blamer--clear-overlay))))
+
 
 
 ;;; Languages
@@ -859,7 +870,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package elisp-mode
   :defer t
   :hook ((emacs-lisp-mode . paren-face-mode)
-         (emacs-lisp-mode . my-setup-tabnine-2)
          (emacs-lisp-mode . rainbow-delimiters-mode-disable))
 
   :bind (("C-c o" . outline-cycle)
@@ -959,6 +969,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :hook (python-mode . pipenv-mode)
   :config
   (setenv "WORKON_HOME" (concat (getenv "HOME") "/.local/share/virtualenvs"))
+  (add-hook 'pyvenv-post-activate-hooks #'lsp-restart-workspace)
   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 
 
@@ -1021,9 +1032,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Scss
 (use-package css-mode
   :defer 10
-  :hook ((css-mode . my-setup-tabnine) (scss-mode . my-setup-tabnine))
   :config
-  (my-setup-tabnine)
   (defun revert-buffer-no-confirm ()
     "Revert buffer without confirmation."
     (interactive)
@@ -1118,6 +1127,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 10)
 
 ;;; Markup
+;;;; Jinja
+(use-package jinja2-mode
+  :defer t)
 ;;;; Markdown
 (use-package grip-mode
   :after markdown-mode
@@ -1234,6 +1246,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (tooltip-mode)
   (setq blamer-tooltip-function 'blamer-tooltip-commit-message)
+  (add-hook 'evil-normal-state-entry-hook (lambda ()
+                                            (setq blamer--block-render-p nil)
+                                            (copilot-clear-overlay)) nil t)
+
+
+
+
   (defun blamer-callback-show-commit-diff (commit-info)
     (interactive)
     (message "Blamer my custom callback")
@@ -1253,6 +1272,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq blamer-bindings '(("<mouse-3>" . blamer-callback-open-remote)
                           ("<mouse-1>" . blamer-callback-show-commit-diff)))
 
+  ;; (advice-add 'blamer--clear-overlay :before 'copilot-complete)
   (global-blamer-mode 1))
 
 (use-package hydra
@@ -1406,9 +1426,6 @@ Version 2015-12-08"
     "l" 'lsp-execute-code-action
 
     "r" 'treemacs-select-window
-    "1" 'my-setup-tabnine
-    "2" 'my-setup-tabnine-2
-    "3" 'my-setup-tabnine-3
 
     "m" 'toggle-maximize-buffer
     "y" 'yas-expand))
@@ -1488,6 +1505,8 @@ Version 2015-12-08"
     (defvar org-babel-js-function-wrapper
       ""
       "Javascript code to print value of body.")))
+
+
 
 (use-package svg-tag-mode
   :defer 7
@@ -1743,10 +1762,12 @@ Version 2015-12-08"
   :defer t)
 ;;; Temporary section
 
+
 (use-package secret-mode
   :defer t)
 ;;; Regexp for compilation and qucik error finding
-(add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+;; (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+(setq compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)) ;
 ;;; Temporary unused
 
 ;; (use-package code-review

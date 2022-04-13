@@ -63,7 +63,14 @@
 ;;; Visual
 (package! centaur-tabs)
 ;;; Completion
-(package! company-tabnine)
+;; (package! company-tabnine)
+;; (package! copilot :recipe (:host github :repo "zerolfx/copilot.el"))
+;; (package! copilot :recipe (:host github :repo "fkr-0/flight-attendant.el"))
+;; (package! flight-attendant :recipe (:host github :repo "fkr-0/flight-attendant.el"))
+;; required for copilot
+(package! editorconfig)
+(package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("dist" "copilot.el")))
+
 (package! company-posframe)
 ;; (package! lsp-mode)
 (package! lsp-ui)
@@ -89,8 +96,11 @@
 (package! lua-mode)
 
 
+;;; Templates
 ;;;; Markdown
 (package! grip-mode)
+;;;; Jinja
+(package! jinja2-mode)
 ;;;; Python
 (package! pipenv)
 (package! python-mode)
@@ -193,6 +203,7 @@
 (package! org-roam)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 (package! org-fancy-priorities)
+;; (package! org-modern)
 ;;;; Org babel
 (package! ob-restclient)
 (package! ob-async)
