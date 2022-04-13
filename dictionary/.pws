@@ -1,4 +1,4 @@
-personal_ws-1.1 en 204 
+personal_ws-1.1 en 206 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -115,6 +115,7 @@ maxPercentProfit
 maxYearsOfInfinityBonds
 middleRiskPercantage
 middleware
+middlewares
 minNominalCost
 minPercentProfit
 mnt
@@ -168,6 +169,7 @@ truthy
 tsconfig
 uniorg
 uniquify
+uuid
 valuegetter
 verifika
 viewport
