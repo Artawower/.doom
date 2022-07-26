@@ -48,7 +48,7 @@ Can be an integer to determine the exact padding."
 
    (bg-alt     '("#fafafa" "#fafafa"       "white"        ))
    (fg-alt     '("#A09BB3" "#A09BB3"     "white"        ))
-   (base0      '("#efefef" "#efefef" "white"        ))
+   (base0      '("#8c8c84" "#efefef" "white"        ))
    (base1      '("#00AEE8" "#00AEE8"     "brightcyan"  ))
    (base2      '("#dfdfdf" "#dfdfdf" "brightblack"  ))
    (base3      '("#c6c7c7" "#c6c7c7" "brightblack"  ))

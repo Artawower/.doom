@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: Json stringefy
+# key: J
+# --
+
+(if (region-active-p)
+   (concat
+     "JSON.stringify("
+     yas-selected-text ")")
+   "JSON.stringify($1)")

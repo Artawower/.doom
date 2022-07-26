@@ -72,8 +72,10 @@
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("dist" "copilot.el")))
 
 (package! company-posframe)
+;;; Lsp
 ;; (package! lsp-mode)
 (package! lsp-ui)
+;; (package! lsp-sonarlint)
 ;; (package! exec-path-from-shell)
 
 
@@ -83,8 +85,8 @@
 (package! ng2-mode)
 
 ;;; Treesitter
-(package! tree-sitter)
-(package! tree-sitter-langs)
+;; (package! tree-sitter)
+;; (package! tree-sitter-langs)
 (package! tree-edit)
 (package! evil-tree-edit)
 
@@ -105,8 +107,9 @@
 (package! pipenv)
 (package! python-mode)
 ;; (package! pyenv-mode)
-;; (package! lsp-python-ms)
+(package! lsp-python-ms)
 (package! lsp-pyright)
+(package! lsp-jedi)
 
 ;;;; Go
 (package! go-playground)
@@ -149,14 +152,26 @@
 (package! turbo-log :recipe (:host github :repo "artawower/turbo-log"))
 ;; (package! turbo-log :recipe (:host github :repo "artawower/turbo-log" :branch "enchancement/jump-inserting"))
 (package! dap-mode)
-(package! undo-tree)
 (package! reverse-im)
 (package! prettier)
+
+
+;;; Undo
+(package! vundo)
+(package! undo-fu-session)
+(package! undo-tree :disable t)
+(unpin! undo-tree)
+;; (package! undo-tree)
+
 (package! package-lint)
 (package! package-build)
 ;;; GIT
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "enhancement/truncated-lines"))
 (package! blamer)
+(package! sideline :recipe (:host github :repo "emacs-sideline/sideline"))
+(package! sideline-blame :recipe (:host github :repo "emacs-sideline/sideline-blame"))
+(package! sideline-lsp)
+(package! sideline-flycheck)
 (package! gist)
 ;; (package! blamer :recipe (:host github :repo "artawower/blamer.el" :branch "enhancement/company-integration"))
 
@@ -164,13 +179,15 @@
 
 ;;; Themes
 (package! atom-one-dark-theme)
+(package! uwu-theme
+   :recipe (:host github :repo "kborling/uwu-theme"))
+(package! auto-dark)
 ;; (package! ewal)
 ;; (package! ewal-doom-themes)
 
 ;;; ~UNCATEGORIZED YET
 (package! hydra)
 ;; (package! company-box)
-;; (package! prettier-js)
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
 (package! origami)
 (package! ivy
@@ -200,6 +217,8 @@
 (package! org-caldav)
 (package! org-superstar)
 (unpin! org-roam)
+(package! web-roam
+  :recipe (:host github :repo "artawower/web-roam.el"))
 (package! org-roam)
 (package! org-roam-ui :recipe (:host github :repo "org-roam/org-roam-ui" :files ("*.el" "out")))
 (package! org-fancy-priorities)
@@ -224,12 +243,15 @@
 (package! svg-tag-mode)
 
 ;;; Not a programming
+;;;; Messanging
+(package! telega)
+;; (package! telega :recipe (:host github :repo "zevlg/telega.el" :branch "release-0.8.0"))
 ;;; Unused
 
 ;; (package! dumb-jump) -- really dumb
 ;; (package! code-review)
 
-;; (package! dirvish) -- so luggy
+(package! dirvish) ;; -- so luggy
 ;; (package! vi-tilde-fringe :disable t)
 ;; (package! multi-vterm)
 ;; (package! pippel)

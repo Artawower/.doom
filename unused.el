@@ -431,6 +431,21 @@
 
 (use-package live-py-mode
   :defer t)
+
+(use-package lsp-python-ms
+  :ensure t
+  :init (setq lsp-python-ms-auto-install-server t)
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-python-ms)
+                          (lsp))))  ; or lsp-deferred
+
+(use-package lsp-jedi
+  :ensure t
+  :config
+  (with-eval-after-load "lsp-mode"
+    (add-to-list 'lsp-disabled-clients 'pyls)
+    (add-to-list 'lsp-enabled-clients 'jedi)))
+
 ;;; Debug
 
 ;; (use-package benchmark-init
@@ -709,3 +724,14 @@
   ;; Enable org-modern-mode
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+
+;;; Undo
+;; Some problems with preserved data
+(use-package undo-tree
+  :defer 2
+  :custom
+  ;; (undo-tree-auto-save-history t)
+  (undo-tree-enable-undo-in-region nil)
+  (undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
+  :config
+  (global-undo-tree-mode 1))

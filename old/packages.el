@@ -95,10 +95,12 @@
 (package! exec-path-from-shell)
 (package! bm)
 (package! google-translate)
-(package! dogears
-    :recipe (:host github :repo "alphapapa/dogears.el")
-)
+;; (package! dogears
+;;     :recipe (:host github :repo "alphapapa/dogears.el")
+;; )
 
+(package! web-roam
+  :recipe (:host github :repo "artawower/web-roam.el"))
 
 ;; dired
 (package! all-the-icons-dired)

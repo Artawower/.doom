@@ -55,8 +55,10 @@
 
 ;; (use-package doom-deep-atom-one-dark)
 (load! "~/.doom.d/private.el")
-
 ;;; Variables
+;;; Regexp for compilation and qucik error finding
+;; (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+(setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))) ;
 ;;;; Additional colors
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
@@ -65,11 +67,23 @@
 ;;;;; Browser configs
 ;; Mac os only
 (when (eq system-type 'darwin)
-  (setq browse-url-firefox-program "/Applications/Firefox.app/Contents/MacOS/firefox")
-  (setq browse-url-generic-program "/Applications/Firefox.app/Contents/MacOS/firefox"
+  (setq browse-url-firefox-program "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser")
+  (setq browse-url-generic-program "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
         browse-url-browser-function 'browse-url-generic))
 
 ;;; My custom functions
+;;;; Toggle transparency
+(defun my-toggle-transparency ()
+  "Toggle transparency"
+  (interactive)
+  (let* ((not-transparent-p (and (boundp 'my-transparency-disabled-p) my-transparency-disabled-p))
+         (alpha (if not-transparent-p 100 95)))
+    (setq my-transparency-disabled-p (not not-transparent-p))
+    (message "%s" alpha)
+    (progn
+      (set-frame-parameter (selected-frame) 'alpha `(,alpha . ,alpha))
+      (add-to-list 'default-frame-alist `(alpha . (,alpha . ,alpha))))))
+
 ;;;; Insert TODO for current git branch
 (defun my-insert-todo-by-current-git-branch ()
   "Insert todo for current git branch."
@@ -127,6 +141,19 @@ BEGIN END specifies region, otherwise works on entire buffer."
     (while (re-search-forward "^.*\033\\[2K\033\\[1G" end t)
       (replace-match ""))))
 
+(defun my-copy-pwd ()
+  "Copy PWD command to clipboard"
+  (interactive)
+  (when (buffer-file-name)
+    (kill-new (replace-regexp-in-string " " "\\\\\  " (file-name-directory (buffer-file-name))))))
+
+(defun my-copy-full-path ()
+  "Copy full path till file to clipboard"
+  (interactive)
+  (when (buffer-file-name)
+    (kill-new (replace-regexp-in-string " " "\\\\\  " (buffer-file-name)))))
+
+
 ;;;; Maximize current buffer
 (defun toggle-maximize-buffer () "Maximize buffer"
        (interactive)
@@ -180,17 +207,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
       ;; (revert-buffer-no-confirm)
       (message "SASS FORMATTED"))))
 ;;; Transparent bg
-;; (progn
-;;   (set-frame-parameter (selected-frame) 'alpha '(100 . 100))
-;;   (add-to-list 'default-frame-alist '(alpha . (100 . 100))))
-
 (progn
   (set-frame-parameter (selected-frame) 'alpha '(90 . 90))
   (add-to-list 'default-frame-alist '(alpha . (90 . 90))))
 
 ;;; Fonts
 
-(set-frame-font "JetBrainsMono Nerd Font 15" nil t)
+(set-frame-font "JetBrainsMono Nerd Font 17" nil t)
 (custom-set-faces
  `(font-lock-comment-face ((t (:font "ChalkBoard SE" :italic t :height 1.0))))
  `(font-lock-string-face ((t (:italic t :height 1.0)))))
@@ -241,6 +264,14 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
 (set-window-buffer nil (current-buffer))
 (setenv "zstd" "/usr/local/bin/zstd")
+
+(set-default-coding-systems 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-language-environment 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
 
 
 
@@ -298,6 +329,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
                     (interactive)
                     (ivy-kill-whole-line)
                     (ivy--cd "~/")))
+         ("C-a" . (lambda ()
+                    (interactive)
+                    (ivy-kill-whole-line)
+                    (ivy--cd "~/org/")))
          ("C-r" . (lambda ()
                     (interactive)
                     (ivy-kill-whole-line)
@@ -390,26 +425,25 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
   (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
 
-(defun my-ecmascript-formatter ()
-  "My custom chaif of formatters for ecmascript and html."
-  (interactive)
-  (prettier-prettify)
-  (+format/buffer))
+;; (defun my-ecmascript-formatter ()
+;;   "My custom chaif of formatters for ecmascript and html."
+;;   (interactive)
+;;   (prettier-prettify)
+;;   (+format/buffer))
 
-(defun my-install-formatter ()
-  (add-hook 'before-save-hook 'my-ecmascript-formatter))
+;; (defun my-install-formatter ()
+;;   (add-hook 'before-save-hook 'my-ecmascript-formatter))
 
+;; TODO: check problem with file corruption
 (use-package prettier
   :defer 1.5
-  :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode vue-mode web-mode) . prettier-mode))
+  :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-mode))
 
 ;; (use-package prettier-js
-;;   :defer 0.3
-;;   ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . prettier-js-mode)
-;;   :config
-;;   (setq prettier-js-args '(
-;;                            "--trailing-comma" "all"
-;;                            "--bracket-spacing" "true")))
+;;   :defer 0.3)
+;; :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-js-mode))
+;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . prettier-js-mode)
+
 
 
 ;;; UI
@@ -422,6 +456,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("SPC f [" . flycheck-previous-error)))
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+;; NOTE: this package is used instead of electric pair mode
+;; cause its simple, and it works in all cases.
 (use-package autopair
   :defer 5
   :config
@@ -429,14 +465,40 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 
 ;;; Undo
-(use-package undo-tree
-  :defer 2
-  :custom
-  (undo-tree-auto-save-history t)
-  (undo-tree-enable-undo-in-region nil)
-  (undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
+
+(use-package vundo
+  :defer 1
   :config
-  (global-undo-tree-mode 1))
+  ;; Take less on-screen space.
+  (setq vundo-compact-display t)
+
+  ;; Better contrasting highlight.
+  (custom-set-faces
+    '(vundo-node ((t (:foreground "#808080"))))
+    '(vundo-stem ((t (:foreground "#808080"))))
+    '(vundo-highlight ((t (:foreground "#FFFF00")))))
+
+  ;; Use `HJKL` VIM-like motion, also Home/End to jump around.
+  (define-key vundo-mode-map (kbd "l") #'vundo-forward)
+  (define-key vundo-mode-map (kbd "<right>") #'vundo-forward)
+  (define-key vundo-mode-map (kbd "h") #'vundo-backward)
+  (define-key vundo-mode-map (kbd "<left>") #'vundo-backward)
+  (define-key vundo-mode-map (kbd "j") #'vundo-next)
+  (define-key vundo-mode-map (kbd "<down>") #'vundo-next)
+  (define-key vundo-mode-map (kbd "k") #'vundo-previous)
+  (define-key vundo-mode-map (kbd "<up>") #'vundo-previous)
+  (define-key vundo-mode-map (kbd "<home>") #'vundo-stem-root)
+  (define-key vundo-mode-map (kbd "<end>") #'vundo-stem-end)
+  (define-key vundo-mode-map (kbd "q") #'vundo-quit)
+  (define-key vundo-mode-map (kbd "C-g") #'vundo-quit)
+  (define-key vundo-mode-map (kbd "RET") #'vundo-confirm))
+
+(use-package undo-fu-session
+  :defer 1
+  :config
+  (global-undo-fu-session-mode))
+
+(with-eval-after-load 'evil (evil-define-key 'normal 'global (kbd "C-M-u") 'vundo))
 
 ;;; Spellcheck via spell-fu
 ;;;; Enable spell fu for tree sitter face
@@ -553,19 +615,98 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (doom-themes-org-config))
 
 ;;; Files
-
-(use-package ranger
-  :defer t
-  :bind (:map evil-normal-state-map
-         ("SPC r r" . ranger))
+(use-package dirvish
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  ;; Go back home? Just press `bh'
+  (dirvish-bookmark-entries
+   '(("h" "~/"                          "Home")
+     ("d" "~/Downloads/"                "Downloads")))
+  ;; (dirvish-header-line-format '(:left (path) :right (free-space)))
+  (dirvish-mode-line-format ; it's ok to place string inside
+   '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+  ;; Don't worry, Dirvish is still performant even you enable all these attributes
+  (dirvish-attributes '(all-the-icons file-size collapse subtree-state vc-state git-msg))
+  ;; Maybe the icons are too big to your eyes
+  (dirvish-all-the-icons-height 0.8)
+  ;; In case you want the details at startup like `dired'
+  ;; (dirvish-hide-details nil)
   :config
-  (setq ranger-preview-file t)
-  (setq ranger-footer-delay 0.2)
-  (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
-  (setq ranger-show-literal t)
-  (setq ranger-dont-show-binary t)
-  (setq ranger-max-preview-size 10)
-  (setq ranger-preview-delay 0.040))
+  (dirvish-peek-mode)
+  (setq dired-kill-when-opening-new-dired-buffer t)
+  (setq dirvish-reuse-session t)
+  ;; Dired options are respected except a few exceptions, see *In relation to Dired* section above
+  (setq dired-dwim-target t)
+  (setq delete-by-moving-to-trash t)
+  (setq dirvish-default-layout '(1 0.3 0.7))
+  ;; Enable mouse drag-and-drop files to other applications
+  (setq dired-mouse-drag-files t)                   ; added in Emacs 29
+  (setq mouse-drag-and-drop-region-cross-program t) ; added in Emacs 29
+  ;; Make sure to use the long name of flags when exists
+  ;; eg. use "--almost-all" instead of "-A"
+  ;; Otherwise some commands won't work properly
+  ;; (dirvish-define-preview exa (file)
+  ;;   "Use `exa' to generate directory preview."
+  ;;   :require ("exa") ; tell Dirvish to check if we have the executable
+  ;;   (when (file-directory-p file) ; we only interest in directories here
+  ;;     `(shell . ("exa" "--color=always" "-al" ,file))))
+                                        ; use the command output as preview
+
+  ;; (add-to-list 'dirvish-preview-dispatchers 'exa)
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
+  (setq dirvish-attributes '(vc-state subtree-state collapse git-msg file-size))
+  (advice-add #'+dired/quit-all :after (lambda () (interactive) (dirvish-kill (dirvish-prop :dv))))
+  :bind
+  ;; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c f" . dirvish-fd)
+   :map dired-mode-map ; Dirvish respects all the keybindings in this map
+   ("h" . dired-up-directory)
+   ("j" . dired-next-line)
+   ("k" . dired-previous-line)
+   ("l" . dired-find-file)
+   ("i" . wdired-change-to-wdired-mode)
+   ("." . dired-omit-mode)
+   ("b"   . dirvish-bookmark-jump)
+   ("f"   . dirvish-file-info-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("s"   . dirvish-quicksort) ; remapped `dired-sort-toggle-or-edit'
+   ("?"   . dirvish-dispatch)  ; remapped `dired-summary'
+   ("TAB" . dirvish-subtree-toggle)
+   ("SPC" . dirvish-history-jump)
+   ("M-n" . dirvish-history-go-forward)
+   ("M-p" . dirvish-history-go-backward)
+   ("M-l" . dirvish-ls-switches-menu)
+   ("M-m" . dirvish-mark-menu)
+   ("M-f" . dirvish-toggle-fullscreen)
+   ("M-s" . dirvish-setup-menu)
+   ("M-e" . dirvish-emerge-menu)
+   ("M-j" . dirvish-fd-jump)))
+
+;; (setq dired-kill-when-opening-new-dired-buffer t) ;; added in emacs 28
+;; (setq dired-clean-confirm-killing-deleted-buffers nil)
+;; (setq large-file-warning-threshold 50000000)
+;; (setq dired-recursive-copies 'always)
+;; (setq dired-recursive-deletes 'always)
+;; (setq delete-by-moving-to-trash t)
+;; (setq dired-dwim-target t)
+;; (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))
+
+;; (use-package ranger
+;;   :defer t
+;;   :bind (:map evil-normal-state-map
+;;          ("SPC r r" . ranger))
+;;   :config
+;;   (setq ranger-preview-file t)
+;;   (setq ranger-footer-delay 0.2)
+;;   (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
+;;   (setq ranger-show-literal t)
+;;   (setq ranger-dont-show-binary t)
+;;   (setq ranger-max-preview-size 10)
+;;   (setq ranger-preview-delay 0.040))
 
 
 ;;; Bookmarks
@@ -643,6 +784,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package modus-themes
   :defer t)
 
+(use-package auto-dark
+  :config
+  (setq auto-dark--dark-theme 'doom-moonlight)
+  (setq auto-dark--light-theme 'pinky-winky))
+
+
 ;;;; Theme switcher
 (use-package heaven-and-hell
   :after doom-themes
@@ -706,8 +853,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; Common configurations for all programming languages
 ;;;; Lsp
 
+
+;; Don't work, and sometime call the big delay
+;; (use-package lsp-sonarlint
+;;   :config
+;;   (require 'lsp-sonarlint-typescript)
+;;   (require 'lsp-sonarlint-python)
+;;   (setq lsp-sonarlint-typescript-enabled t)
+;;   (setq lsp-sonarlint-python-enabled t))
+
 (use-package lsp
-  :defer 3
   :hook ((clojure-mode
           scss-mode
           go-mode
@@ -734,9 +889,17 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
+  ;; (setq lsp-enable-file-watchers t)
+  (setq lsp-enable-file-watchers nil)
+  (setq lsp-file-watch-threshold 5000)
   ;; (lsp-yaml-schemas '(:kubernetes "/.yaml" :kubernetes "/*.yml"))
   :config
-  (setq lsp-json-schemas `[(:fileMatch ["ng-openapi-gen.json"] :url "https://raw.githubusercontent.com/cyclosproject/ng-openapi-gen/master/ng-openapi-gen-schema.json")])
+  (setq lsp-javascript-display-return-type-hints t)
+  (setq lsp-json-schemas
+        `[
+          (:fileMatch ["ng-openapi-gen.json"] :url "https://raw.githubusercontent.com/cyclosproject/ng-openapi-gen/master/ng-openapi-gen-schema.json")
+          (:fileMatch ["package.json"] :url "http://json-schema.org/draft-07/schema")
+          ])
   (set-face-attribute 'lsp-face-highlight-read nil :background "#61AFEF")
   ;; Flycheck patch checkers
   (require 'flycheck)
@@ -753,6 +916,22 @@ BEGIN END specifies region, otherwise works on entire buffer."
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
   (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+  (setq lsp-idle-delay 0.5
+        lsp-enable-symbol-highlighting t
+        lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
+        lsp-pyls-plugins-flake8-enabled t)
+
+  (lsp-register-custom-settings
+   '(("pyls.plugins.pyls_mypy.enabled" t t)
+     ("pyls.plugins.pyls_mypy.live_mode" nil t)
+     ("pyls.plugins.pyls_black.enabled" t t)
+     ("pyls.plugins.pyls_isort.enabled" t t)
+
+     ;; Disable these as they're duplicated by flake8
+     ("pyls.plugins.pycodestyle.enabled" nil t)
+     ("pyls.plugins.mccabe.enabled" nil t)
+     ("pyls.plugins.pyflakes.enabled" nil t)))
   ;; (add-hook 'emacs-lisp-mode-hook #'(lambda ()
   ;;                                     (setq company-backends '(company-tabnine company-dabbrev))))
 
@@ -765,7 +944,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\pyenv\\'")
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (setq lsp-eldoc-hook nil))
+
 
 (use-package lsp-yaml
   :defer t
@@ -779,7 +961,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :bind (:map evil-normal-state-map
          ("SPC l r" . lsp-find-references))
   :config
-  (setq lsp-ui-sideline-diagnostic-max-line-length 200
+  (setq lsp-ui-sideline-diagnostic-max-line-length 100
         lsp-ui-sideline-diagnostic-max-lines 5
         lsp-ui-doc-delay 2
         lsp-ui-doc-position 'top
@@ -788,12 +970,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;;; Syntax highlight
 (use-package tree-sitter-langs
-  :defer 6)
+  :defer 3)
 
 (use-package tree-sitter
   :after (tree-sitter-langs spell-fu)
   :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
   :config
+  (setq tsc-dyn-get-from '(:compilation))
   (advice-add 'tree-sitter-hl-mode :before 'my-set-spellfu-faces)
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
@@ -834,11 +1017,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ("s-[" . copilot-previous-completion)
   ("s-l" . copilot-accept-completion)
   ("s-j" . copilot-complete)
+  ("s-;" . copilot-accept-completion-by-word)
   :custom
-  (copilot-idle-delay 0.3)
+  (copilot-idle-delay 0.05)
   :config
   (setq copilot--previous-point nil)
   (setq copilot--previous-window-width nil)
+  (copilot-diagnose)
 
   (defun copilot--preserve-positions ()
     (setq copilot--previous-point (point))
@@ -857,10 +1042,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
       (when (evil-insert-state-p) (copilot-complete))))
 
   (add-hook 'post-command-hook #'copilot--rerender)
-  (add-hook 'evil-insert-state-exit-hook 'copilot-clear-overlay)
+  ;; (add-hook 'evil-insert-state-exit-hook 'copilot-clear-overlay)
   (add-hook 'evil-insert-state-entry-hook (lambda ()
                                             (setq blamer--block-render-p t)
-                                            (blamer--clear-overlay))))
+                                            (blamer--clear-overlay)))
+  (add-hook 'evil-normal-state-entry-hook (lambda ()
+                                            (message "Okay, now blamer should works correctly!")
+                                            (setq blamer--block-render-p nil)
+                                            (copilot-clear-overlay)))
+  ;; (copilot-clear-overlay)) nil t)
+  )
 
 
 
@@ -904,21 +1095,37 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 10
   :config
   (setq typescript-indent-level 2)
-  (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
+  (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
+  (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))))
 
 ;;;;; Angular
 (use-package ng2-mode
   :after typescript-mode
   :hook (ng2-html-mode . web-mode)
-  :config
+  :init
   (setq lsp-clients-angular-language-server-command
-        '("node"
-          "/usr/local/lib/node_modules/@angular/language-server"
+        '("/opt/homebrew/opt/node@14/bin/node"
+          "/opt/homebrew/lib/node_modules/@angular/language-server"
           "--ngProbeLocations"
-          "/usr/local/lib/node_modules"
+          "/opt/homebrew/lib/node_modules"
+          ;; "/usr/local/lib/node_modules"
           "--tsProbeLocations"
-          "/usr/local/lib/node_modules"
-          "--stdio")))
+          ;; "/usr/local/lib/node_modules"
+          "/opt/homebrew/lib/node_modules"
+          "--stdio"))
+  :config
+  ;; (add-to-list 'lsp-disabled-clients 'deno-ls)
+  (setq lsp-clients-angular-language-server-command
+        '("/opt/homebrew/opt/node@14/bin/node"
+          "/opt/homebrew/lib/node_modules/@angular/language-server"
+          "--ngProbeLocations"
+          "/opt/homebrew/lib/node_modules"
+          ;; "/usr/local/lib/node_modules"
+          "--tsProbeLocations"
+          ;; "/usr/local/lib/node_modules"
+          "/opt/homebrew/lib/node_modules"
+          "--stdio"))
+  (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))))
 
 
 ;;;; Javascript
@@ -984,18 +1191,25 @@ BEGIN END specifies region, otherwise works on entire buffer."
               (setq indent-tabs-mode nil)
               (setq tab-width 4))))
 
+
+(setq lsp-pyright-multi-root nil)
 (use-package lsp-pyright
   :defer t
   :config
   (setq lsp-pyright-auto-import-completions t)
   (setq lsp-pyright-auto-search-paths t)
-  (setq lsp-pyright-log-level "trace"))
+  (setq lsp-pyright-log-level "trace")
+  (setq lsp-pyright-multi-root nil)
+  (setq lsp-pyright-use-library-code-for-types t)
+  (setq lsp-pyright-venv-directory "/Users/darkawower/.local/share/virtualenvs/spice-farm-YhO8T07I")
+  (setq lsp-pyright-diagnostic-mode "workspace"))
+
 
 ;;;; Vue
 ;; npm install -g @volar/server
 ;; Check it
 (use-package! lsp-volar
-  :defer t)
+  :after lsp-mode)
 
 ;;;; Web mode
 (use-package web-mode
@@ -1136,7 +1350,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ;; :hook (markdown-mode . grip-mode)
   :custom
   (browse-url-browser-function 'browse-url-generic)
-  (grip-url-browser #'browse-url-firefox-program)
+  ;; (grip-url-browser #'browse-url-firefox-program)
   :config
   (let ((credential (auth-source-user-and-password "api.github.com")))
     (setq grip-github-user (car credential)
@@ -1144,6 +1358,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 (use-package auto-rename-tag
   :defer t
+  :hook ((html-mode ng2-html-mode-hook vue-mode web-mode) . auto-rename-tag-mode)
   :config
   (auto-rename-tag-mode 1))
 
@@ -1174,6 +1389,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Git
 (use-package magit
   :defer t
+  :bind (:map magit-mode-map
+         ("s-<return>" . magit-diff-visit-file-worktree)
+         :map evil-normal-state-map
+         ("SPC g i" . (lambda () (interactive) (wakatime-ui--clear-modeline) (magit-status))))
   :config
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
@@ -1183,6 +1402,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
    :before
    #'my-remove-cr)
   (setq magit-process-finish-apply-ansi-colors t))
+
 
 (use-package gist                       ;
   :defer t
@@ -1220,8 +1440,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Blamer
 (use-package blamer
   :defer 5
-  :bind (("s-i" . blamer-show-commit-info)
-         ("C-c i" . (lambda () (interactive) (blamer-show-commit-info 'visual))))
+  :bind (
+         ("C-c i" . blamer-show-commit-info)
+         ("C-c h" . (lambda () (interactive) (blamer-show-commit-info 'visual)))
+         ("s-i" . blamer-show-posframe-commit-info))
   :custom
   (blamer-idle-time 0.8)
   (blamer-min-offset 20)
@@ -1246,11 +1468,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (tooltip-mode)
   (setq blamer-tooltip-function 'blamer-tooltip-commit-message)
-  (add-hook 'evil-normal-state-entry-hook (lambda ()
-                                            (setq blamer--block-render-p nil)
-                                            (copilot-clear-overlay)) nil t)
-
-
 
 
   (defun blamer-callback-show-commit-diff (commit-info)
@@ -1274,6 +1491,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
   ;; (advice-add 'blamer--clear-overlay :before 'copilot-complete)
   (global-blamer-mode 1))
+
+(use-package sideline
+  :hook (lsp-mode-hook . sideline-mode)
+  :init
+  (setq sideline-backends-right '(sideline-lsp))
+  :defer 2)
 
 (use-package hydra
   :defer t)
@@ -1356,6 +1579,8 @@ Version 2015-12-08"
          ("SPC n r f" . org-roam-node-find)
          ("SPC t a" . treemacs-add-project-to-workspace)
          ("SPC g t" . git-timemachine)
+         ;; Compilation
+         ("SPC c v" . compilation-display-error)
          ;; CUSTOM
          ("SPC t i" . my-insert-todo-by-current-git-branch)
          ;; Org mode
@@ -1370,21 +1595,25 @@ Version 2015-12-08"
                         (run-at-time "0.3 sec" nil (lambda () (org-roam-ui-sync-theme) (my-switch-to-xwidget-buffer)))))
          ("SPC j" . ace-window)
          ("SPC w f" . ace-window)
-         ("s-2" . xah-paste-from-register-1)
+         ("s-Y" . xah-paste-from-register-1)
          ("s-p" . yank-from-kill-ring)
          ("s-r" . (lambda () (interactive) (set-mark-command nil) (evil-avy-goto-char)))
          ("SPC y k" . yank-from-kill-ring)
+         ("s-." . ace-window)
          ;; Git
          ("SPC g o f" . my-forge-browse-buffer-file)
          :map evil-insert-state-map
-         ("s-2" . xah-paste-from-register-1)
+         ("s-Y" . xah-copy-to-register-1)
+         ;; ("s-2" . xah-paste-from-register-1)
          ("s-p" . yank-from-kill-ring)
+         ("s-." . ace-window)
          :map evil-visual-state-map
-         ("s-1" . xah-copy-to-register-1)
-         ("s-2" . xah-paste-from-register-1)
+         ("s-Y" . xah-copy-to-register-1)
+         ("s-P" . xah-paste-from-register-1)
+         ("s-." . ace-window)
          :map ivy-mode-map
-         ("s-1" . xah-copy-to-register-1)
-         ("s-2" . xah-paste-from-register-1))
+         ("s-Y" . xah-copy-to-register-1)
+         ("s-P" . xah-paste-from-register-1))
   :init
   (global-evil-leader-mode)
   :config
@@ -1590,11 +1819,12 @@ Version 2015-12-08"
 
 ;;;; Roam
 (use-package org-roam
-  :defer 8
+  :after org
   :init
   (setq org-roam-v2-ack t)
   :config
-  (cl-defmethod org-roam-node-compositetitle ((node org-roam-node))
+  (org-roam-setup)
+  (cl-defmethod org-roam-node-mtitle ((node org-roam-node))
     "Return customized title of roam node"
     (let* ((tags (org-roam-node-tags node))
            (title (org-roam-node-title node)))
@@ -1602,11 +1832,9 @@ Version 2015-12-08"
           title
         (setq joined-text (string-join tags ", "))
         (concat (propertize (format "(%s) " joined-text) 'face `(:foreground ,+m-color-main :weight bold :slant italic)) title))))
-
-  ;; (message m-color-main)
   (setq org-roam-completion-system 'ivy)
-  (setq org-roam-node-display-template "${compositetitle:100}")
-  (setq org-roam-directory (file-truename "~/Yandex.Disk.localized/Dropbox/org-roam"))
+  (setq org-roam-node-display-template "${mtitle:100}")
+  (setq org-roam-directory (file-truename "~/org-roam"))
   (org-roam-db-autosync-mode))
 
 (use-package! org-roam-ui
@@ -1618,6 +1846,11 @@ Version 2015-12-08"
         org-roam-ui-open-on-start t
         org-roam-ui-browser-function #'xwidget-webkit-browse-url))
 
+(use-package! web-roam
+  :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC n p" . web-roam-publish-file))
+  :hook (org-mode . web-roam-sync-mode))
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()
@@ -1729,11 +1962,30 @@ Version 2015-12-08"
 
 (use-package wakatime-ui
   :load-path "~/.doom.d/"
+  :defer 4
   :custom
   ;; (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/bb8cf0d7-3554-4297-ac4d-01f8a155073c.svg")
   (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/af1bfb85-2c8b-44e4-9873-c4a91b512e8d.png")
   :config
   (wakatime-ui-mode))
+
+;;;; Messanging
+(use-package telega
+  :defer t
+  :bind (:map evil-normal-state-map
+         ("SPC t v" . telega)
+         :map telega-prefix-map
+         ("g" . telega-filter-by-folder))
+  :config
+  (require 'telega-alert)
+  (setq telega-server-libs-prefix "/opt/homebrew")
+  (setq telega-chat-fill-column 190)
+  (setq telega-use-docker t)
+  (setq telega-accounts (list
+                         (list "demonnsd" 'telega-database-dir telega-database-dir)
+                         (list "artawower" 'telega-database-dir (expand-file-name "artawower" telega-database-dir))
+                         (list "ksenofobious" 'telega-database-dir (expand-file-name "ksenofobious" telega-database-dir))))
+  (telega-alert-mode 1))
 
 ;;; COlloboration
 (use-package floobits
@@ -1748,6 +2000,9 @@ Version 2015-12-08"
   (setq-default elfeed-search-title-max-width 100)
   (setq-default elfeed-search-title-min-width 100)
   (setq browse-url-browser-function #'browse-url-default-browser))
+
+(add-hook 'before-save-hook (lambda (set-buffer-file-coding-system 'utf-8)))
+(set-buffer-file-coding-system 'utf-8)
 
 (use-package elfeed-score
   :after elfeed
@@ -1765,10 +2020,89 @@ Version 2015-12-08"
 
 (use-package secret-mode
   :defer t)
-;;; Regexp for compilation and qucik error finding
-;; (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
-(setq compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)) ;
 ;;; Temporary unused
 
 ;; (use-package code-review
 ;;   :defer t)
+;;; Crutches
+(setq python-mode-map
+      (let ((map (make-sparse-keymap)))
+        ;; Movement
+        (define-key map [remap backward-sentence] 'python-nav-backward-block)
+        (define-key map [remap forward-sentence] 'python-nav-forward-block)
+        (define-key map [remap backward-up-list] 'python-nav-backward-up-list)
+        (define-key map [remap mark-defun] 'python-mark-defun)
+        (define-key map "\C-c\C-j" 'imenu)
+        ;; Indent specific
+        (define-key map "\177" 'python-indent-dedent-line-backspace)
+        (define-key map (kbd "<backtab>") 'python-indent-dedent-line)
+        (define-key map "\C-c<" 'python-indent-shift-left)
+        (define-key map "\C-c>" 'python-indent-shift-right)
+        ;; Skeletons
+        (define-key map "\C-c\C-tc" 'python-skeleton-class)
+        (define-key map "\C-c\C-td" 'python-skeleton-def)
+        (define-key map "\C-c\C-tf" 'python-skeleton-for)
+        (define-key map "\C-c\C-ti" 'python-skeleton-if)
+        (define-key map "\C-c\C-tm" 'python-skeleton-import)
+        (define-key map "\C-c\C-tt" 'python-skeleton-try)
+        (define-key map "\C-c\C-tw" 'python-skeleton-while)
+        ;; Shell interaction
+        (define-key map "\C-c\C-p" 'run-python)
+        (define-key map "\C-c\C-s" 'python-shell-send-string)
+        (define-key map "\C-c\C-e" 'python-shell-send-statement)
+        (define-key map "\C-c\C-r" 'python-shell-send-region)
+        (define-key map "\C-\M-x" 'python-shell-send-defun)
+        (define-key map "\C-c\C-c" 'python-shell-send-buffer)
+        (define-key map "\C-c\C-l" 'python-shell-send-file)
+        (define-key map "\C-c\C-z" 'python-shell-switch-to-shell)
+        ;; Some util commands
+        (define-key map "\C-c\C-v" 'python-check)
+        (define-key map "\C-c\C-f" 'python-eldoc-at-point)
+        (define-key map "\C-c\C-d" 'python-describe-at-point)
+        ;; Utilities
+        (substitute-key-definition 'complete-symbol 'completion-at-point
+                                   map global-map)
+        (easy-menu-define python-menu map "Python Mode menu"
+          '("Python"
+            :help "Python-specific Features"
+            ["Shift region left" python-indent-shift-left :active mark-active
+             :help "Shift region left by a single indentation step"]
+            ["Shift region right" python-indent-shift-right :active mark-active
+             :help "Shift region right by a single indentation step"]
+            "-"
+            ["Start of def/class" beginning-of-defun
+             :help "Go to start of outermost definition around point"]
+            ["End of def/class" end-of-defun
+             :help "Go to end of definition around point"]
+            ["Mark def/class" mark-defun
+             :help "Mark outermost definition around point"]
+            ["Jump to def/class" imenu
+             :help "Jump to a class or function definition"]
+            "--"
+            ("Skeletons")
+            "---"
+            ["Start interpreter" run-python
+             :help "Run inferior Python process in a separate buffer"]
+            ["Switch to shell" python-shell-switch-to-shell
+             :help "Switch to running inferior Python process"]
+            ["Eval string" python-shell-send-string
+             :help "Eval string in inferior Python session"]
+            ["Eval buffer" python-shell-send-buffer
+             :help "Eval buffer in inferior Python session"]
+            ["Eval statement" python-shell-send-statement
+             :help "Eval statement in inferior Python session"]
+            ["Eval region" python-shell-send-region
+             :help "Eval region in inferior Python session"]
+            ["Eval defun" python-shell-send-defun
+             :help "Eval defun in inferior Python session"]
+            ["Eval file" python-shell-send-file
+             :help "Eval file in inferior Python session"]
+            ["Debugger" pdb :help "Run pdb under GUD"]
+            "----"
+            ["Check file" python-check
+             :help "Check file for errors"]
+            ["Help on symbol" python-eldoc-at-point
+             :help "Get help on symbol at point"]
+            ["Complete symbol" completion-at-point
+             :help "Complete symbol before point"]))
+        map))

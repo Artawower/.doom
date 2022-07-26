@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: swagger
+# key: !s
+# --
+
+// $1 godoc
+// @Summary      $2
+// @Description  $3
+// @Tags         $4
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int  true  "$5"
+// @Success      200  {object}  HttpResponse
+// @Failure      400  {object}  HttpError
+// @Failure      404  {object}  HttpError
+// @Failure      500  {object}  HttpError
+// @Router       $6  [$7]

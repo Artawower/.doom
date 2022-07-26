@@ -55,6 +55,9 @@
 (defvar wakatime-ui--command-args '(:today-time "--today")
   "Plist of available arguments")
 
+(defvar wakatime-ui--busy nil
+  "Is there wakatime ui busy right now?")
+
 (defun wakatime-ui--format-time ())
 
 (defun wakatime-ui--update-time (text)
@@ -63,9 +66,15 @@
   ;; (setq-default mode-line-misc-info (propertize text 'face '(:foreground "red" :bold t))))
   ;; (setq global-mode-string (propertize text 'face '(:foreground "#f65866"))))
   ;; (add-to-list 'mode-line-misc-info (propertize (concat text " ") 'face '(:foreground "#f65866"))))
-  (setq-default mode-line-misc-info (propertize (concat text " ") 'face '(:foreground "#f65866"))))
-  ;; (setq mode-line-misc-info (propertize text 'face '(:foreground "#f65866")))
-  ;; )
+  ;; (setq-default mode-line-misc-info (propertize (concat text " ") 'face '(:foreground "#f65866"))))
+  ;; (setq-default mode-line-misc-info (concat text " ")))
+  (setq-default mode-line-misc-info (propertize text 'face '(:foreground "#f65866"))))
+
+(defun wakatime-ui--clear-modeline (&optional directory cache)
+  "Clear modeline information."
+  (interactive)
+  ;; (message "mee")
+  (setq-default mode-line-misc-info nil))
 
 (defun wakatime-ui--handle-process-output (process signal buffer-name)
   "Handle background PROCESS SIGNAL and BUFFER-NAME."
@@ -76,25 +85,27 @@
       (let* ((output (buffer-substring (point-min) (point-max))))
         (kill-matching-buffers buffer-name nil t)
         (wakatime-ui--update-time (replace-regexp-in-string "\n\\'" "" output))))
-    (shell-command-sentinel process signal)))
+    (shell-command-sentinel process signal)
+      (setq wakatime-ui--busy nil)))
 
 (defun wakatime-ui--get-changes ()
   "Get changes of current spent time."
   (message "Get changes from wakatime!")
-  (let* ((binary (wakatime-find-binary wakatime-ui--binary-name))
-         (process (start-process
-                   "WakatimeUI"
-                   wakatime-ui--buffer-name
-                   binary
-                   (plist-get wakatime-ui--command-args :today-time))))
-
-    (when (process-live-p process)
-      (set-process-sentinel process
-                            #'(lambda (proc signal)
-                                (wakatime-ui--handle-process-output
-                                 proc
-                                 signal
-                                 wakatime-ui--buffer-name))))))
+  (unless wakatime-ui--busy
+    (let* ((binary (wakatime-find-binary wakatime-ui--binary-name))
+           (process (start-process
+                     "WakatimeUI"
+                     wakatime-ui--buffer-name
+                     binary
+                     (plist-get wakatime-ui--command-args :today-time))))
+      (setq wakatime-ui--busy t)
+      (when (process-live-p process)
+        (set-process-sentinel process
+                              #'(lambda (proc signal)
+                                  (wakatime-ui--handle-process-output
+                                   proc
+                                   signal
+                                   wakatime-ui--buffer-name)))))))
 
 (defun wakatime-ui--start-watch-time ()
   (unless wakatime-ui--check-timer
