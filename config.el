@@ -1018,8 +1018,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ("s-l" . copilot-accept-completion)
   ("s-j" . copilot-complete)
   ("s-;" . copilot-accept-completion-by-word)
-  :custom
-  (copilot-idle-delay 0.05)
+  ;; :custom
+  ;; (copilot-idle-delay 0.05)
   :config
   (setq copilot--previous-point nil)
   (setq copilot--previous-window-width nil)
