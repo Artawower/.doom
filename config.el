@@ -1850,7 +1850,8 @@ Version 2015-12-08"
   :defer t
   :bind (:map evil-normal-state-map
          ("SPC n p" . web-roam-publish-file))
-  :hook (org-mode . web-roam-sync-mode))
+  ;; :hook (org-mode . web-roam-sync-mode)
+  )
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()
@@ -2001,7 +2002,6 @@ Version 2015-12-08"
   (setq-default elfeed-search-title-min-width 100)
   (setq browse-url-browser-function #'browse-url-default-browser))
 
-(add-hook 'before-save-hook (lambda (set-buffer-file-coding-system 'utf-8)))
 (set-buffer-file-coding-system 'utf-8)
 
 (use-package elfeed-score
