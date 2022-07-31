@@ -1207,7 +1207,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;;; Vue
 ;; npm install -g @volar/server
-;; Check it
 (use-package! lsp-volar
   :after lsp-mode)
 
@@ -1849,9 +1848,8 @@ Version 2015-12-08"
 (use-package! web-roam
   :defer t
   :bind (:map evil-normal-state-map
-         ("SPC n p" . web-roam-publish-file))
+         ("SPC n p" . web-roam-publish-file)))
   ;; :hook (org-mode . web-roam-sync-mode)
-  )
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()
