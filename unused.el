@@ -735,3 +735,18 @@
   (undo-tree-history-directory-alist '(("." . "~/tmp/undo")))
   :config
   (global-undo-tree-mode 1))
+
+
+;;; File manager
+;; (use-package ranger
+;;   :defer t
+;;   :bind (:map evil-normal-state-map
+;;          ("SPC r r" . ranger))
+;;   :config
+;;   (setq ranger-preview-file t)
+;;   (setq ranger-footer-delay 0.2)
+;;   (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
+;;   (setq ranger-show-literal t)
+;;   (setq ranger-dont-show-binary t)
+;;   (setq ranger-max-preview-size 10)
+;;   (setq ranger-preview-delay 0.040))

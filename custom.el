@@ -12,12 +12,25 @@
  '(dockerfile-build-args '("--progress=plain"))
  '(exec-path-from-shell-arguments '("-l"))
  '(fringe-mode 28 nil (fringe))
+ '(ignored-local-variable-values
+   '((eval dap-register-debug-template "Second brain parser"
+           (list :type "node" :request "launch" :args
+                 ["/Users/darkawower/projects/pet/second-brain/second-brain-parser/src/index.ts"]
+                 :runtimeArgs
+                 ["--loader" "tsm"]
+                 :cwd "/Users/darkawower/projects/pet/second-brain/second-brain-parser" :outDir "/Users/darkawower/projects/pet/second-brain/second-brain-parser/dist" :sourceMap t :protocol "inspector" :name "Second brain parser"))))
  '(ispell-program-name "hunspell")
  '(keyboard-coding-system 'utf-8)
  '(package-selected-packages
-   '(vs-dark-theme tree-sitter posframe enlightened-theme vs-light-theme idea-darkula-theme modus-vivendi-theme mini-frame smbc intellij-theme filetree k8s-mode lua-mode csharp-mode javap-mode svg-tag-mode dumb-jump a topsy grip-mode pacmacs pippel gist treemacs-all-the-icons highlight-parentheses modus-themes ayu-theme nano-agenda git-blamed nano-theme dream-theme quasi-monochrome-theme sexy-monochrome-theme tao-theme nano-modeline monochrome-theme night-owl-theme github-theme ox-gfm flatui-dark-theme orderless corfu vscode-dark-plus-theme atom-dark-theme parchment-theme atom-one-dark-theme brutal-theme darktooth-theme espresso-theme immaterial-theme flatfluc-theme jetbrains-darcula-theme nimbus-theme mood-one-theme purp-theme notink-theme sculpture-themes stimmung-themes tango-plus-theme zerodark-theme plantuml-mode package-build yasnippet-snippets which-key websocket web-mode wakatime-mode vterm-toggle unicode-fonts undo-tree turbo-log ts-mode treemacs-projectile treemacs-magit treemacs-icons-dired treemacs-evil tree-sitter-langs spell-fu smex scss-mode sass-mode rustic reverse-im rainbow-mode rainbow-delimiters quelpa-use-package python-mode pug-mode pretty-hydra prettier-js presentation pipenv persp-mode paren-face package-lint ox-json origami org-superstar org-sticky-header org-roam org-plus-contrib ob-restclient no-littering ng2-mode lsp-ui lsp-python-ms json-mode jenkinsfile-mode ivy-posframe indent-guide hl-todo hl-defined heaven-and-hell guess-language google-translate go-mode git-timemachine git-messenger git-gutter-fringe format-all forge flycheck exec-path-from-shell evil-surround evil-matchit evil-leader evil-commentary evil-collection emmet-mode doom-themes doom-modeline dockerfile-mode docker-compose-mode dap-mode counsel-projectile company-tabnine bm all-the-icons-ivy-rich all-the-icons-ivy all-the-icons-dired))
+   '(cyberpunk-2019-theme cyberpunk-theme lsp-treemacs xml-format chess catppuccin-theme vs-dark-theme tree-sitter posframe enlightened-theme vs-light-theme idea-darkula-theme modus-vivendi-theme mini-frame smbc intellij-theme filetree k8s-mode lua-mode csharp-mode javap-mode svg-tag-mode dumb-jump a topsy grip-mode pacmacs pippel gist treemacs-all-the-icons highlight-parentheses modus-themes ayu-theme nano-agenda git-blamed nano-theme dream-theme quasi-monochrome-theme sexy-monochrome-theme tao-theme nano-modeline monochrome-theme night-owl-theme github-theme ox-gfm flatui-dark-theme orderless corfu vscode-dark-plus-theme atom-dark-theme parchment-theme atom-one-dark-theme brutal-theme darktooth-theme espresso-theme immaterial-theme flatfluc-theme jetbrains-darcula-theme nimbus-theme mood-one-theme purp-theme notink-theme sculpture-themes stimmung-themes tango-plus-theme zerodark-theme plantuml-mode package-build yasnippet-snippets which-key websocket web-mode wakatime-mode vterm-toggle unicode-fonts undo-tree turbo-log ts-mode treemacs-projectile treemacs-magit treemacs-icons-dired treemacs-evil tree-sitter-langs spell-fu smex scss-mode sass-mode rustic reverse-im rainbow-mode rainbow-delimiters quelpa-use-package python-mode pug-mode pretty-hydra prettier-js presentation pipenv persp-mode paren-face package-lint ox-json origami org-superstar org-sticky-header org-roam org-plus-contrib ob-restclient no-littering ng2-mode lsp-ui lsp-python-ms json-mode jenkinsfile-mode ivy-posframe indent-guide hl-todo hl-defined heaven-and-hell guess-language google-translate go-mode git-timemachine git-messenger git-gutter-fringe format-all forge flycheck exec-path-from-shell evil-surround evil-matchit evil-leader evil-commentary evil-collection emmet-mode doom-themes doom-modeline dockerfile-mode docker-compose-mode dap-mode counsel-projectile company-tabnine bm all-the-icons-ivy-rich all-the-icons-ivy all-the-icons-dired))
  '(safe-local-variable-values
-   '((pyvenv-activate . "/Users/darkawower/projects/pet/social-network-promotion")))
+   '((eval dap-register-debug-template "Second brain parser"
+           (list :type "node" :request "launch" :args
+                 ["/Users/darkawower/projects/pet/second-brain/second-brain-parser/src/index.ts"]
+                 :runtimeArgs
+                 ["--loader" "tsm"]
+                 :cwd "/Users/darkawower/projects/pet/second-brain/second-brain-parser" :outDir "/Users/darkawower/projects/pet/second-brain/second-brain-parser/dist" :sourceMap t :protocol "inspector" :name "Second brain parser"))
+     (pyvenv-activate . "/Users/darkawower/projects/pet/social-network-promotion")))
  '(wakatime-api-key "4ce27567-8d06-4cc2-b891-5e732e37b650")
  '(wakatime-cli-path "/opt/homebrew/bin/wakatime"))
 (custom-set-faces

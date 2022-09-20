@@ -213,7 +213,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
 ;;; Fonts
 
-(set-frame-font "JetBrainsMono Nerd Font 17" nil t)
+(set-frame-font "JetBrainsMono Nerd Font 15" nil t)
 (custom-set-faces
  `(font-lock-comment-face ((t (:font "ChalkBoard SE" :italic t :height 1.0))))
  `(font-lock-string-face ((t (:italic t :height 1.0)))))
@@ -262,16 +262,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (setq warning-minimum-level :emergency)
 (setq read-process-output-max (* 1024 1024))
 (setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
-(set-window-buffer nil (current-buffer))
-(setenv "zstd" "/usr/local/bin/zstd")
+;; (set-window-buffer nil (current-buffer))
+;; (setenv "zstd" "/usr/local/bin/zstd")
 
-(set-default-coding-systems 'utf-8)
-(set-selection-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-language-environment 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(setq locale-coding-system 'utf-8)
+;; (set-default-coding-systems 'utf-8)
+;; (set-selection-coding-system 'utf-8)
+;; (prefer-coding-system 'utf-8)
+;; (set-language-environment 'utf-8)
+;; (set-terminal-coding-system 'utf-8)
+;; (set-keyboard-coding-system 'utf-8)
+;; (setq locale-coding-system 'utf-8)
 
 
 
@@ -329,10 +329,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
                     (interactive)
                     (ivy-kill-whole-line)
                     (ivy--cd "~/")))
-         ("C-a" . (lambda ()
-                    (interactive)
-                    (ivy-kill-whole-line)
-                    (ivy--cd "~/org/")))
+         ;; ("C-a" . (lambda ()
+         ;;            (interactive)
+         ;;            (ivy-kill-whole-line)
+         ;;            (ivy--cd "~/org/")))
          ("C-r" . (lambda ()
                     (interactive)
                     (ivy-kill-whole-line)
@@ -437,7 +437,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; TODO: check problem with file corruption
 (use-package prettier
   :defer 1.5
-  :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-mode))
+  :hook ((typescript-tsx-mode js2-mode) . prettier-mode)
+  :config
+  ;; This should prevent reset of encoding
+  (defun custom-prettier ()
+    (interactive)
+    (when (member major-mode '(js2-mode typescript-mode ng2-html-mode vue-mode web-mode ng2-ts-mode))
+      (prettier-prettify)))
+  (add-hook 'before-save-hook #'custom-prettier t)
+  ;; :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-mode)
+  )
 
 ;; (use-package prettier-js
 ;;   :defer 0.3)
@@ -454,15 +463,41 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :bind (:map evil-normal-state-map
          ("SPC f ]" . flycheck-next-error)
          ("SPC f [" . flycheck-previous-error)))
+
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 ;; NOTE: this package is used instead of electric pair mode
 ;; cause its simple, and it works in all cases.
-(use-package autopair
-  :defer 5
-  :config
-  (autopair-global-mode))
+;; (use-package autopair
+;;   :defer 5
+;;   :config
+;;   (autopair-global-mode))
+(defun new-line-dwim ()
+  (interactive)
+  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
+                             (and (looking-back ">") (looking-at "<"))
+                             (and (looking-back "(") (looking-at ")"))
+                             (and (looking-back "\\[") (looking-at "\\]")))))
+    (newline)
+    (when break-open-pair
+      (save-excursion
+        (newline)
+        (indent-for-tab-command)))
+    (indent-for-tab-command)))
 
+(use-package electric
+  :defer
+  ;; :bind (:map evil-insert-state-map
+  ;;        ("RET" . new-line-dwim))
+  :config
+  (setq electric-pair-preserve-balance t
+        electric-pair-delete-adjacent-pairs nil
+        electric-pair-open-newline-between-pairs t)
+
+  ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
+  ;; NOTE: fix indent after electric pair appear
+  ;; BUG not work properly
+  (electric-pair-mode 1))
 
 ;;; Undo
 
@@ -474,9 +509,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 
   ;; Better contrasting highlight.
   (custom-set-faces
-    '(vundo-node ((t (:foreground "#808080"))))
-    '(vundo-stem ((t (:foreground "#808080"))))
-    '(vundo-highlight ((t (:foreground "#FFFF00")))))
+   '(vundo-node ((t (:foreground "#808080"))))
+   '(vundo-stem ((t (:foreground "#808080"))))
+   '(vundo-highlight ((t (:foreground "#FFFF00")))))
 
   ;; Use `HJKL` VIM-like motion, also Home/End to jump around.
   (define-key vundo-mode-map (kbd "l") #'vundo-forward)
@@ -633,7 +668,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ;; In case you want the details at startup like `dired'
   ;; (dirvish-hide-details nil)
   :config
-  (dirvish-peek-mode)
+  ;; (dirvish-peek-mode)
   (setq dired-kill-when-opening-new-dired-buffer t)
   (setq dirvish-reuse-session t)
   ;; Dired options are respected except a few exceptions, see *In relation to Dired* section above
@@ -695,18 +730,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; (setq dired-dwim-target t)
 ;; (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))
 
-;; (use-package ranger
-;;   :defer t
-;;   :bind (:map evil-normal-state-map
-;;          ("SPC r r" . ranger))
-;;   :config
-;;   (setq ranger-preview-file t)
-;;   (setq ranger-footer-delay 0.2)
-;;   (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
-;;   (setq ranger-show-literal t)
-;;   (setq ranger-dont-show-binary t)
-;;   (setq ranger-max-preview-size 10)
-;;   (setq ranger-preview-delay 0.040))
 
 
 ;;; Bookmarks
@@ -802,6 +825,11 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :hook (after-init . heaven-and-hell-init-hook)
   :bind (("<f5>" . heaven-and-hell-toggle-theme)))
 
+;; cursor
+(setq evil-normal-state-cursor '(box "#41a7fc")
+      evil-insert-state-cursor '(bar "#00AEE8")
+      evil-visual-state-cursor '(hollow "#c75ae8"))
+
 ;;;; Modeline
 ;; The most important package in the world
 (use-package nyan-mode
@@ -878,7 +906,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :bind (:map evil-normal-state-map
          ("SPC f n" . flycheck-next-error)
          ("g i" . lsp-goto-implementation)
-         ("SPC l a" . lsp-execute-code-action))
+         ("SPC l a" . lsp-execute-code-action)
+         ("SPC r l" . lsp))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.3)
@@ -920,18 +949,18 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq lsp-idle-delay 0.5
         lsp-enable-symbol-highlighting t
         lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-        lsp-pyls-plugins-flake8-enabled t)
+        lsp-pyls-plugins-flake8-enabled nil)
 
-  (lsp-register-custom-settings
-   '(("pyls.plugins.pyls_mypy.enabled" t t)
-     ("pyls.plugins.pyls_mypy.live_mode" nil t)
-     ("pyls.plugins.pyls_black.enabled" t t)
-     ("pyls.plugins.pyls_isort.enabled" t t)
+  ;; (lsp-register-custom-settings
+  ;;  '(("pyls.plugins.pyls_mypy.enabled" t t)
+  ;;    ("pyls.plugins.pyls_mypy.live_mode" nil t)
+  ;;    ("pyls.plugins.pyls_black.enabled" t t)
+  ;;    ("pyls.plugins.pyls_isort.enabled" t t)
 
-     ;; Disable these as they're duplicated by flake8
-     ("pyls.plugins.pycodestyle.enabled" nil t)
-     ("pyls.plugins.mccabe.enabled" nil t)
-     ("pyls.plugins.pyflakes.enabled" nil t)))
+  ;;    ;; Disable these as they're duplicated by flake8
+  ;;    ("pyls.plugins.pycodestyle.enabled" nil t)
+  ;;    ("pyls.plugins.mccabe.enabled" nil t)
+  ;;    ("pyls.plugins.pyflakes.enabled" nil t)))
   ;; (add-hook 'emacs-lisp-mode-hook #'(lambda ()
   ;;                                     (setq company-backends '(company-tabnine company-dabbrev))))
 
@@ -946,6 +975,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\pyenv\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
+  (set-face-attribute 'lsp-face-highlight-textual nil :background "#c0caf5")
   (setq lsp-eldoc-hook nil))
 
 
@@ -962,21 +992,23 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("SPC l r" . lsp-find-references))
   :config
   (setq lsp-ui-sideline-diagnostic-max-line-length 100
-        lsp-ui-sideline-diagnostic-max-lines 5
+        lsp-ui-sideline-diagnostic-max-lines 8
         lsp-ui-doc-delay 2
         lsp-ui-doc-position 'top
         lsp-ui-doc-show-with-mouse nil
         lsp-ui-doc-border +m-color-main))
 
 ;;;; Syntax highlight
-(use-package tree-sitter-langs
-  :defer 3)
+(use-package tree-sitter-langs)
 
 (use-package tree-sitter
   :after (tree-sitter-langs spell-fu)
   :hook ((go-mode typescript-mode css-mode typescript-tsx-mode html-mode scss-mode ng2-mode js-mode python-mode rust-mode ng2-ts-mode ng2-html-mode) . tree-sitter-hl-mode)
+  :init
+  (setq tsc-dyn-get-from nil)
   :config
-  (setq tsc-dyn-get-from '(:compilation))
+  (setq tsc-dyn-get-from '(:github))
+  (setq tsc-dyn-get-from nil)
   (advice-add 'tree-sitter-hl-mode :before 'my-set-spellfu-faces)
   (push '(ng2-html-mode . html) tree-sitter-major-mode-language-alist)
   (push '(ng2-ts-mode . typescript) tree-sitter-major-mode-language-alist)
@@ -1188,6 +1220,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (setq pytnon-indent-level 4)
   (add-hook 'python-mode-hook
             (lambda ()
+              (require 'lsp-pyright)
+              (lsp-deferred)
               (setq indent-tabs-mode nil)
               (setq tab-width 4))))
 
@@ -1297,7 +1331,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (dap-mode 1)
   (setq dap-auto-configure-features '(sessions locals))
-  (require 'dap-go))
+  (require 'dap-go)
+  (require 'dap-node))
 
 ;;; Infrastructure
 ;;;; Docker compose
@@ -1429,12 +1464,15 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (setq code-review-new-buffer-window-strategy #'switch-to-buffer))
 
-(use-package git-gutter
-  :defer 10
-  :init
-  (global-git-gutter-mode)
+(after! git-gutter
   (global-set-key (kbd "C-x p") 'git-gutter:previous-hunk)
   (global-set-key (kbd "C-x n") 'git-gutter:next-hunk))
+
+(after! git-gutter-fringe
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
+
 
 ;;; Blamer
 (use-package blamer
@@ -1849,7 +1887,7 @@ Version 2015-12-08"
   :defer t
   :bind (:map evil-normal-state-map
          ("SPC n p" . web-roam-publish-file)))
-  ;; :hook (org-mode . web-roam-sync-mode)
+;; :hook (org-mode . web-roam-sync-mode)
 
 ;;;; Org ligatures
 (add-hook 'org-mode-hook (lambda ()

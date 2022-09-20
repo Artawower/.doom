@@ -1,4 +1,4 @@
-personal_ws-1.1 en 240 
+personal_ws-1.1 en 249 
 AgGridColumn
 ApiHttpError
 AxiosInstance
@@ -52,6 +52,7 @@ autofixable
 autoscaler
 axios
 bool
+bson
 calc
 cdr
 cellValueChanged
@@ -122,6 +123,7 @@ langs
 languageByCode
 languageById
 languagesIdMap
+lexem
 loadReferencesIfNotExist
 loc
 matchLabels
@@ -133,6 +135,7 @@ middleware
 middlewares
 minNominalCost
 minPercentProfit
+mixins
 mnt
 mongo
 mountPath
@@ -192,15 +195,20 @@ targetPort
 termbase
 termbases
 testcafe
+tokenize
+tokenizer
 tooltip
 truthy
 tsconfig
+undisplayed
 uniorg
 uniquify
 uploaders
 upsert
+urlpatterns
 uuid
 validator
+validators
 valuegetter
 verifika
 viewport
@@ -237,5 +245,6 @@ wordforms
 wucuo
 yabai
 zettelkasten
+кастомного
 баг
 нативное

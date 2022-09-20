@@ -56,6 +56,7 @@
        treemacs          ; a project drawer, like neotree but cooler
        ;;unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
+       ;; (vc-gutter +diff-hl)
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        ;;window-select     ; visually switch windows
        workspaces        ; tab emulation, persistence & separate workspaces
@@ -96,7 +97,7 @@
        grammar           ; tasing grammar mistake every you make
 
        :tools
-       tree-sitter
+       ;; tree-sitter
        ;;ansible
        ;;debugger          ; FIXME stepping through code, to help you add bugs
        ;;direnv

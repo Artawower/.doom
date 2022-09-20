@@ -85,8 +85,13 @@
 (package! ng2-mode)
 
 ;;; Treesitter
-;; (package! tree-sitter)
-;; (package! tree-sitter-langs)
+;; (package! tree-sitter :pin "48b06796a3b2e76ce004972d929de38146eafaa0" :recipe (:host github :repo "emacs-tree-sitter/elisp-tree-sitter"))
+(package! tree-sitter)
+(package! tree-sitter-langs)
+;; (package! tree-sitter
+;;   :pin "c7a1c34549cad41a3618c6f17e0e9dabd3e98fe1")
+;; (package! tree-sitter-langs
+;;   :pin "e7b8db7c4006c04a4bc1fc6865ec31f223843192")
 (package! tree-edit)
 (package! evil-tree-edit)
 
