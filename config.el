@@ -58,7 +58,13 @@
 ;;; Variables
 ;;; Regexp for compilation and qucik error finding
 ;; (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
-(setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))) ;
+;; src/pages/MainPage/MainPage.tsx:18:18 - error TS2304: Cannot find name 'SocialMedia'.
+;; "1" means that the file name is matched by the first
+; subexpression : \\([_[:alnum:]-/]*.js\\). See
+; compilation-error-regexp-alist for the meaning of "2 3".
+;; (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)
+;;                                        ("^\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - error [A-Za-z[:space:]0-9:'.]*$" 1 2 3)))
+
 ;;;; Additional colors
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
@@ -437,12 +443,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; TODO: check problem with file corruption
 (use-package prettier
   :defer 1.5
-  :hook ((typescript-tsx-mode js2-mode) . prettier-mode)
+  :hook ((typescript-tsx-mode typescript-mode js2-mode) . prettier-mode)
   :config
   ;; This should prevent reset of encoding
   (defun custom-prettier ()
     (interactive)
-    (when (member major-mode '(js2-mode typescript-mode ng2-html-mode vue-mode web-mode ng2-ts-mode))
+    (when (member major-mode '(js2-mode typescript-mode typescript-tsx-mode ng2-html-mode vue-mode web-mode ng2-ts-mode))
       (prettier-prettify)))
   (add-hook 'before-save-hook #'custom-prettier t)
   ;; :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-mode)
@@ -468,36 +474,10 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 ;; NOTE: this package is used instead of electric pair mode
 ;; cause its simple, and it works in all cases.
-;; (use-package autopair
-;;   :defer 5
-;;   :config
-;;   (autopair-global-mode))
-(defun new-line-dwim ()
-  (interactive)
-  (let ((break-open-pair (or (and (looking-back "{") (looking-at "}"))
-                             (and (looking-back ">") (looking-at "<"))
-                             (and (looking-back "(") (looking-at ")"))
-                             (and (looking-back "\\[") (looking-at "\\]")))))
-    (newline)
-    (when break-open-pair
-      (save-excursion
-        (newline)
-        (indent-for-tab-command)))
-    (indent-for-tab-command)))
-
-(use-package electric
-  :defer
-  ;; :bind (:map evil-insert-state-map
-  ;;        ("RET" . new-line-dwim))
+(use-package autopair
+  :defer 5
   :config
-  (setq electric-pair-preserve-balance t
-        electric-pair-delete-adjacent-pairs nil
-        electric-pair-open-newline-between-pairs t)
-
-  ;; https://github.com/hlissner/doom-emacs/issues/1739#issuecomment-529858261
-  ;; NOTE: fix indent after electric pair appear
-  ;; BUG not work properly
-  (electric-pair-mode 1))
+  (autopair-global-mode))
 
 ;;; Undo
 
@@ -1128,7 +1108,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (setq typescript-indent-level 2)
   (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
-  (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))))
+  ;; (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)
+  ;;                                        ("\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$")))
+  )
 
 ;;;;; Angular
 (use-package ng2-mode
@@ -1424,13 +1406,16 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package magit
   :defer t
   :bind (:map magit-mode-map
-         ("s-<return>" . magit-diff-visit-file-worktree)
+         ("s-<return>" . magit-diff-visit-worktree-file)
          :map evil-normal-state-map
          ("SPC g i" . (lambda () (interactive) (wakatime-ui--clear-modeline) (magit-status))))
   :config
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
   (define-key transient-sticky-map "q" 'transient-quit-seq)
+  (add-hook 'magit-process-mode #'disable-magit-hooks)
+  (setcdr magit-process-mode-map (cdr (make-keymap)))
+  (set-keymap-parent magit-process-mode-map special-mode-map)
   (advice-add
    'ansi-color-apply-on-region
    :before
@@ -2142,3 +2127,12 @@ Version 2015-12-08"
             ["Complete symbol" completion-at-point
              :help "Complete symbol before point"]))
         map))
+
+(after! compile
+  (setq compilation-error-regexp-alist '())
+  (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+  (add-to-list 'compilation-error-regexp-alist '("\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))
+  ;; (setq compilation-error-regexp-alist '(("\\([_[:alnum:]-/.]*\\):\\([:digit:]+\\):\\([:digit:]+\\)" 1 2 3)))
+  (add-to-list 'compilation-error-regexp-alist-alist '(react "\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))
+  (add-to-list 'compilation-error-regexp-alist 'react))
+;; (add-to-list 'compilation-error-regexp-alist-alist '("^\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))

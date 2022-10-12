@@ -1,11 +1,12 @@
 # -*- mode: snippet -*-
 # name: prettier
-# key: prettier
+# key: pret
 # --
+
 {
   "trailingComma": "es5",
   "tabWidth": 2,
   "semi": true,
   "singleQuote": true,
-  "printWidth": 120,
+  "jsxSingleQuote": true
 }
