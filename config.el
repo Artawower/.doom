@@ -57,14 +57,6 @@
 (load! "~/.doom.d/private.el")
 ;;; Variables
 ;;; Regexp for compilation and qucik error finding
-;; (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
-;; src/pages/MainPage/MainPage.tsx:18:18 - error TS2304: Cannot find name 'SocialMedia'.
-;; "1" means that the file name is matched by the first
-; subexpression : \\([_[:alnum:]-/]*.js\\). See
-; compilation-error-regexp-alist for the meaning of "2 3".
-;; (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)
-;;                                        ("^\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - error [A-Za-z[:space:]0-9:'.]*$" 1 2 3)))
-
 ;;;; Additional colors
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
@@ -99,7 +91,7 @@
          (task-number (match-string 2 branch-name))
          (todo-msg (or task-number branch-name)))
     (insert (format "TODO: %s " todo-msg))
-    (comment-line 1)
+    (forward-line 1)
     (previous-line)
     (end-of-line)
     (evil-insert 1)))
@@ -136,7 +128,7 @@
 
 ;;;; Switch to first finded buffer
 (defun switch-to-first-matching-buffer (regex)
-  (switch-to-buffer (car (remove-if-not (apply-partially #'string-match-p regex)
+  (switch-to-buffer (car (cl-remove-if-not (apply-partially #'string-match-p regex)
                                         (mapcar #'buffer-name (buffer-list))))));;;
 (defun my-remove-cr (&optional begin end)
   "Remove line prefixes ending with carriage-return.
@@ -152,6 +144,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (interactive)
   (when (buffer-file-name)
     (kill-new (replace-regexp-in-string " " "\\\\\  " (file-name-directory (buffer-file-name))))))
+
+(defun my-copy-file-name ()
+  "Copy file name command to clipboard"
+  (interactive)
+  (when (buffer-file-name)
+    (kill-new (file-name-nondirectory (buffer-file-name)))))
 
 (defun my-copy-full-path ()
   "Copy full path till file to clipboard"
@@ -203,6 +201,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
            )))
      (forge--format repo "https://%h/%o/%n/blob/master/%f%L"
                     `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
+
 ;;;; My sass format
 (defun my-run-sass-auto-fix ()
   "Run sass auto fix if cli tool exist"
@@ -268,16 +267,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (setq warning-minimum-level :emergency)
 (setq read-process-output-max (* 1024 1024))
 (setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
-;; (set-window-buffer nil (current-buffer))
-;; (setenv "zstd" "/usr/local/bin/zstd")
 
-;; (set-default-coding-systems 'utf-8)
-;; (set-selection-coding-system 'utf-8)
-;; (prefer-coding-system 'utf-8)
-;; (set-language-environment 'utf-8)
-;; (set-terminal-coding-system 'utf-8)
-;; (set-keyboard-coding-system 'utf-8)
-;; (setq locale-coding-system 'utf-8)
 
 
 
@@ -289,40 +279,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer t)
 
 ;;; Centaur tabs
-;; (defun centaur-tabs-hide-tab (x)
-;;   (not (string-match "vterm" (format "%s" (format "%s" x)))))
-
-;; (use-package centaur-tabs
-;;   :defer 5
-;;   :bind (:map evil-normal-state-map
-;;          ("M-]" . centaur-tabs-forward)
-;;          ("M-[" . centaur-tabs-backward))
-;;   :hook ((vterm-mode vterm-toggle--mode) . centaur-tabs-local-mode)
-;;   :config
-;;   (centaur-tabs-mode t)
-;;   (setq centaur-tabs-height 46
-;;         centaur-tabs-style "bar"
-;;         centaur-tabs-set-icons t
-;;         centaur-tabs-set-modified-marker t
-;;         centaur-tabs-show-navigation-buttons t
-;;         centaur-tabs-set-bar 'under
-;;         x-underline-at-descent-line t)
-
-;;   ;; (defun centaur-tabs-buffer-groups ()
-;;   ;;   (list
-;;   ;;    (cond
-;;   ;;     ((string-match "vterm" (format "%s" (buffer-name))) "Emacs")
-;;   ;;     (t (centaur-tabs-get-group-name (current-buffer))))))
-
-;;   (defun my-show-only-vterm ()
-;;     (when (bound-and-true-p centaur-tabs-mode)
-;;           (if (string-match "vterm" (format "%s" (buffer-name)))
-;;               (unless centaur-tabs-local-mode
-;;                 (centaur-tabs-local-mode))
-;;             (centaur-tabs-local-mode nil))))
-
-;;   ;; (add-hook! 'window-configuration-change-hook 'my-show-only-vterm)
-;;   (add-hook! 'buffer-list-update-hook 'my-show-only-vterm))
 
 
 
@@ -330,39 +286,53 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package ivy
   :defer t
   :bind (:map ivy-mode-map
-         ("C-<return>" . ivy-immediate-done)
-         ("C-d" . (lambda ()
-                    (interactive)
-                    (ivy-kill-whole-line)
-                    (ivy--cd "~/")))
-         ;; ("C-a" . (lambda ()
-         ;;            (interactive)
-         ;;            (ivy-kill-whole-line)
-         ;;            (ivy--cd "~/org/")))
-         ("C-r" . (lambda ()
-                    (interactive)
-                    (ivy-kill-whole-line)
-                    (ivy--cd "/")))))
+              ("C-<return>" . ivy-immediate-done)
+              ("C-d" . (lambda ()
+                         (interactive)
+                         (ivy-kill-whole-line)
+                         (ivy--cd "~/")))
+              ;; ("C-a" . (lambda ()
+              ;;            (interactive)
+              ;;            (ivy-kill-whole-line)
+              ;;            (ivy--cd "~/org/")))
+              ("C-r" . (lambda ()
+                         (interactive)
+                         (ivy-kill-whole-line)
+                         (ivy--cd "/")))))
 
 (use-package ivy-rich
   :hook (ivy-mode . ivy-rich-mode)
   :after ivy
   :config)
 
+;; (use-package vertico
+;;   :defer t
+;;   :bind (:map vertico-map
+;;               ("C-d" . (lambda ()
+;;                          (interactive)
+;;                          (kill-whole-line)
+;;                          (insert "~/")
+;;                          ))
+;;               ("C-o" . (lambda ()
+;;                          (interactive)
+;;                          (embark-act)))
+;;               ("C-r" . (lambda ()
+;;                          (interactive)
+;;                          (kill-whole-line)
+;;                          (insert "/")))))
+
 (use-package counsel-projectile
   :defer 0.5
   :config
   (add-to-list 'projectile-globally-ignored-directories "node_modules"))
 
-;; (use-package all-the-icons-ivy-rich
-;;   :defer 0.5)
 (defun @ivy-rich-prettify-file-search ()
   (let* ((col-def '((all-the-icons-ivy-rich-file-icon)
-                    (file-name-nondirectory (:width 0.2 :face (:foreground "#61AFEF" :slant 'italic)))
+                    (file-name-nondirectory (:width 0.2 :face (:foreground "#61AFEF" :slant italic)))
                     ((lambda (str) (string-join (butlast (split-string (counsel-projectile-find-file-transformer str) "/")) "/")) (:width 0.4))
                     ;; (counsel-projectile-find-file-transformer (:width 0.4))
                     (all-the-icons-ivy-rich-project-file-size (:width 7 :face all-the-icons-ivy-rich-size-face))
-                    (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-file-modes-face))
+                    (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-doc-face))
                     (all-the-icons-ivy-rich-project-file-id (:width 12 :face all-the-icons-ivy-rich-file-owner-face))
                     (all-the-icons-ivy-rich-project-file-modification-time (:face all-the-icons-ivy-rich-time-face)))))
     (set-face-attribute 'all-the-icons-ivy-rich-doc-face nil :font "ChalkBoard SE 13" :italic t :height 136)
@@ -383,42 +353,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
               (plist-get info :posframe-width))
            2)
         40))
-
-(use-package ivy-posframe
-  :after ivy
-  :disabled t
-  :custom-face
-  (ivy-posframe-border ((t (:background ,+m-color-main))))
-  :init
-  (ivy-posframe-mode 1)
-  :config
-  (setq ivy-posframe-parameters '((internal-border-width . 20) (left-fringe . 18) (right-fringe . 18))
-        ivy-posframe-height 14
-        ;; ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
-        ;; ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
-                                        ; ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
-        ivy-posframe-font "JetBrainsMono Nerd Font Mono Bold 13")
-  ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
-  (defun ivy-posframe-get-size ()
-    "Func for detect ivy posframe size after resize dynamically"
-    (list
-     ;; :height ivy-posframe-height
-     ;; :width ivy-posframe-width
-     :min-height (or ivy-posframe-min-height
-                     (let ((height (+ ivy-height 1)))
-                       (min height (or ivy-posframe-height height))
-                       ))
-     :min-width (or ivy-posframe-min-width
-                    (let ((width (round (* (frame-width) 0.9))))
-                      (min width (or ivy-posframe-width width))
-                      ))))
-
-
-
-  (defun ivy-posframe-display-at-frame-top-center-with-offset (str)
-    (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
-
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center-with-offset))))
 
 ;;; Formatter
 ;; Improve counsel search (async)
@@ -443,7 +377,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;; TODO: check problem with file corruption
 (use-package prettier
   :defer 1.5
-  :hook ((typescript-tsx-mode typescript-mode js2-mode) . prettier-mode)
+  ;; :hook ((typescript-tsx-mode typescript-mode js2-mode) . prettier-mode)
   :config
   ;; This should prevent reset of encoding
   (defun custom-prettier ()
@@ -455,9 +389,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   )
 
 ;; (use-package prettier-js
-;;   :defer 0.3)
+;;   :defer 0.3
 ;; :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-js-mode))
-;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode) . prettier-js-mode)
 
 
 
@@ -467,8 +400,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package flycheck
   :defer 2
   :bind (:map evil-normal-state-map
-         ("SPC f ]" . flycheck-next-error)
-         ("SPC f [" . flycheck-previous-error)))
+              ("SPC f ]" . flycheck-next-error)
+              ("SPC f [" . flycheck-previous-error)))
 
 ;;; Smartparens
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
@@ -539,7 +472,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
                                        '(diredfl-file-name))))
 (use-package spell-fu
   :bind (:map evil-normal-state-map
-         ("z g" . spell-fu-word-add))
+              ("z g" . spell-fu-word-add))
   :defer 1
   :config
   (setq ispell-program-name "aspell")
@@ -595,15 +528,22 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (global-spell-fu-mode)
   (my-set-spellfu-faces))
 
+;;;; Grammarly
 
+(use-package lsp-grammarly
+  :defer t
+  :ensure t
+  :hook (text-mode . (lambda ()
+                       (require 'lsp-grammarly)
+                       (lsp-deferred))))
 ;;; Folding
 ;;;; Html
 (use-package origami
   :defer 2
   :bind (:map evil-normal-state-map
-         ("SPC z a" . origami-toggle-node)
-         ("SPC z r" . origami-open-all-nodes)
-         ("SPC z m" . origami-close-all-node))
+              ("SPC z a" . origami-toggle-node)
+              ("SPC z r" . origami-open-all-nodes)
+              ("SPC z m" . origami-close-all-node))
   :hook ((ng2-html-mode html-mode) . origami-mode))
 ;;;; Outline
 (use-package outline-minor-faces
@@ -614,9 +554,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; File managers
 ;;;; treemacs
 (use-package treemacs
-  :defer 10
+  :defer t
   :bind (:map treemacs-mode-map
-         ("@" . evil-execute-macro))
+              ("@" . evil-execute-macro))
   :custom-face
   (font-lock-doc-face ((t (:inherit nil))))
   (doom-themes-treemacs-file-face ((t (:inherit font-lock-doc-face :slant italic))))
@@ -701,15 +641,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
    ("M-e" . dirvish-emerge-menu)
    ("M-j" . dirvish-fd-jump)))
 
-;; (setq dired-kill-when-opening-new-dired-buffer t) ;; added in emacs 28
-;; (setq dired-clean-confirm-killing-deleted-buffers nil)
-;; (setq large-file-warning-threshold 50000000)
-;; (setq dired-recursive-copies 'always)
-;; (setq dired-recursive-deletes 'always)
-;; (setq delete-by-moving-to-trash t)
-;; (setq dired-dwim-target t)
-;; (setq dired-listing-switches "-AGhlv --group-directories-first --time-style=long-iso"))
-
 
 
 ;;; Bookmarks
@@ -741,23 +672,23 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package vterm-toggle
   :defer 10
   :bind (:map evil-normal-state-map
-         ("SPC t ]" . vterm-toggle-forward)
-         ("SPC t [" . vterm-toggle-backward)
-         ("SPC t n" . (lambda () (interactive)
-                        (let ((current-buffer-name (buffer-name)))
-                          (vterm-toggle--new)
-                          (delete-window)
-                          (display-buffer current-buffer-name)
-                          (vterm-toggle-forward))))
-         ("SPC t x" . (lambda (args) (interactive "P")
-                        (when (string-match "vterm" (buffer-name))
-                          (let ((kill-buffer-query-functions nil))
-                            (kill-this-buffer)
-                            (+vterm/toggle args)))))
-         ("SPC o h" . (lambda () (interactive)
-                        (+vterm/toggle t)))
-         ("SPC t h" . vterm-toggle-hide)
-         ("SPC t k" . my-open-kitty-right-here))
+              ("SPC t ]" . vterm-toggle-forward)
+              ("SPC t [" . vterm-toggle-backward)
+              ("SPC t n" . (lambda () (interactive)
+                             (let ((current-buffer-name (buffer-name)))
+                               (vterm-toggle--new)
+                               (delete-window)
+                               (display-buffer current-buffer-name)
+                               (vterm-toggle-forward))))
+              ("SPC t x" . (lambda (args) (interactive "P")
+                             (when (string-match "vterm" (buffer-name))
+                               (let ((kill-buffer-query-functions nil))
+                                 (kill-this-buffer)
+                                 (+vterm/toggle args)))))
+              ("SPC o h" . (lambda () (interactive)
+                             (+vterm/toggle t)))
+              ("SPC t h" . vterm-toggle-hide)
+              ("SPC t k" . my-open-kitty-right-here))
   :config
   (setq vterm-kill-buffer-on-exit nil)
   (setq vterm-toggle-scope 'project))
@@ -860,16 +791,6 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;; Programming
 ;; Common configurations for all programming languages
 ;;;; Lsp
-
-
-;; Don't work, and sometime call the big delay
-;; (use-package lsp-sonarlint
-;;   :config
-;;   (require 'lsp-sonarlint-typescript)
-;;   (require 'lsp-sonarlint-python)
-;;   (setq lsp-sonarlint-typescript-enabled t)
-;;   (setq lsp-sonarlint-python-enabled t))
-
 (use-package lsp
   :hook ((clojure-mode
           scss-mode
@@ -882,12 +803,13 @@ BEGIN END specifies region, otherwise works on entire buffer."
           ng2-html-mode
           ng2-ts-mode
           python-mode
+          dart-mode
           typescript-tsx-mode) . lsp-deferred)
   :bind (:map evil-normal-state-map
-         ("SPC f n" . flycheck-next-error)
-         ("g i" . lsp-goto-implementation)
-         ("SPC l a" . lsp-execute-code-action)
-         ("SPC r l" . lsp))
+              ("SPC f n" . flycheck-next-error)
+              ("g i" . lsp-goto-implementation)
+              ("SPC l a" . lsp-execute-code-action)
+              ("SPC r l" . lsp))
   :custom
   (lsp-headerline-breadcrumb-enable nil)
   (lsp-idle-delay 0.3)
@@ -898,10 +820,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
-  ;; (setq lsp-enable-file-watchers t)
   (setq lsp-enable-file-watchers nil)
   (setq lsp-file-watch-threshold 5000)
-  ;; (lsp-yaml-schemas '(:kubernetes "/.yaml" :kubernetes "/*.yml"))
   :config
   (setq lsp-javascript-display-return-type-hints t)
   (setq lsp-json-schemas
@@ -931,32 +851,30 @@ BEGIN END specifies region, otherwise works on entire buffer."
         lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
         lsp-pyls-plugins-flake8-enabled nil)
 
-  ;; (lsp-register-custom-settings
-  ;;  '(("pyls.plugins.pyls_mypy.enabled" t t)
-  ;;    ("pyls.plugins.pyls_mypy.live_mode" nil t)
-  ;;    ("pyls.plugins.pyls_black.enabled" t t)
-  ;;    ("pyls.plugins.pyls_isort.enabled" t t)
-
-  ;;    ;; Disable these as they're duplicated by flake8
-  ;;    ("pyls.plugins.pycodestyle.enabled" nil t)
-  ;;    ("pyls.plugins.mccabe.enabled" nil t)
-  ;;    ("pyls.plugins.pyflakes.enabled" nil t)))
-  ;; (add-hook 'emacs-lisp-mode-hook #'(lambda ()
-  ;;                                     (setq company-backends '(company-tabnine company-dabbrev))))
-
-
-  ;; (setq +lsp-company-backends '(company-tabnine company-capf))
-  ;; (setq company-backends '((company-tabnine :separate company-capf)))
-  ;;
-  ;; (setq +lsp-company-backends '(company-dabbrev company-capf))
-  ;; (setq company-backends '((company-dabbrev company-capf)))
-
   (setq lsp-disabled-clients '(html html-ls))
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\venv\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\pyenv\\'")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.cache\\'")
   (set-face-attribute 'lsp-face-highlight-textual nil :background "#c0caf5")
   (setq lsp-eldoc-hook nil))
+
+
+(use-package lsp-dart
+  :defer t
+  ;; :config
+  ;; (defun lsp-dart-flutter-widget-guide--add-overlay-to (buffer line col string)
+  ;;   "Add to BUFFER at LINE and COL a STRING overlay."
+  ;;   (save-excursion
+  ;;     (goto-char (point-min))
+  ;;     (forward-line line)
+  ;;     (move-to-column col)
+  ;;     (when (string= lsp-dart-flutter-widget-guide-space (string (following-char)))
+  ;;       (message "NEED TO LINE")
+  ;;       (let ((ov (make-overlay (point) (1+ (point)) buffer)))
+  ;;         (overlay-put ov 'category 'lsp-dart-flutter-widget-guide)
+  ;;         (overlay-put ov 'display (propertize string
+  ;;                                              'face 'lsp-dart-test-tree-passed-face))))))
+  )
 
 
 (use-package lsp-yaml
@@ -969,7 +887,8 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :after lsp-mode
   :hook (lsp-mode . lsp-ui-mode)
   :bind (:map evil-normal-state-map
-         ("SPC l r" . lsp-find-references))
+              ("SPC l r" . lsp-find-references)
+              ("SPC l w" . lsp-restart-workspace))
   :config
   (setq lsp-ui-sideline-diagnostic-max-line-length 100
         lsp-ui-sideline-diagnostic-max-lines 8
@@ -1014,7 +933,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
                          (evil-normal-state))))
   :config
   (setq company-idle-delay 0.2)
-  (setq company-show-numbers nil)
+  (setq company-show-quick-access nil)
   (setq company-quick-access-modifier 'super)
   (setq company-show-quick-access t)
   (setq company-minimum-prefix-length 1)
@@ -1031,7 +950,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   ("s-j" . copilot-complete)
   ("s-;" . copilot-accept-completion-by-word)
   ;; :custom
-  ;; (copilot-idle-delay 0.05)
+  ;; (copilot-idle-delay 0.5)
   :config
   (setq copilot--previous-point nil)
   (setq copilot--previous-window-width nil)
@@ -1107,10 +1026,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 10
   :config
   (setq typescript-indent-level 2)
-  (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode))
-  ;; (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)
-  ;;                                        ("\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$")))
-  )
+  (add-to-list 'auto-mode-alist '("\.ts\'" . typescript-mode)))
 
 ;;;;; Angular
 (use-package ng2-mode
@@ -1138,8 +1054,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
           "--tsProbeLocations"
           ;; "/usr/local/lib/node_modules"
           "/opt/homebrew/lib/node_modules"
-          "--stdio"))
-  (setq compilation-error-regexp-alist '(("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))))
+          "--stdio")))
 
 
 ;;;; Javascript
@@ -1158,14 +1073,14 @@ BEGIN END specifies region, otherwise works on entire buffer."
 (use-package rustic
   :defer t
   :bind (:map rustic-mode-map
-         ("M-j" . lsp-ui-imenu)
-         ("M-?" . lsp-find-references)
-         ("C-c C-c l" . flycheck-list-errors)
-         ("C-c C-c a" . lsp-execute-code-action)
-         ("C-c C-c r" . lsp-rename)
-         ("C-c C-c q" . lsp-workspace-restart)
-         ("C-c C-c Q" . lsp-workspace-shutdown)
-         ("C-c C-c s" . lsp-rust-analyzer-status))
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
   :config
   ;; uncomment for less flashiness
   ;; (setq lsp-eldoc-hook nil)
@@ -1274,8 +1189,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
       (let ((default-directory (file-name-directory buffer-file-name)))
         (async-shell-command "sass-lint-auto-fix")
         ;; (revert-buffer-no-confirm)
-        (message "SASS FORMATTED")
-        )))
+        (message "SASS FORMATTED"))))
   ;; (add-hook 'scss-mode-hook '(lambda () (add-hook 'after-save-hook #'run-sass-auto-fix t t)))
   (add-hook 'scss-mode-hook '(lambda () (add-hook 'before-save-hook #'format-all-buffer nil t))))
 
@@ -1287,30 +1201,41 @@ BEGIN END specifies region, otherwise works on entire buffer."
 ;;;; Lua
 (use-package lua-mode
   :defer t)
+;;;; Flutter
+(use-package dart-mode
+  ;; Optional
+  :hook (dart-mode . flutter-test-mode))
+
+(use-package flutter
+  :after dart-mode
+  :bind (:map dart-mode-map
+              ("C-c C-r" . #'flutter-run-or-hot-reload))
+  :custom
+  (flutter-sdk-path "/Applications/flutter/"))
 
 ;;;; Debug
 (use-package dap-mode
   :defer 3
   :bind (:map evil-normal-state-map
-         ("SPC d n" . dap-next)
-         ("SPC d i" . dap-step-in)
-         ("SPC d o" . dap-step-out)
-         ("SPC d c" . dap-continue)
-         ("SPC d Q" . dap-disconnect)
-         ("SPC d q" . dap-disconnect)
-         ("SPC d d" . (lambda () (interactive)
-                        (call-interactively #'dap-debug)
-                        (set-window-buffer nil (current-buffer))))
-         ("SPC d r" . dap-debug-recent)
-         ("SPC d l" . dap-ui-locals)
-         ("SPC d b" . dap-ui-breakpoints)
-         ("SPC d s" . dap-ui-sessions)
-         ("SPC d e" . dap-debug-last)
-         ("SPC d p" . (lambda () (interactive)
-                        (set-window-buffer nil (current-buffer))
-                        (dap-breakpoint-toggle)))
-         ("SPC d e" . dap-debug-edit-template))
-  :config
+              ("SPC d n" . dap-next)
+              ("SPC d i" . dap-step-in)
+              ("SPC d o" . dap-step-out)
+              ("SPC d c" . dap-continue)
+              ("SPC d Q" . dap-disconnect)
+              ("SPC d q" . dap-disconnect)
+              ("SPC d d" . (lambda () (interactive)
+                             (call-interactively #'dap-debug)
+                             (set-window-buffer nil (current-buffer))))
+              ("SPC d r" . dap-debug-recent)
+              ("SPC d l" . dap-ui-locals)
+              ("SPC d b" . dap-ui-breakpoints)
+              ("SPC d s" . dap-ui-sessions)
+              ("SPC d e" . dap-debug-last)
+              ("SPC d p" . (lambda () (interactive)
+                             (set-window-buffer nil (current-buffer))
+                             (dap-breakpoint-toggle)))
+              ("SPC d e" . dap-debug-edit-template))
+  :init
   (dap-mode 1)
   (setq dap-auto-configure-features '(sessions locals))
   (require 'dap-go)
@@ -1332,17 +1257,12 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer t
   :config)
 
-;;;; Nginx
-;; (use-package company-nginx
-;;   :after nginx-mode
-;;   :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
-
 ;;;; Kuber
 (use-package kubernetes
   :defer 6
   :commands (kubernetes-overview)
   :bind (:map evil-normal-state-map
-         ("SPC o K" . kubernetes-overview))
+              ("SPC o K" . kubernetes-overview))
   :config
   (setq kubernetes-poll-frequency 3600
         kubernetes-redraw-frequency 3600))
@@ -1391,9 +1311,9 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :defer 30
   :bind
   (:map google-translate-minibuffer-keymap
-   ("C-k" . google-translate-next-translation-direction)
-   ("C-n" . google-translate-next-translation-direction)
-   ("C-l" . google-translate-next-translation-direction))
+        ("C-k" . google-translate-next-translation-direction)
+        ("C-n" . google-translate-next-translation-direction)
+        ("C-l" . google-translate-next-translation-direction))
   :config
   (require 'google-translate-smooth-ui)
   (setq google-translate-backend-method 'curl)
@@ -1409,11 +1329,14 @@ BEGIN END specifies region, otherwise works on entire buffer."
          ("s-<return>" . magit-diff-visit-worktree-file)
          :map evil-normal-state-map
          ("SPC g i" . (lambda () (interactive) (wakatime-ui--clear-modeline) (magit-status))))
+  :hook
+  (magit-process-mode . compilation-minor-mode)
   :config
   (define-key transient-map        "q" 'transient-quit-one)
   (define-key transient-edit-map   "q" 'transient-quit-one)
   (define-key transient-sticky-map "q" 'transient-quit-seq)
   (add-hook 'magit-process-mode #'disable-magit-hooks)
+  ;; (add-hook 'magit-process-mode-hook #'compilation-mode)
   (setcdr magit-process-mode-map (cdr (make-keymap)))
   (set-keymap-parent magit-process-mode-map special-mode-map)
   (advice-add
@@ -1441,7 +1364,7 @@ BEGIN END specifies region, otherwise works on entire buffer."
   :config
   (setq auth-sources '("~/.authinfo"))
   (push `(,+m-work-gitlab-url ,(concat +m-work-gitlab-url "/api/v4")
-                              "gpalex" forge-gitlab-repository)
+          "gpalex" forge-gitlab-repository)
         forge-alist))
 
 (use-package code-review
@@ -1588,8 +1511,8 @@ Version 2015-12-08"
 (use-package avy
   :defer t
   :bind (:map evil-normal-state-map
-         ("SPC k l" . avy-kill-whole-line)
-         ("SPC k r" . avy-kill-region))
+              ("SPC k l" . avy-kill-whole-line)
+              ("SPC k r" . avy-kill-region))
   :custom
   (avy-single-candidate-jump t)
   (avy-keys '(?w ?e ?r ?t ?y ?u ?i ?o ?p ?a ?s ?d ?f ?g ?h ?j ?k ?l ?z ?x ?c ?v ?b ?n ?m)))
@@ -1633,9 +1556,9 @@ Version 2015-12-08"
          ("s-Y" . xah-copy-to-register-1)
          ("s-P" . xah-paste-from-register-1)
          ("s-." . ace-window)
-         :map ivy-mode-map
-         ("s-Y" . xah-copy-to-register-1)
-         ("s-P" . xah-paste-from-register-1))
+                                        :map ivy-mode-map
+                                        ("s-Y" . xah-copy-to-register-1)
+                                        ("s-P" . xah-paste-from-register-1))
   :init
   (global-evil-leader-mode)
   :config
@@ -1698,8 +1621,8 @@ Version 2015-12-08"
   :defer t
   ;; :demand t
   :bind (:map evil-normal-state-map
-         ("SPC h ]" . org-next-visible-heading)
-         ("SPC h [" . org-previous-visible-heading))
+              ("SPC h ]" . org-next-visible-heading)
+              ("SPC h [" . org-previous-visible-heading))
   :config
   (progn
     (define-key org-mode-map "\C-x a f" "\C-x h \C-M-\\ \C-c")
@@ -1845,7 +1768,7 @@ Version 2015-12-08"
   :init
   (setq org-roam-v2-ack t)
   :config
-  (org-roam-setup)
+  (org-roam-db-autosync-enable)
   (cl-defmethod org-roam-node-mtitle ((node org-roam-node))
     "Return customized title of roam node"
     (let* ((tags (org-roam-node-tags node))
@@ -1854,7 +1777,7 @@ Version 2015-12-08"
           title
         (setq joined-text (string-join tags ", "))
         (concat (propertize (format "(%s) " joined-text) 'face `(:foreground ,+m-color-main :weight bold :slant italic)) title))))
-  (setq org-roam-completion-system 'ivy)
+  (setq org-roam-completion-system 'vertico)
   (setq org-roam-node-display-template "${mtitle:100}")
   (setq org-roam-directory (file-truename "~/org-roam"))
   (org-roam-db-autosync-mode))
@@ -1871,7 +1794,7 @@ Version 2015-12-08"
 (use-package! web-roam
   :defer t
   :bind (:map evil-normal-state-map
-         ("SPC n p" . web-roam-publish-file)))
+              ("SPC n p" . web-roam-publish-file)))
 ;; :hook (org-mode . web-roam-sync-mode)
 
 ;;;; Org ligatures
@@ -1937,8 +1860,6 @@ Version 2015-12-08"
 (defun format-org-mode-block ()
   "Format org mode code block"
   (interactive "p")
-  ;; (execute-kbd-macro (kbd "C-c ' C-x h C-M-\\ C-c '"))
-  ;; (execute-kbd-macro (read-kbd-macro "C-c ' C-x h C-M-\\ C-c '"))
   (org-edit-special)
   (format-all-ensure-formatter)
   (format-all-buffer)
@@ -2128,11 +2049,41 @@ Version 2015-12-08"
              :help "Complete symbol before point"]))
         map))
 
-(after! compile
+(defun compile-eslint--find-filename ()
+  "Find the filename for current error."
+  (save-match-data
+    (save-excursion
+      (when (re-search-backward (rx bol (group "/" (+ any)) eol))
+        (list (match-string 1))))))
+
+(use-package compile
+  :defer 5
+  :config
+  (setq compilation-scroll-output t)
   (setq compilation-error-regexp-alist '())
-  (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
-  (add-to-list 'compilation-error-regexp-alist '("\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))
-  ;; (setq compilation-error-regexp-alist '(("\\([_[:alnum:]-/.]*\\):\\([:digit:]+\\):\\([:digit:]+\\)" 1 2 3)))
-  (add-to-list 'compilation-error-regexp-alist-alist '(react "\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))
-  (add-to-list 'compilation-error-regexp-alist 'react))
-;; (add-to-list 'compilation-error-regexp-alist-alist '("^\\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\) - [A-Za-z[:space:]0-9:'.]*$" 1 2 3))
+  (setq compilation-error-regexp-alist-alist '())
+
+
+  ;; eslint https://github.com/Fuco1/compile-eslint/blob/master/compile-eslint.el
+  (when (not compilation-error-regexp-alist-alist)
+    (setq compilation-error-regexp-alist-alist '()))
+
+  (let ((form `(eslint
+                ,(rx-to-string
+                  '(and (group (group (+ digit)) ":" (group (+ digit)))
+                        (+ " ") (or "error" "warning")))
+                compile-eslint--find-filename
+                2 3 2 1)))
+
+    (if (assq 'eslint compilation-error-regexp-alist-alist)
+        (setf (cdr (assq 'eslint compilation-error-regexp-alist-alist)) (cdr form))
+      (push form compilation-error-regexp-alist-alist)))
+  (push 'eslint compilation-error-regexp-alist)
+
+
+
+  (add-to-list 'compilation-error-regexp-alist '("^[[:blank:]]*\\([/_-\\.[:alnum:]]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\) - error.*$" 1 2 3))
+  ;; React
+  (add-to-list 'compilation-error-regexp-alist '("[[:blank:]]*\\([/_\\.[:alnum:]-]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\) - error.*$" 1 2 3))
+  ;; Angular
+  (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)))

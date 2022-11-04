@@ -75,6 +75,7 @@
 ;;; Lsp
 ;; (package! lsp-mode)
 (package! lsp-ui)
+(package! lsp-dart)
 ;; (package! lsp-sonarlint)
 ;; (package! exec-path-from-shell)
 
@@ -96,6 +97,9 @@
 (package! evil-tree-edit)
 
 ;;; Languages
+;;;; Flutter
+(package! flutter)
+(package! dart-mode)
 ;;;; CLojure
 (package! cider)
 
@@ -133,6 +137,8 @@
 ;;; Performance bench
 (package! explain-pause-mode :recipe (:host github :repo "lastquestion/explain-pause-mode"))
 
+;;; Compile
+;; (package! compile-eslint :recipe (:host github :repo "Fuco1/compile-eslint" :files ("compile-eslint.el")))
 ;;; Markup
 (package! pug-mode)
 (package! auto-rename-tag)
@@ -278,7 +284,7 @@
 ;; (package! shikimori :recipe (:host nil :repo "https://git.sr.ht/~akagi/shikimori.el"))
 
 ;; (package! xwidgets-reuse)
-;; (package! lsp-grammarly)
+(package! lsp-grammarly)
 
 ;; (package! modus-themes)
 

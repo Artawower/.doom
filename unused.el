@@ -8,8 +8,45 @@
   (setq org-fancy-priorities-list '("⚡" "⬆" "■" "⬇" "❓")))
 
 
+;;; Ivy
 (use-package lsp-ivy
   :after lsp)
+
+(use-package ivy-posframe
+  :after ivy
+  :disabled t
+  :custom-face
+  (ivy-posframe-border ((t (:background ,+m-color-main))))
+  :init
+  (ivy-posframe-mode 1)
+  :config
+  (setq ivy-posframe-parameters '((internal-border-width . 20) (left-fringe . 18) (right-fringe . 18))
+        ivy-posframe-height 14
+        ;; ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ;; ivy-posframe-display-functions-alist '((t . posframe-poshandler-top-center-with-offset))
+                                        ; ivy-posframe-font "JetBrainsMonoExtraBold Nerd Font Mono 13")
+        ivy-posframe-font "JetBrainsMono Nerd Font Mono Bold 13")
+  ;; ivy-posframe-font "JetBrainsMono Nerd Font 13")
+  (defun ivy-posframe-get-size ()
+    "Func for detect ivy posframe size after resize dynamically"
+    (list
+     ;; :height ivy-posframe-height
+     ;; :width ivy-posframe-width
+     :min-height (or ivy-posframe-min-height
+                     (let ((height (+ ivy-height 1)))
+                       (min height (or ivy-posframe-height height))
+                       ))
+     :min-width (or ivy-posframe-min-width
+                    (let ((width (round (* (frame-width) 0.9))))
+                      (min width (or ivy-posframe-width width))
+                      ))))
+
+
+
+  (defun ivy-posframe-display-at-frame-top-center-with-offset (str)
+    (ivy-posframe--display str #'posframe-poshandler-frame-top-center-with-offset))
+
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center-with-offset))))
 
 ;; Completion
 (use-package corfu
@@ -750,3 +787,55 @@
 ;;   (setq ranger-dont-show-binary t)
 ;;   (setq ranger-max-preview-size 10)
 ;;   (setq ranger-preview-delay 0.040))
+
+
+
+;; Don't work, and sometime call the big delay
+(use-package lsp-sonarlint
+  :config
+  (require 'lsp-sonarlint-typescript)
+  (require 'lsp-sonarlint-python)
+  (setq lsp-sonarlint-typescript-enabled t)
+  (setq lsp-sonarlint-python-enabled t))
+
+;;; Centaurs tabs
+(defun centaur-tabs-hide-tab (x)
+  (not (string-match "vterm" (format "%s" (format "%s" x)))))
+
+(use-package centaur-tabs
+  :defer 5
+  :bind (:map evil-normal-state-map
+         ("M-]" . centaur-tabs-forward)
+         ("M-[" . centaur-tabs-backward))
+  :hook ((vterm-mode vterm-toggle--mode) . centaur-tabs-local-mode)
+  :config
+  (centaur-tabs-mode t)
+  (setq centaur-tabs-height 46
+        centaur-tabs-style "bar"
+        centaur-tabs-set-icons t
+        centaur-tabs-set-modified-marker t
+        centaur-tabs-show-navigation-buttons t
+        centaur-tabs-set-bar 'under
+        x-underline-at-descent-line t)
+
+  ;; (defun centaur-tabs-buffer-groups ()
+  ;;   (list
+  ;;    (cond
+  ;;     ((string-match "vterm" (format "%s" (buffer-name))) "Emacs")
+  ;;     (t (centaur-tabs-get-group-name (current-buffer))))))
+
+  (defun my-show-only-vterm ()
+    (when (bound-and-true-p centaur-tabs-mode)
+          (if (string-match "vterm" (format "%s" (buffer-name)))
+              (unless centaur-tabs-local-mode
+                (centaur-tabs-local-mode))
+            (centaur-tabs-local-mode nil))))
+
+  ;; (add-hook! 'window-configuration-change-hook 'my-show-only-vterm)
+  (add-hook! 'buffer-list-update-hook 'my-show-only-vterm))
+
+
+;;;; Nginx company
+(use-package company-nginx
+  :after nginx-mode
+  :config (add-hook 'nginx-mode-hook (lambda () (add-to-list 'company-backends #'company-nginx))))
