@@ -173,7 +173,7 @@
 (package! vundo)
 (package! undo-fu-session)
 (package! undo-tree :disable t)
-;; (unpin! undo-tree)
+(unpin! undo-tree)
 ;; (package! undo-tree)
 
 (package! package-lint)
@@ -203,9 +203,9 @@
 ;; (package! company-box)
 (package! quicktype :recipe (:host github :repo "artawower/quicktype.el"))
 (package! origami)
-;; (package! ivy
-;;   :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
-;;   :recipe (:host github :repo "abo-abo/swiper"))
+(package! ivy
+  :pin "487e97a94a49ededc2485d845cc912a893e8cc72"
+  :recipe (:host github :repo "abo-abo/swiper"))
 
 ;; TMP
 ;; Not its not so usefull like company mode. But performance is totally better!

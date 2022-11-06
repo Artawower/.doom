@@ -9,60 +9,6 @@
 
 
 ;;; Ivy
-(use-package ivy
-  :defer t
-  :bind (:map ivy-mode-map
-              ("C-<return>" . ivy-immediate-done)
-              ("C-d" . (lambda ()
-                         (interactive)
-                         (ivy-kill-whole-line)
-                         (ivy--cd "~/")))
-              ;; ("C-a" . (lambda ()
-              ;;            (interactive)
-              ;;            (ivy-kill-whole-line)
-              ;;            (ivy--cd "~/org/")))
-              ("C-r" . (lambda ()
-                         (interactive)
-                         (ivy-kill-whole-line)
-                         (ivy--cd "/"))))
-
-             ("s-Y" . xah-copy-to-register-1)
-             ("s-P" . xah-paste-from-register-1)
-)
-
-(defun @ivy-rich-prettify-file-search ()
-  (let* ((col-def '((all-the-icons-ivy-rich-file-icon)
-                    (file-name-nondirectory (:width 0.2 :face (:foreground "#61AFEF" :slant italic)))
-                    ((lambda (str) (string-join (butlast (split-string (counsel-projectile-find-file-transformer str) "/")) "/")) (:width 0.4))
-                    ;; (counsel-projectile-find-file-transformer (:width 0.4))
-                    (all-the-icons-ivy-rich-project-file-size (:width 7 :face all-the-icons-ivy-rich-size-face))
-                    (all-the-icons-ivy-rich-project-file-modes (:width 12 :face all-the-icons-ivy-rich-doc-face))
-                    (all-the-icons-ivy-rich-project-file-id (:width 12 :face all-the-icons-ivy-rich-file-owner-face))
-                    (all-the-icons-ivy-rich-project-file-modification-time (:face all-the-icons-ivy-rich-time-face)))))
-    (set-face-attribute 'all-the-icons-ivy-rich-doc-face nil :font "ChalkBoard SE 13" :italic t :height 136)
-    (ivy-rich-set-columns 'projectile-find-file col-def)
-    (ivy-rich-set-columns 'counsel-projectile-find-file col-def)
-    (ivy-rich-set-columns 'projectile--find-file col-def)))
-
-(use-package all-the-icons-ivy-rich
-  :after (all-the-icons ivy-rich counsel-projectile)
-  :config
-  (run-at-time "3 sec" nil #'@ivy-rich-prettify-file-search)
-  (all-the-icons-ivy-rich-mode 1))
-
-
-(defun posframe-poshandler-frame-top-center-with-offset (info)
-  "Posframe position at top + 40px offset."
-  (cons (/ (- (plist-get info :parent-frame-width)
-              (plist-get info :posframe-width))
-           2)
-        40))
-
-(use-package ivy-rich
-  :hook (ivy-mode . ivy-rich-mode)
-  :after ivy
-  :config)
-
 (use-package lsp-ivy
   :after lsp)
 
