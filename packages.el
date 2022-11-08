@@ -77,7 +77,7 @@
 (package! lsp-ui)
 ;; (package! lsp-dart :recipe (:host github :repo "emacs-lsp/lsp-dart" :pin "b99f743302a4e77b1e149bbb1b325b6f0bfc38ad"))
 ;; (package! lsp-dart :pin "4d28d13d8b468bfb8f992da0ea450269d672562c")
-(package! lsp-dart)
+(package! lsp-dart :recipe (:host github :repo "emacs-lsp/lsp-dart"))
 ;; (package! lsp-sonarlint)
 ;; (package! exec-path-from-shell)
 
@@ -91,6 +91,9 @@
 ;; (package! tree-sitter :pin "48b06796a3b2e76ce004972d929de38146eafaa0" :recipe (:host github :repo "emacs-tree-sitter/elisp-tree-sitter"))
 (package! tree-sitter)
 (package! tree-sitter-langs)
+(package! msgu :recipe (:host github :repo "jcs-elpa/msgu"))
+(package! ts-docstr
+  :recipe (:host github :repo "emacs-vs/ts-docstr" :files (:defaults "langs/*.el")))
 ;; (package! tree-sitter
 ;;   :pin "c7a1c34549cad41a3618c6f17e0e9dabd3e98fe1")
 ;; (package! tree-sitter-langs
@@ -136,8 +139,9 @@
 ;;;; Documentation
 (package! zeal-at-point)
 
-;;; Performance bench
+;;; Performance benchmark/startup
 (package! explain-pause-mode :recipe (:host github :repo "lastquestion/explain-pause-mode"))
+(package! benchmark-init)
 
 ;;; Compile
 ;; (package! compile-eslint :recipe (:host github :repo "Fuco1/compile-eslint" :files ("compile-eslint.el")))
@@ -226,6 +230,7 @@
 ;; (package! polymode)
 ;; (package! poly-org)
 (package! ox-gfm)
+(package! ob-dart)
 (package! oauth2)
 (package! org-caldav)
 (package! org-superstar)

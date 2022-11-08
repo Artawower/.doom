@@ -1,3 +1,11 @@
+(when init-file-debug
+  (require 'benchmark-init)
+  (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
+
+(setq warning-minimum-level :emergency)
+(setq read-process-output-max (* 1024 1024))
+(setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
+
 (ignore-errors
   (load! "~/.doom.d/private.el"))
 
@@ -91,6 +99,11 @@
 (use-package! rainbow-mode
   :hook (((css-mode scss-mode org-mode typescript-mode js-mode emacs-lisp-mode). rainbow-mode))
   :defer 5)
+
+(use-package! doom-modeline
+  :defer t
+  :config
+  (setq doom-modeline-buffer-file-name-style 'file-name))
 
 (defun my-add-additional-space-when-not-exist (_)
   "Add additional sapce if previous char is not space!"
@@ -221,7 +234,9 @@ Version 2015-12-08"
   (interactive)
   (browse-url
    (let
-       ((rev (magit-rev-abbrev "HEAD"))
+       ((rev (cond ((and (boundp git-timemachine-mode) git-timemachine-mode) (git-timemachine-kill-revision))
+                   ((and (boundp magit-gitflow-mode) magit-gitflow-mode) (magit-copy-buffer-revision))
+                   (t "master")))
         (repo (forge-get-repository 'stub))
         (file (magit-file-relative-name buffer-file-name))
         (highlight
@@ -232,9 +247,16 @@ Version 2015-12-08"
                (format "#L%d-L%d" l1 l2))
            ""
            )))
-     (forge--format repo "https://%h/%o/%n/blob/master/%f%L"
-                    `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
+     (message "rev: %s" rev)
+     (if (not file)
+         (if-let ((path (forge--split-remote-url (forge--get-remote))))
+                  (message "https://%s/%s/%s/commit/%s" (nth 0 path) (nth 1 path) (nth 2 path) rev)
+           (user-error "Cannot browse non-forge remote %s" (forge--get-remote)))
 
+       (forge--format repo "https://%h/%o/%n/blob/%r/%f%L"
+                      `((?r . ,rev) (?f . ,file) (?L . ,highlight)))))))
+
+(setq my-transparency-disabled-p t)
 (defun my-toggle-transparency ()
   "Toggle transparency"
   (interactive)
@@ -462,6 +484,7 @@ Version 2015-12-08"
          ("s-." . ace-window)
          ;; Git
          ("SPC g o f" . my-forge-browse-buffer-file)
+         ("SPC g o s" . my-forge-browse-buffer-file)
          :map evil-insert-state-map
          ("s-Y" . xah-copy-to-register-1)
          ("s-P" . xah-paste-from-register-1)
@@ -553,6 +576,15 @@ Version 2015-12-08"
   :config
   (global-wakatime-mode))
 
+(use-package! wakatime-ui
+  :load-path "~/.doom.d/"
+  :defer 4
+  :custom
+  ;; (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/bb8cf0d7-3554-4297-ac4d-01f8a155073c.svg")
+  (wakatim-ui-schedule-url "https://wakatime.com/share/@darkawower/af1bfb85-2c8b-44e4-9873-c4a91b512e8d.png")
+  :config
+  (wakatime-ui-mode))
+
 (defun my-set-spellfu-faces ()
   "Set faces for correct spell-fu working"
   (interactive)
@@ -638,7 +670,7 @@ Version 2015-12-08"
   ;;                      (lsp-deferred))))
 
 (use-package! google-translate
-  :defer t
+  :defer 10
   :bind
   (:map google-translate-minibuffer-keymap
         ("C-k" . google-translate-next-translation-direction)
@@ -656,20 +688,21 @@ Version 2015-12-08"
   :defer 2
   :bind (:map evil-normal-state-map
               ("SPC f ]" . flycheck-next-error)
-              ("SPC f [" . flycheck-previous-error)))
+              ("SPC f [" . flycheck-previous-error)
+              ("SPC e l" . flycheck-list-errors)))
 
-;; (use-package! format-all
-;;   :defer t
-;;   ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
-;;   :hook ((json-mode go-mode) . format-all-mode)
-;;   :config
-;;   (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
-;;   (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
-;;   (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
+(use-package! format-all
+  :defer t
+  ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
+  :hook ((json-mode go-mode) . format-all-mode)
+  :config
+  (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
 
 (use-package! prettier
   :defer 5
-  :hook ((typescript-tsx-mode typescript-mode js2-mode json-mode ng2-mode) . prettier-mode)
+  :hook ((typescript-tsx-mode typescript-mode js2-mode json-mode ng2-mode ng2-html-mode html-mode) . prettier-mode)
   ;; :config
   ;; ;; This should prevent reset of encoding
   ;; (defun custom-prettier ()
@@ -804,7 +837,7 @@ Version 2015-12-08"
         lsp-ui-doc-show-with-mouse nil
         lsp-ui-doc-border +m-color-main))
 
-;; (use-package! tree-sitter-langs)
+(use-package! tree-sitter-langs)
 
 (use-package! tree-sitter
   :after (tree-sitter-langs spell-fu)
@@ -833,6 +866,12 @@ Version 2015-12-08"
 
 (use-package! evil-tree-edit
   :after tree-edit)
+
+(use-package ts-docstr
+  :after tree-sitter
+  :config
+  (setq ts-docstr-key-support t)
+  (setq ts-docstr-ask-on-enable t))
 
 (defun compile-eslint--find-filename ()
   "Find the filename for current error."
@@ -1315,6 +1354,10 @@ Version 2015-12-08"
 (use-package! pocket-reader
   :defer t)
 
+(use-package! pdf-view
+  :defer t
+  :hook (pdf-view-mode . pdf-view-themed-minor-mode))
+
 (use-package! prg-crypt
   :defer t)
 
@@ -1491,7 +1534,7 @@ Version 2015-12-08"
   :init
   (setq org-roam-v2-ack t)
   :config
-  (org-roam-db-autosync-enable)
+  ;; (org-roam-db-autosync-enable)
   (cl-defmethod org-roam-node-mtitle ((node org-roam-node))
     "Return customized title of roam node"
     (let* ((tags (org-roam-node-tags node))
@@ -1555,6 +1598,12 @@ Version 2015-12-08"
 
 (use-package! ob-restclient
   :defer 8)
+
+(use-package! ob-dart
+  :after org
+  :defer t
+  :config
+  (add-to-list 'org-babel-load-languages  '(dart . t)))
 
 (use-package! pretty-agenda
   :load-path "~/.doom.d/"

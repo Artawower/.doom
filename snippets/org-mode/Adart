@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: dart
+# key: d
+# --
+#+BEGIN_SRC dart
+$0
+#+END_SRC

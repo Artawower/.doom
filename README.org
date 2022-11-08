@@ -9,6 +9,18 @@ For install emacs on macos use brew:
 brew install emacs-plus@28 --with-xwidgets --with-nobu417-big-sur-icon --with-no-frame-refocus --with-native-comp --with-dbus --with-imagemagick
 #+END_SRC
 * Core
+** Benchmark
+#+BEGIN_SRC emacs-lisp
+(when init-file-debug
+  (require 'benchmark-init)
+  (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
+#+END_SRC
+** Some predefined settings
+#+BEGIN_SRC emacs-lisp
+(setq warning-minimum-level :emergency)
+(setq read-process-output-max (* 1024 1024))
+(setq-default left-margin-width 1 right-margin-width 2) ; Define new widths.
+#+END_SRC
 ** Load private configs
 Load private configs
 #+BEGIN_SRC emacs-lisp
@@ -173,9 +185,9 @@ Funny scrollbar ;)
   :defer 5)
 #+END_SRC
 ** Modeline
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
 (use-package! doom-modeline
-  :defer 0.1
+  :defer t
   :config
   (setq doom-modeline-buffer-file-name-style 'file-name))
 #+END_SRC
@@ -343,7 +355,9 @@ Copy full path
   (interactive)
   (browse-url
    (let
-       ((rev (magit-rev-abbrev "HEAD"))
+       ((rev (cond ((and (boundp git-timemachine-mode) git-timemachine-mode) (git-timemachine-kill-revision))
+                   ((and (boundp magit-gitflow-mode) magit-gitflow-mode) (magit-copy-buffer-revision))
+                   (t "master")))
         (repo (forge-get-repository 'stub))
         (file (magit-file-relative-name buffer-file-name))
         (highlight
@@ -354,11 +368,22 @@ Copy full path
                (format "#L%d-L%d" l1 l2))
            ""
            )))
-     (forge--format repo "https://%h/%o/%n/blob/master/%f%L"
-                    `((?r . ,rev) (?f . ,file) (?L . ,highlight))))))
+     (message "rev: %s" rev)
+     (if (not file)
+         (if-let ((path (forge--split-remote-url (forge--get-remote))))
+                  (message "https://%s/%s/%s/commit/%s" (nth 0 path) (nth 1 path) (nth 2 path) rev)
+           (user-error "Cannot browse non-forge remote %s" (forge--get-remote)))
+
+       (forge--format repo "https://%h/%o/%n/blob/%r/%f%L"
+                      `((?r . ,rev) (?f . ,file) (?L . ,highlight)))))))
 #+END_SRC
+
+#+RESULTS:
+: my-forge-browse-buffer-file
+
 ** Toggle transparency
 #+BEGIN_SRC emacs-lisp
+(setq my-transparency-disabled-p t)
 (defun my-toggle-transparency ()
   "Toggle transparency"
   (interactive)
@@ -370,6 +395,8 @@ Copy full path
       (set-frame-parameter (selected-frame) 'alpha `(,alpha . ,alpha))
       (add-to-list 'default-frame-alist `(alpha . (,alpha . ,alpha))))))
 #+END_SRC
+
+
 ** Insert TODO attached to current git branch
 #+BEGIN_SRC emacs-lisp
 (defun my-insert-todo-by-current-git-branch ()
@@ -400,9 +427,15 @@ For correct work you need to install sass-lint-auto-fix
 #+END_SRC
 * Emacs internal (common)
 ** Banchmark
+*** Profiler
 #+BEGIN_SRC emacs-lisp
 (use-package! explain-pause-mode
   :defer t)
+#+END_SRC
+*** Package startup speed
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package esup)
+;; (package! benchmark-init
 #+END_SRC
 ** Files
 *** Dired batteries ;3
@@ -755,9 +788,10 @@ Best time tracker resource
   :config
   (global-wakatime-mode))
 #+END_SRC
-** Ui widget
+** TODO Ui widget
 My custom package for quick showing wakatime statistic
-#+BEGIN_SRC emacs-lisp :tangle no
+/Need to fix modeline elem, also warkning about lambda/
+#+BEGIN_SRC emacs-lisp
 (use-package! wakatime-ui
   :load-path "~/.doom.d/"
   :defer 4
@@ -859,7 +893,7 @@ My custom package for quick showing wakatime statistic
 ** Google translate
 #+BEGIN_SRC emacs-lisp
 (use-package! google-translate
-  :defer t
+  :defer 10
   :bind
   (:map google-translate-minibuffer-keymap
         ("C-k" . google-translate-next-translation-direction)
@@ -875,30 +909,33 @@ My custom package for quick showing wakatime statistic
 #+END_SRC
 * Programming
 ** Error check
+*** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package! flycheck
   :defer 2
   :bind (:map evil-normal-state-map
               ("SPC f ]" . flycheck-next-error)
-              ("SPC f [" . flycheck-previous-error)))
+              ("SPC f [" . flycheck-previous-error)
+              ("SPC e l" . flycheck-list-errors)))
 #+END_SRC
+
 ** Formatters
 #+BEGIN_SRC emacs-lisp
-;; (use-package! format-all
-;;   :defer t
-;;   ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
-;;   :hook ((json-mode go-mode) . format-all-mode)
-;;   :config
-;;   (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
-;;   (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
-;;   (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
+(use-package! format-all
+  :defer t
+  ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
+  :hook ((json-mode go-mode dart-mode) . format-all-mode)
+  :config
+  (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
+  (add-to-list '+format-on-save-enabled-modes 'js2-mode t))
 #+END_SRC
 
 Prettier
 #+BEGIN_SRC emacs-lisp
 (use-package! prettier
   :defer 5
-  :hook ((typescript-tsx-mode typescript-mode js2-mode json-mode ng2-mode) . prettier-mode)
+  :hook ((typescript-tsx-mode typescript-mode js2-mode json-mode ng2-mode ng2-html-mode html-mode) . prettier-mode)
   ;; :config
   ;; ;; This should prevent reset of encoding
   ;; (defun custom-prettier ()
@@ -909,6 +946,10 @@ Prettier
   ;; :hook ((js2-mode typescript-mode ng2-html-mode vue-mode web-mode) . prettier-mode)
   )
 #+END_SRC
+
+#+RESULTS:
+| prettier-mode | er/add-html-mode-expansions | tree-sitter-hl-mode | emmet-mode | auto-rename-tag-mode |
+
 ** Editing
 *** Quick log inserting
 #+BEGIN_SRC emacs-lisp
@@ -933,7 +974,7 @@ Prettier
    :post-insert-hooks (prettier-prettify lsp)
    :msg-format-template "'🦄: %s'"))
 #+END_SRC
-*** Autopair mode
+*** HOLD Autopair mode
 NOTE: this package is used instead of electric pair mode
 cause its simple, and it works in all cases.
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -1075,10 +1116,28 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
   (setq lsp-eldoc-hook nil))
 #+END_SRC
 *** Flutter (dart)
+This functions need for overwrite font lock for widget guides
 #+BEGIN_SRC emacs-lisp
-(use-package! lsp-dart
-  :defer t)
+  (defun lsp-dart-flutter-widget-guide--add-overlay-to (buffer line col string)
+    "Add to BUFFER at LINE and COL a STRING overlay."
+    (save-excursion
+      (goto-char (point-min))
+      (forward-line line)
+      (move-to-column col)
+      (when (string= lsp-dart-flutter-widget-guide-space (string (following-char)))
+        (let ((ov (make-overlay (point) (1+ (point)) buffer)))
+          (overlay-put ov 'category 'lsp-dart-flutter-widget-guide)
+          (overlay-put ov 'display (propertize string
+                                               'face 'custom-comment-tag))))))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package! lsp-dart
+    :defer t)
+#+END_SRC
+
+#+RESULTS:
+
 *** Yaml lsp
 #+BEGIN_SRC emacs-lisp
 (use-package! lsp-yaml
@@ -1100,7 +1159,7 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
 #+END_SRC
 ** Tree sitter (AST)
 #+BEGIN_SRC emacs-lisp
-;; (use-package! tree-sitter-langs)
+(use-package! tree-sitter-langs)
 
 (use-package! tree-sitter
   :after (tree-sitter-langs spell-fu)
@@ -1134,6 +1193,14 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
 (use-package! evil-tree-edit
   :after tree-edit)
 
+#+END_SRC
+*** TEST Tree sitter docs
+#+BEGIN_SRC emacs-lisp
+(use-package ts-docstr
+  :after tree-sitter
+  :config
+  (setq ts-docstr-key-support t)
+  (setq ts-docstr-ask-on-enable t))
 #+END_SRC
 ** Compilation
 #+BEGIN_SRC emacs-lisp
@@ -1176,6 +1243,10 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
   ;; Angular
   (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)))
 #+END_SRC
+
+#+RESULTS:
+: t
+
 ** Autocomplete
 *** Company mode
 #+BEGIN_SRC emacs-lisp
@@ -1705,6 +1776,7 @@ Need to check. Alternative emulator for flutter devices.
   (setq magit-process-finish-apply-ansi-colors t))
 #+END_SRC
 
+
 ** Github gists
 #+BEGIN_SRC emacs-lisp
 (use-package! gist                       ;
@@ -1863,6 +1935,12 @@ Read your saved articles inside emacs
 #+BEGIN_SRC emacs-lisp
 (use-package! pocket-reader
   :defer t)
+#+END_SRC
+** PDF
+#+BEGIN_SRC emacs-lisp
+(use-package! pdf-view
+  :defer t
+  :hook (pdf-view-mode . pdf-view-themed-minor-mode))
 #+END_SRC
 * ORG
 ** Crypt
@@ -2085,7 +2163,7 @@ One of the best Zettelkasten implementation
   :init
   (setq org-roam-v2-ack t)
   :config
-  (org-roam-db-autosync-enable)
+  ;; (org-roam-db-autosync-enable)
   (cl-defmethod org-roam-node-mtitle ((node org-roam-node))
     "Return customized title of roam node"
     (let* ((tags (org-roam-node-tags node))
@@ -2147,7 +2225,7 @@ My own package for publish roam files
   :bind (:map evil-normal-state-map
               ("SPC n p" . web-roam-publish-file)))
 #+END_SRC
-** Custom code executors
+** Org babels
 *** async code
 #+BEGIN_SRC emacs-lisp
 (use-package! ob-async
@@ -2165,6 +2243,14 @@ Dependency
 #+BEGIN_SRC emacs-lisp
 (use-package! ob-restclient
   :defer 8)
+#+END_SRC
+*** Dart
+#+BEGIN_SRC emacs-lisp
+(use-package! ob-dart
+  :after org
+  :defer t
+  :config
+  (add-to-list 'org-babel-load-languages  '(dart . t)))
 #+END_SRC
 ** Pretty agenda
 #+BEGIN_SRC emacs-lisp
