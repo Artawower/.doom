@@ -20,10 +20,12 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 
+(setq buffer-file-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
-
-(setq global-vi-tilde-fringe-mode nil)
 
 (use-package! modus-themes
   :defer t)
@@ -138,6 +140,14 @@
 (defun switch-to-first-matching-buffer (regex)
   (switch-to-buffer (car (remove-if-not (apply-partially #'string-match-p regex)
                                         (mapcar #'buffer-name (buffer-list))))))
+
+(defun +select-window-by-name (regexp)
+  "Selects the window with buffer NAME"
+  (select-window
+   (car (seq-filter
+     (lambda (window)
+       (string-match-p regexp (buffer-name (window-buffer window))))
+     (window-list-1 nil 0 t)))))
 
 (defun my-remove-cr (&optional begin end)
   "Remove line prefixes ending with carriage-return.
@@ -276,9 +286,11 @@ Version 2015-12-08"
          (task-number (match-string 2 branch-name))
          (todo-msg (or task-number branch-name)))
     (insert (format "TODO: %s " todo-msg))
-    (forward-line 1)
+    (comment-line 1)
+    ;; (forward-line 1)
     (previous-line)
     (end-of-line)
+    (indent-according-to-mode)
     (evil-insert 1)))
 
 (defun my-run-sass-auto-fix ()
@@ -462,7 +474,10 @@ Version 2015-12-08"
          ("SPC t a" . treemacs-add-project-to-workspace)
          ("SPC g t" . git-timemachine)
          ;; Compilation
-         ("SPC c v" . compilation-display-error)
+         ("SPC c v" . (lambda ()
+                        (interactive)
+                        (compilation-display-error)
+                        (+select-window-by-name "*compilation.*")))
          ;; CUSTOM
          ("SPC t i" . my-insert-todo-by-current-git-branch)
          ;; Org mode
@@ -471,6 +486,7 @@ Version 2015-12-08"
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
          ("SPC t t" . ivy-magit-todos)
+         ("SPC v t t" . my-toggle-transparency)
          ;; TODO: add check might be roam buffer already opened?
          ("SPC r u" . (lambda () (interactive)
                         (org-roam-ui-open)
@@ -484,7 +500,6 @@ Version 2015-12-08"
          ("s-." . ace-window)
          ;; Git
          ("SPC g o f" . my-forge-browse-buffer-file)
-         ("SPC g o s" . my-forge-browse-buffer-file)
          :map evil-insert-state-map
          ("s-Y" . xah-copy-to-register-1)
          ("s-P" . xah-paste-from-register-1)
@@ -493,7 +508,8 @@ Version 2015-12-08"
          :map evil-visual-state-map
          ("s-Y" . xah-copy-to-register-1)
          ("s-P" . xah-paste-from-register-1)
-         ("s-." . ace-window))
+         ("s-." . ace-window)
+         ("SPC r r" . query-replace))
   :init
   (global-evil-leader-mode)
   :config
@@ -569,7 +585,8 @@ Version 2015-12-08"
               ("C-r" . (lambda ()
                          (interactive)
                          (kill-whole-line)
-                         (insert "/")))))
+                         (insert "/")))
+              ("s-<return>" . vertico-exit-input)))
 
 (use-package! wakatime-mode
   :defer 3
@@ -694,7 +711,7 @@ Version 2015-12-08"
 (use-package! format-all
   :defer t
   ;; :hook ((js2-mode typescript-mode ng2-html-mode ng2-ts-mode go-mode) . format-all-mode)
-  :hook ((json-mode go-mode) . format-all-mode)
+  :hook ((json-mode go-mode dart-mode) . format-all-mode)
   :config
   (add-to-list '+format-on-save-enabled-modes 'typescript-mode t)
   (add-to-list '+format-on-save-enabled-modes 'ng2-mode t)
@@ -780,6 +797,9 @@ Version 2015-12-08"
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
+  ;; Disable bottom help info
+  (lsp-signature-render-documentation nil)
+  (lsp-signature-auto-activate nil)
   ;; (lsp-use-plists t)
   (lsp-enable-file-watchers nil)
   (lsp-file-watch-threshold 5000)
@@ -820,7 +840,21 @@ Version 2015-12-08"
   (setq lsp-eldoc-hook nil))
 
 (use-package! lsp-dart
-  :defer t)
+  :defer t
+  :custom
+  (lsp-dart-dap-flutter-hot-reload-on-save t)
+  :config
+  (defun lsp-dart-flutter-widget-guide--add-overlay-to (buffer line col string)
+    "Add to BUFFER at LINE and COL a STRING overlay."
+    (save-excursion
+      (goto-char (point-min))
+      (forward-line line)
+      (move-to-column col)
+      (when (string= lsp-dart-flutter-widget-guide-space (string (following-char)))
+        (let ((ov (make-overlay (point) (1+ (point)) buffer)))
+          (overlay-put ov 'category 'lsp-dart-flutter-widget-guide)
+          (overlay-put ov 'display (propertize string
+                                               'face 'custom-comment-tag)))))))
 
 (use-package! lsp-yaml
   :defer t
@@ -880,9 +914,10 @@ Version 2015-12-08"
       (when (re-search-backward (rx bol (group "/" (+ any)) eol))
         (list (match-string 1))))))
 
-(use-package! compile
-  :defer 5
-  :config
+;; (use-package! compile
+;;   :defer t
+;;   :config
+(after! compile
   (setq compilation-scroll-output t)
   (setq compilation-error-regexp-alist '())
   (setq compilation-error-regexp-alist-alist '())
@@ -1057,6 +1092,9 @@ Version 2015-12-08"
 (use-package! js2-mode
   :defer t
   :hook (js2-mode . js2-highlight-unused-variables-mode))
+
+(use-package! nodejs-repl
+  :defer t)
 
 (use-package! npm
   :defer t)

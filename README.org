@@ -53,10 +53,6 @@ Tabs
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
 #+END_SRC
-Disable tilda at the end of docs
-#+BEGIN_SRC emacs-lisp
-(setq global-vi-tilde-fringe-mode nil)
-#+END_SRC
 ** Theme config
 Modus theme
 #+BEGIN_SRC emacs-lisp
@@ -236,6 +232,21 @@ Format org mode block
   (switch-to-buffer (car (remove-if-not (apply-partially #'string-match-p regex)
                                         (mapcar #'buffer-name (buffer-list))))))
 #+END_SRC
+
+Focus buffer by name
+#+BEGIN_SRC emacs-lisp
+(defun +select-window-by-name (regexp)
+  "Selects the window with buffer NAME"
+  (select-window
+   (car (seq-filter
+     (lambda (window)
+       (string-match-p regexp (buffer-name (window-buffer window))))
+     (window-list-1 nil 0 t)))))
+#+END_SRC
+
+#+RESULTS:
+: +select-window-by-name
+
 ** Terminal
 #+BEGIN_SRC emacs-lisp
 (defun my-remove-cr (&optional begin end)
@@ -396,7 +407,6 @@ Copy full path
       (add-to-list 'default-frame-alist `(alpha . (,alpha . ,alpha))))))
 #+END_SRC
 
-
 ** Insert TODO attached to current git branch
 #+BEGIN_SRC emacs-lisp
 (defun my-insert-todo-by-current-git-branch ()
@@ -407,11 +417,17 @@ Copy full path
          (task-number (match-string 2 branch-name))
          (todo-msg (or task-number branch-name)))
     (insert (format "TODO: %s " todo-msg))
-    (forward-line 1)
+    (comment-line 1)
+    ;; (forward-line 1)
     (previous-line)
     (end-of-line)
+    (indent-according-to-mode)
     (evil-insert 1)))
 #+END_SRC
+
+#+RESULTS:
+: my-insert-todo-by-current-git-branch
+
 ** Sass autofix
 For correct work you need to install sass-lint-auto-fix
 ~yarn global add sass-lint-auto-fix~
@@ -619,7 +635,6 @@ Something like screenserver
   :defer t)
 #+END_SRC
 
-
 * Keybindings
 ** Global keys
 #+BEGIN_SRC emacs-lisp
@@ -661,7 +676,10 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
          ("SPC t a" . treemacs-add-project-to-workspace)
          ("SPC g t" . git-timemachine)
          ;; Compilation
-         ("SPC c v" . compilation-display-error)
+         ("SPC c v" . (lambda ()
+                        (interactive)
+                        (compilation-display-error)
+                        (+select-window-by-name "*compilation.*")))
          ;; CUSTOM
          ("SPC t i" . my-insert-todo-by-current-git-branch)
          ;; Org mode
@@ -670,6 +688,7 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
          ("SPC r p" . +python/open-ipython-repl)
          ("SPC r n" . nodejs-repl)
          ("SPC t t" . ivy-magit-todos)
+         ("SPC v t t" . my-toggle-transparency)
          ;; TODO: add check might be roam buffer already opened?
          ("SPC r u" . (lambda () (interactive)
                         (org-roam-ui-open)
@@ -691,7 +710,8 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
          :map evil-visual-state-map
          ("s-Y" . xah-copy-to-register-1)
          ("s-P" . xah-paste-from-register-1)
-         ("s-." . ace-window))
+         ("s-." . ace-window)
+         ("SPC r r" . query-replace))
   :init
   (global-evil-leader-mode)
   :config
@@ -737,6 +757,7 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
     "m" 'toggle-maximize-buffer
     "y" 'yas-expand))
 #+END_SRC
+
 ** Evil quick jump to bracket
 #+BEGIN_SRC emacs-lisp
 (use-package! evil-matchit
@@ -777,7 +798,8 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
               ("C-r" . (lambda ()
                          (interactive)
                          (kill-whole-line)
-                         (insert "/")))))
+                         (insert "/")))
+              ("s-<return>" . vertico-exit-input)))
 #+END_SRC
 * Productivity
 ** Time track
@@ -983,7 +1005,7 @@ cause its simple, and it works in all cases.
   :config
   (autopair-global-mode))
 #+END_SRC
-*** Undo system
+*** HOLD Undo system
 #+BEGIN_SRC emacs-lisp :tangle no
 (use-package! vundo
   :defer 1
@@ -1076,6 +1098,9 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
   (lsp-modeline-diagnostics-scope :workspace)
   (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
   (lsp-yaml-schemas '((kubernetes . ["/auth-reader.yaml", "/deployment.yaml"])))
+  ;; Disable bottom help info
+  (lsp-signature-render-documentation nil)
+  (lsp-signature-auto-activate nil)
   ;; (lsp-use-plists t)
   (lsp-enable-file-watchers nil)
   (lsp-file-watch-threshold 5000)
@@ -1115,28 +1140,37 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
   (set-face-attribute 'lsp-face-highlight-textual nil :background "#c0caf5")
   (setq lsp-eldoc-hook nil))
 #+END_SRC
-*** Flutter (dart)
-This functions need for overwrite font lock for widget guides
-#+BEGIN_SRC emacs-lisp
-  (defun lsp-dart-flutter-widget-guide--add-overlay-to (buffer line col string)
-    "Add to BUFFER at LINE and COL a STRING overlay."
-    (save-excursion
-      (goto-char (point-min))
-      (forward-line line)
-      (move-to-column col)
-      (when (string= lsp-dart-flutter-widget-guide-space (string (following-char)))
-        (let ((ov (make-overlay (point) (1+ (point)) buffer)))
-          (overlay-put ov 'category 'lsp-dart-flutter-widget-guide)
-          (overlay-put ov 'display (propertize string
-                                               'face 'custom-comment-tag))))))
-#+END_SRC
-
+*** TODO Flutter (dart)
 #+BEGIN_SRC emacs-lisp
   (use-package! lsp-dart
-    :defer t)
+    :defer t
+    :hook (dart-mode . (lambda () (interactive)
+                         (add-hook 'after-save-hook
+                                   (lambda ()
+                                     ;; (flutter-run-or-hot-reload)
+                                     (flutter-hot-restart)
+                                     (message "flutter restarted")
+                                     )
+                                   t t)))
+    :custom
+    (lsp-dart-dap-flutter-hot-reload-on-save t)
+    :config
+    (defun lsp-dart-flutter-widget-guide--add-overlay-to (buffer line col string)
+      "Add to BUFFER at LINE and COL a STRING overlay."
+      (save-excursion
+        (goto-char (point-min))
+        (forward-line line)
+        (move-to-column col)
+        (when (string= lsp-dart-flutter-widget-guide-space (string (following-char)))
+          (let ((ov (make-overlay (point) (1+ (point)) buffer)))
+            (overlay-put ov 'category 'lsp-dart-flutter-widget-guide)
+            (overlay-put ov 'display (propertize string
+                                                 'face 'custom-comment-tag)))))))
 #+END_SRC
 
 #+RESULTS:
+| (lambda nil (interactive) (add-hook 'after-save-hook (lambda nil (flutter-hot-restart) (message flutter restarted)) t t)) | (lambda nil (interactive) (add-hook 'after-save-hook (lambda nil (flutter-run-or-hot-reload) (message flutter restarted)) t t)) | flutter-test-mode | lsp-deferred | format-all-mode | rainbow-delimiters-mode |
+
 
 *** Yaml lsp
 #+BEGIN_SRC emacs-lisp
@@ -1211,9 +1245,10 @@ This functions need for overwrite font lock for widget guides
       (when (re-search-backward (rx bol (group "/" (+ any)) eol))
         (list (match-string 1))))))
 
-(use-package! compile
-  :defer 5
-  :config
+;; (use-package! compile
+;;   :defer t
+;;   :config
+(after! compile
   (setq compilation-scroll-output t)
   (setq compilation-error-regexp-alist '())
   (setq compilation-error-regexp-alist-alist '())
@@ -1245,7 +1280,7 @@ This functions need for overwrite font lock for widget guides
 #+END_SRC
 
 #+RESULTS:
-: t
+| (^Error: \([_[:alnum:]-/.]*\):\([0-9]+\):\([0-9]+\) 1 2 3) | ([[:blank:]]*\([/_\.[:alnum:]-]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | (^[[:blank:]]*\([/_-\.[:alnum:]]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | eslint |
 
 ** Autocomplete
 *** Company mode
@@ -1259,12 +1294,18 @@ This functions need for overwrite font lock for widget guides
                          (evil-normal-state))))
   :config
   (setq company-idle-delay 0.2)
-  (setq company-show-quick-access nil)
   (setq company-quick-access-modifier 'super)
   (setq company-show-quick-access t)
   (setq company-minimum-prefix-length 1)
-  (setq company-dabbrev-char-regexp "[A-z:-]"))
+  (setq company-dabbrev-char-regexp "[A-z:-]")
+  (custom-set-variables
+   '(company-quick-access-keys '("1" "2" "3" "4" "5" "6" "7" "8" "9" "0"))
+   '(company-quick-access-modifier 'super)))
 #+END_SRC
+
+#+RESULTS:
+| lambda | nil | (interactive) | (company-cancel) | (evil-normal-state) |
+
 *** Copilot
 #+BEGIN_SRC emacs-lisp
 (use-package! copilot
@@ -1422,6 +1463,12 @@ REPL
   :defer t
   :hook (js2-mode . js2-highlight-unused-variables-mode))
 #+END_SRC
+*** Node REPL
+#+BEGIN_SRC emacs-lisp
+(use-package! nodejs-repl
+  :defer t)
+#+END_SRC
+
 ** NPM
 #+BEGIN_SRC emacs-lisp
 (use-package! npm
@@ -1676,7 +1723,7 @@ For install type ~npm install -g @volar/server~
 #+END_SRC
 
 *** TODO Flutter emulator
-Need to check. Alternative emulator for flutter devices.
+Need to check. Alternative emulator for flutter devices. Didn't manage to work.
 #+BEGIN_SRC emacs-lisp :tangle no
 (use-package! hover
   :defer t
@@ -1776,7 +1823,6 @@ Need to check. Alternative emulator for flutter devices.
   (setq magit-process-finish-apply-ansi-colors t))
 #+END_SRC
 
-
 ** Github gists
 #+BEGIN_SRC emacs-lisp
 (use-package! gist                       ;
@@ -1827,7 +1873,6 @@ Visual fringes
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 #+END_SRC
-
 
 ** Git blamer
 #+BEGIN_SRC emacs-lisp
@@ -1886,6 +1931,8 @@ Visual fringes
   (global-blamer-mode 1))
 #+END_SRC
 
+** TODO Browse remote
+Need to find way for opening remote file by git revision with last edit under cursor
 
 * External services
 ** Telegram
@@ -2012,8 +2059,17 @@ Read your saved articles inside emacs
 
     (defvar org-babel-js-function-wrapper
       ""
-      "Javascript code to print value of body.")))
+      "Javascript code to print value of body.")
+;; Applications for opening from org files
+(if (assoc "\\.pdf\\'" org-file-apps)
+         (setcdr (assoc "\\.pdf\\'" org-file-apps) 'emacs)
+       (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs) t))))
+
 #+END_SRC
+
+#+RESULTS:
+: org-previous-visible-heading
+
 ** Pretty tags
 Replace all tags inside org document to pretty svg buttons
 #+BEGIN_SRC emacs-lisp

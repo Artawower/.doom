@@ -143,6 +143,7 @@ Can be an integer to determine the exact padding."
    (elscreen-tab-other-screen-face :background "#353a42" :foreground "#1e2022")
 ;;;; ivy
    (ivy-current-match :background (doom-lighten red 0.35) :distant-foreground base0 :weight 'normal :foreground bg)
+   (vertico-current :background (doom-lighten red 0.35) :distant-foreground base0 :weight 'normal :foreground bg)
    (ivy-minibuffer-match-face-2 :background violet :foreground cyan)
    (ivy-posframe :background bg)
 ;;;; LaTeX-mode

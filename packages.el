@@ -86,6 +86,7 @@
 (package! typescript-mode)
 (package! npm)
 (package! ng2-mode)
+(package! nodejs-repl)
 
 ;;; Treesitter
 ;; (package! tree-sitter :pin "48b06796a3b2e76ce004972d929de38146eafaa0" :recipe (:host github :repo "emacs-tree-sitter/elisp-tree-sitter"))
@@ -298,3 +299,6 @@
 ;; (package! counsel-dash)
 
 ;; (package! live-py-mode)
+
+;;; Disable doom crap
+(package! evil-goggles :disable t)
