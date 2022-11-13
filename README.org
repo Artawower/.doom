@@ -53,6 +53,7 @@ Tabs
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
 #+END_SRC
+
 ** Theme config
 Modus theme
 #+BEGIN_SRC emacs-lisp
@@ -799,7 +800,7 @@ More info could be found [[https://github.com/noctuid/evil-guide][here]] sd
                          (interactive)
                          (kill-whole-line)
                          (insert "/")))
-              ("s-<return>" . vertico-exit-input)))
+              ))
 #+END_SRC
 * Productivity
 ** Time track
@@ -1276,11 +1277,16 @@ Allow to transform PASCAL_CASE -> camelCase -> snake_case
   ;; React
   (add-to-list 'compilation-error-regexp-alist '("[[:blank:]]*\\([/_\\.[:alnum:]-]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\) - error.*$" 1 2 3))
   ;; Angular
-  (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)))
+  (add-to-list 'compilation-error-regexp-alist '("^Error: \\([_[:alnum:]-/.]*\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3))
+
+  ;; Flutter
+  ;; (add-to-list 'compilation-error-regexp-alist '("[[:blank:]]*\\([/_\\.[:alnum:]-]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): Error.*$"))
+  (add-to-list 'compilation-error-regexp-alist 'dart-analyze)
+  (add-to-list 'compilation-error-regexp-alist-alist '(dart-analyze "\\([^ ]*\\.dart\\):\\([0-9]+\\):\\([0-9]+\\)" 1 2 3)))
 #+END_SRC
 
 #+RESULTS:
-| (^Error: \([_[:alnum:]-/.]*\):\([0-9]+\):\([0-9]+\) 1 2 3) | ([[:blank:]]*\([/_\.[:alnum:]-]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | (^[[:blank:]]*\([/_-\.[:alnum:]]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | eslint |
+| ([[:blank:]]*\([/_\.[:alnum:]-]+\):\([[:digit:]]+\):\([[:digit:]]+\): Error.*$) | (^Error: \([_[:alnum:]-/.]*\):\([0-9]+\):\([0-9]+\) 1 2 3) | ([[:blank:]]*\([/_\.[:alnum:]-]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | (^[[:blank:]]*\([/_-\.[:alnum:]]+\):\([[:digit:]]+\):\([[:digit:]]+\) - error.*$ 1 2 3) | eslint |
 
 ** Autocomplete
 *** Company mode
@@ -2216,6 +2222,8 @@ One of the best Zettelkasten implementation
 #+BEGIN_SRC emacs-lisp
 (use-package! org-roam
   :after org
+  :bind (:map evil-normal-state-map
+               ("SPC n r i" . org-roam-node-insert))
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -2236,6 +2244,10 @@ One of the best Zettelkasten implementation
 (use-package! websocket
   :after org-roam)
 #+END_SRC
+
+#+RESULTS:
+: websocket
+
 ** Visual roam ui nodes
 #+BEGIN_SRC emacs-lisp
 (use-package! org-roam-ui

@@ -20,10 +20,6 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
 
-(setq buffer-file-coding-system 'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-(setq default-buffer-file-coding-system 'utf-8)
-
 (setq +m-color-main "#61AFEF"
       +m-color-secondary "red")
 
@@ -841,6 +837,14 @@ Version 2015-12-08"
 
 (use-package! lsp-dart
   :defer t
+  :hook (dart-mode . (lambda () (interactive)
+                       (add-hook 'after-save-hook
+                                 (lambda ()
+                                   ;; (flutter-run-or-hot-reload)
+                                   (flutter-hot-restart)
+                                   (message "flutter restarted")
+                                   )
+                                 t t)))
   :custom
   (lsp-dart-dap-flutter-hot-reload-on-save t)
   :config
@@ -956,11 +960,13 @@ Version 2015-12-08"
                          (evil-normal-state))))
   :config
   (setq company-idle-delay 0.2)
-  (setq company-show-quick-access nil)
   (setq company-quick-access-modifier 'super)
   (setq company-show-quick-access t)
   (setq company-minimum-prefix-length 1)
-  (setq company-dabbrev-char-regexp "[A-z:-]"))
+  (setq company-dabbrev-char-regexp "[A-z:-]")
+  (custom-set-variables
+   '(company-quick-access-keys '("1" "2" "3" "4" "5" "6" "7" "8" "9" "0"))
+   '(company-quick-access-modifier 'super)))
 
 (use-package! copilot
   :defer 5
@@ -1461,7 +1467,11 @@ Version 2015-12-08"
 
     (defvar org-babel-js-function-wrapper
       ""
-      "Javascript code to print value of body.")))
+      "Javascript code to print value of body.")
+;; Applications for opening from org files
+(if (assoc "\\.pdf\\'" org-file-apps)
+         (setcdr (assoc "\\.pdf\\'" org-file-apps) 'emacs)
+       (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs) t))))
 
 (use-package! svg-tag-mode
   :defer t
@@ -1569,6 +1579,8 @@ Version 2015-12-08"
 
 (use-package! org-roam
   :after org
+  :bind (:map evil-normal-state-map
+               ("SPC n r i" . org-roam-node-insert))
   :init
   (setq org-roam-v2-ack t)
   :config
